@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package stock.v1;
+
+option go_package = "/gen/go/stock/v1";
+
+service StockService {
+    rpc Ping(PingRequest) returns (PingResponse) {};
+}
+
+message PingRequest {}
+message PingResponse {
+    string message = 1;
+}

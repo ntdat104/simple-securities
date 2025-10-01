@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package crypto.v1;
+
+option go_package = "/gen/go/crypto/v1";
+
+service CryptoService {
+    rpc GetServerTime(GetServerTimeRequest) returns (GetServerTimeResponse) {};
+}
+
+message GetServerTimeRequest {}
+message GetServerTimeResponse {
+    optional int64 server_time = 1;
+}
