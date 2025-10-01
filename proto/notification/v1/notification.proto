@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package notification.v1;
+
+option go_package = "/gen/go/notification/v1";
+
+service NotificationService {
+    rpc Send(SendRequest) returns (SendResponse);
+    rpc Get(GetRequest) returns (GetResponse);
+    rpc GetByUserId(GetByUserIdRequest) returns (GetByUserIdResponse);
+}
+
+message SendRequest {
+    uint64 user_id = 1;
+    string type = 2;
+    string title = 3;
+    string body = 4;
+}
+
+message SendResponse {
+    bool success = 1;
+}
+
+message GetRequest {
+    uint64 id = 1;
+}
+
+message GetResponse {
+    Notification notification = 1;
+}
+
+message GetByUserIdRequest {
+    uint64 user_id = 1;
+    uint32 limit = 2;
+    uint32 offset = 3;
+}
+
+message GetByUserIdResponse {
+    repeated Notification notifications = 1;
+}
+
+message Notification {
+    uint64 id = 1;
+    string uuid = 2;
+    uint64 user_id = 3;
+    string type = 4;
+    string title = 5;
+    string body = 6;
+    bool read = 7;
+    uint64 read_at = 8;
+    bool viewed = 9;
+    uint64 viewed_at = 10;
+    uint64 created_at = 11;
+    uint64 updated_at = 12;
+}
