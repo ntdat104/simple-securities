@@ -1,4 +1,4 @@
-package handler
+package grpc
 
 import (
 	"context"
@@ -9,17 +9,25 @@ import (
 
 type NotificationGrpcHandler struct {
 	noti.UnimplementedNotificationServiceServer
-	notificationService service.NotificationService
+	sendNotiSvc        service.SendNotiSvc
+	getNotiSvc         service.GetNotiSvc
+	getNotiByUserIdSvc service.GetNotiByUserIdSvc
 }
 
-func NewNotificationGrpcHandler(notificationService service.NotificationService) *NotificationGrpcHandler {
+func NewNotificationGrpcHandler(
+	sendNotiSvc service.SendNotiSvc,
+	getNotiSvc service.GetNotiSvc,
+	getNotiByUserIdSvc service.GetNotiByUserIdSvc,
+) noti.NotificationServiceServer {
 	return &NotificationGrpcHandler{
-		notificationService: notificationService,
+		sendNotiSvc:        sendNotiSvc,
+		getNotiSvc:         getNotiSvc,
+		getNotiByUserIdSvc: getNotiByUserIdSvc,
 	}
 }
 
 func (h *NotificationGrpcHandler) Send(ctx context.Context, req *noti.SendRequest) (*noti.SendResponse, error) {
-	err := h.notificationService.SendNoti(ctx, mapper.ToCreateReq(req))
+	err := h.sendNotiSvc.Handle(ctx, mapper.ToCreateReq(req))
 	if err != nil {
 		return &noti.SendResponse{Success: false}, err
 	}
@@ -27,7 +35,7 @@ func (h *NotificationGrpcHandler) Send(ctx context.Context, req *noti.SendReques
 }
 
 func (h *NotificationGrpcHandler) Get(ctx context.Context, req *noti.GetRequest) (*noti.GetResponse, error) {
-	notiDto, err := h.notificationService.GetNoti(ctx, req.Id)
+	notiDto, err := h.getNotiSvc.Handle(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +43,7 @@ func (h *NotificationGrpcHandler) Get(ctx context.Context, req *noti.GetRequest)
 }
 
 func (h *NotificationGrpcHandler) GetByUserId(ctx context.Context, req *noti.GetByUserIdRequest) (*noti.GetByUserIdResponse, error) {
-	notiDtos, err := h.notificationService.GetNotiByUserId(ctx, req.UserId, req.Limit, req.Offset)
+	notiDtos, err := h.getNotiByUserIdSvc.Handle(ctx, req.UserId, req.Limit, req.Offset)
 	if err != nil {
 		return nil, err
 	}

@@ -42,7 +42,7 @@ func (c *CoreService) Run() {
 	}
 	log.Printf("✅ Notification sent: %v", sendResp.Success)
 
-	getResp, err := c.notiClient.Get(ctx, &noti.GetRequest{UserId: "123"})
+	getResp, err := c.notiClient.Get(ctx, &noti.GetRequest{Id: 123})
 	if err != nil {
 		log.Fatalf("❌ Failed to get notifications: %v", err)
 	}

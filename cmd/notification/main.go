@@ -8,9 +8,10 @@ import (
 	"simple-securities/config"
 	noti "simple-securities/gen/notification/v1"
 	"simple-securities/internal/notification/application/service"
-	"simple-securities/internal/notification/handler"
+	grpcHandler "simple-securities/internal/notification/handler/grpc"
 	"simple-securities/internal/notification/infras/repo"
 	"simple-securities/pkg/conv"
+	"simple-securities/pkg/db/cache"
 	"simple-securities/pkg/db/sqlite"
 	"simple-securities/pkg/logger"
 	"simple-securities/pkg/server"
@@ -39,9 +40,14 @@ func main() {
 	}
 	defer db.Close(ctx)
 
+	rdb, err := cache.NewRedisClient(cache.DefaultRedisConfig())
+
 	notiRepo := repo.NewNotificationRepo(db.DB)
-	notiSvc := service.NewNotificationService(notiRepo)
-	notiHandler := handler.NewNotificationGrpcHandler(notiSvc)
+	notiCacheRepo := repo.NewNotificationCacheRepo(rdb.Client)
+	sendNotiSvc := service.NewSendNotiSvc(notiRepo, notiCacheRepo)
+	getNotiSvc := service.NewGetNotiSvc(notiRepo, notiCacheRepo)
+	getNotiByUserIdSvc := service.NewGetNotiByUserIdSvc(notiRepo, notiCacheRepo)
+	notiHandler := grpcHandler.NewNotificationGrpcHandler(sendNotiSvc, getNotiSvc, getNotiByUserIdSvc)
 
 	// Create the gRPC server
 	grpcServer, err := grpc.NewGrpcServer(
