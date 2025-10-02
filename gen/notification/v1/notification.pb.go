@@ -7,6 +7,7 @@
 package v1
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -461,7 +462,7 @@ var File_notification_v1_notification_proto protoreflect.FileDescriptor
 
 const file_notification_v1_notification_proto_rawDesc = "" +
 	"\n" +
-	"\"notification/v1/notification.proto\x12\x0fnotification.v1\"d\n" +
+	"\"notification/v1/notification.proto\x12\x0fnotification.v1\x1a\x1cgoogle/api/annotations.proto\"d\n" +
 	"\vSendRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\tR\x04type\x12\x14\n" +
@@ -495,11 +496,11 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\v \x01(\x04R\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\f \x01(\x04R\tupdatedAt2\xf6\x01\n" +
-	"\x13NotificationService\x12C\n" +
-	"\x04Send\x12\x1c.notification.v1.SendRequest\x1a\x1d.notification.v1.SendResponse\x12@\n" +
-	"\x03Get\x12\x1b.notification.v1.GetRequest\x1a\x1c.notification.v1.GetResponse\x12X\n" +
-	"\vGetByUserId\x12#.notification.v1.GetByUserIdRequest\x1a$.notification.v1.GetByUserIdResponseB\x9e\x01\n" +
+	"updated_at\x18\f \x01(\x04R\tupdatedAt2\xc8\x02\n" +
+	"\x13NotificationService\x12]\n" +
+	"\x04Send\x12\x1c.notification.v1.SendRequest\x1a\x1d.notification.v1.SendResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/noti/v1/send\x12W\n" +
+	"\x03Get\x12\x1b.notification.v1.GetRequest\x1a\x1c.notification.v1.GetResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/noti/v1/{id}\x12y\n" +
+	"\vGetByUserId\x12#.notification.v1.GetByUserIdRequest\x1a$.notification.v1.GetByUserIdResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/noti/v1/user/{user_id}B\x9e\x01\n" +
 	"\x13com.notification.v1B\x11NotificationProtoP\x01Z\x17/gen/go/notification/v1\xa2\x02\x03NXX\xaa\x02\x0fNotification.V1\xca\x02\x0fNotification\\V1\xe2\x02\x1bNotification\\V1\\GPBMetadata\xea\x02\x10Notification::V1b\x06proto3"
 
 var (

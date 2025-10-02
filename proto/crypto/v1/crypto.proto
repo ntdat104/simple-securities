@@ -2,10 +2,16 @@ syntax = "proto3";
 
 package crypto.v1;
 
+import "google/api/annotations.proto";
+
 option go_package = "/gen/go/crypto/v1";
 
 service CryptoService {
-    rpc GetServerTime(GetServerTimeRequest) returns (GetServerTimeResponse) {};
+    rpc GetServerTime(GetServerTimeRequest) returns (GetServerTimeResponse) {
+      option (google.api.http) = {
+        get: "/crypto/v1/server_time"
+      };
+    };
 }
 
 message GetServerTimeRequest {}
