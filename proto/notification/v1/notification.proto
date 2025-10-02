@@ -2,12 +2,29 @@ syntax = "proto3";
 
 package notification.v1;
 
+import "google/api/annotations.proto";
+
 option go_package = "/gen/go/notification/v1";
 
 service NotificationService {
-    rpc Send(SendRequest) returns (SendResponse);
-    rpc Get(GetRequest) returns (GetResponse);
-    rpc GetByUserId(GetByUserIdRequest) returns (GetByUserIdResponse);
+  rpc Send(SendRequest) returns (SendResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/noti/send"
+      body: "*"
+    };
+  }
+
+  rpc Get(GetRequest) returns (GetResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/noti/{id}"
+    };
+  }
+
+  rpc GetByUserId(GetByUserIdRequest) returns (GetByUserIdResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/noti" // /api/v1/noti?user_id=1&limit=10&offset=0
+    };
+  }
 }
 
 message SendRequest {

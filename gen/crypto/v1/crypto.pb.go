@@ -7,6 +7,7 @@
 package v1
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -333,7 +334,7 @@ var File_crypto_v1_crypto_proto protoreflect.FileDescriptor
 
 const file_crypto_v1_crypto_proto_rawDesc = "" +
 	"\n" +
-	"\x16crypto/v1/crypto.proto\x12\tcrypto.v1\"\x16\n" +
+	"\x16crypto/v1/crypto.proto\x12\tcrypto.v1\x1a\x1cgoogle/api/annotations.proto\"\x16\n" +
 	"\x14GetServerTimeRequest\"8\n" +
 	"\x15GetServerTimeResponse\x12\x1f\n" +
 	"\vserver_time\x18\x01 \x01(\x03R\n" +
@@ -357,10 +358,10 @@ const file_crypto_v1_crypto_proto_rawDesc = "" +
 	"\x10number_of_trades\x18\t \x01(\x05R\x0enumberOfTrades\x12<\n" +
 	"\x1btaker_buy_base_asset_volume\x18\n" +
 	" \x01(\tR\x17takerBuyBaseAssetVolume\x12>\n" +
-	"\x1ctaker_buy_quote_asset_volume\x18\v \x01(\tR\x18takerBuyQuoteAssetVolume2\xab\x01\n" +
-	"\rCryptoService\x12R\n" +
-	"\rGetServerTime\x12\x1f.crypto.v1.GetServerTimeRequest\x1a .crypto.v1.GetServerTimeResponse\x12F\n" +
-	"\tGetKlines\x12\x1b.crypto.v1.GetKlinesRequest\x1a\x1c.crypto.v1.GetKlinesResponseBt\n" +
+	"\x1ctaker_buy_quote_asset_volume\x18\v \x01(\tR\x18takerBuyQuoteAssetVolume2\xee\x01\n" +
+	"\rCryptoService\x12v\n" +
+	"\rGetServerTime\x12\x1f.crypto.v1.GetServerTimeRequest\x1a .crypto.v1.GetServerTimeResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/crypto/server-time\x12e\n" +
+	"\tGetKlines\x12\x1b.crypto.v1.GetKlinesRequest\x1a\x1c.crypto.v1.GetKlinesResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v1/crypto/klinesBt\n" +
 	"\rcom.crypto.v1B\vCryptoProtoP\x01Z\x11/gen/go/crypto/v1\xa2\x02\x03CXX\xaa\x02\tCrypto.V1\xca\x02\tCrypto\\V1\xe2\x02\x15Crypto\\V1\\GPBMetadata\xea\x02\n" +
 	"Crypto::V1b\x06proto3"
 

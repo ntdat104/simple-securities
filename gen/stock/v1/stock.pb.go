@@ -7,6 +7,7 @@
 package v1
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -105,12 +106,12 @@ var File_stock_v1_stock_proto protoreflect.FileDescriptor
 
 const file_stock_v1_stock_proto_rawDesc = "" +
 	"\n" +
-	"\x14stock/v1/stock.proto\x12\bstock.v1\"\r\n" +
+	"\x14stock/v1/stock.proto\x12\bstock.v1\x1a\x1cgoogle/api/annotations.proto\"\r\n" +
 	"\vPingRequest\"(\n" +
 	"\fPingResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2G\n" +
-	"\fStockService\x127\n" +
-	"\x04Ping\x12\x15.stock.v1.PingRequest\x1a\x16.stock.v1.PingResponse\"\x00Bm\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage2]\n" +
+	"\fStockService\x12M\n" +
+	"\x04Ping\x12\x15.stock.v1.PingRequest\x1a\x16.stock.v1.PingResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/stock/v1/pingBm\n" +
 	"\fcom.stock.v1B\n" +
 	"StockProtoP\x01Z\x10/gen/go/stock/v1\xa2\x02\x03SXX\xaa\x02\bStock.V1\xca\x02\bStock\\V1\xe2\x02\x14Stock\\V1\\GPBMetadata\xea\x02\tStock::V1b\x06proto3"
 
