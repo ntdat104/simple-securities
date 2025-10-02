@@ -7,14 +7,44 @@ import "google/api/annotations.proto";
 option go_package = "/gen/go/crypto/v1";
 
 service CryptoService {
-    rpc GetServerTime(GetServerTimeRequest) returns (GetServerTimeResponse) {
-      option (google.api.http) = {
-        get: "/crypto/v1/server_time"
-      };
+  rpc GetServerTime(GetServerTimeRequest) returns (GetServerTimeResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/crypto/server-time"
     };
+  };
+
+  rpc GetKlines (GetKlinesRequest) returns (GetKlinesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/crypto/klines" // /api/v1/crypto/klines?symbol=BTCUSDT&interval=15m&limit=10
+    };
+  };
 }
 
 message GetServerTimeRequest {}
 message GetServerTimeResponse {
-    optional int64 server_time = 1;
+  int64 server_time = 1;
+}
+
+message GetKlinesRequest {
+  string symbol = 1;   // e.g., "BTCUSDT"
+  string interval = 2; // e.g., "15m", "1h", "1d"
+  int32 limit = 3;     // max 1000
+}
+
+message GetKlinesResponse {
+  repeated Kline klines = 1;
+}
+
+message Kline {
+  int64 open_time = 1;
+  string open = 2;
+  string high = 3;
+  string low = 4;
+  string close = 5;
+  string volume = 6;
+  int64 close_time = 7;
+  string quote_asset_volume = 8;
+  int32 number_of_trades = 9;
+  string taker_buy_base_asset_volume = 10;
+  string taker_buy_quote_asset_volume = 11;
 }

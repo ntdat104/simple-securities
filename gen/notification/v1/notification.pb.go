@@ -496,11 +496,11 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\v \x01(\x04R\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\f \x01(\x04R\tupdatedAt2\xc8\x02\n" +
-	"\x13NotificationService\x12]\n" +
-	"\x04Send\x12\x1c.notification.v1.SendRequest\x1a\x1d.notification.v1.SendResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/noti/v1/send\x12W\n" +
-	"\x03Get\x12\x1b.notification.v1.GetRequest\x1a\x1c.notification.v1.GetResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/noti/v1/{id}\x12y\n" +
-	"\vGetByUserId\x12#.notification.v1.GetByUserIdRequest\x1a$.notification.v1.GetByUserIdResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/noti/v1/user/{user_id}B\x9e\x01\n" +
+	"updated_at\x18\f \x01(\x04R\tupdatedAt2\xc5\x02\n" +
+	"\x13NotificationService\x12a\n" +
+	"\x04Send\x12\x1c.notification.v1.SendRequest\x1a\x1d.notification.v1.SendResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/api/v1/noti/send\x12[\n" +
+	"\x03Get\x12\x1b.notification.v1.GetRequest\x1a\x1c.notification.v1.GetResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/api/v1/noti/{id}\x12n\n" +
+	"\vGetByUserId\x12#.notification.v1.GetByUserIdRequest\x1a$.notification.v1.GetByUserIdResponse\"\x14\x82\xd3\xe4\x93\x02\x0e\x12\f/api/v1/notiB\x9e\x01\n" +
 	"\x13com.notification.v1B\x11NotificationProtoP\x01Z\x17/gen/go/notification/v1\xa2\x02\x03NXX\xaa\x02\x0fNotification.V1\xca\x02\x0fNotification\\V1\xe2\x02\x1bNotification\\V1\\GPBMetadata\xea\x02\x10Notification::V1b\x06proto3"
 
 var (

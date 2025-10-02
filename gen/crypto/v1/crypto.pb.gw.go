@@ -56,6 +56,41 @@ func local_request_CryptoService_GetServerTime_0(ctx context.Context, marshaler 
 	return msg, metadata, err
 }
 
+var filter_CryptoService_GetKlines_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+
+func request_CryptoService_GetKlines_0(ctx context.Context, marshaler runtime.Marshaler, client CryptoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetKlinesRequest
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_CryptoService_GetKlines_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := client.GetKlines(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_CryptoService_GetKlines_0(ctx context.Context, marshaler runtime.Marshaler, server CryptoServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetKlinesRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_CryptoService_GetKlines_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.GetKlines(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 // RegisterCryptoServiceHandlerServer registers the http handlers for service CryptoService to "mux".
 // UnaryRPC     :call CryptoServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -68,7 +103,7 @@ func RegisterCryptoServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/crypto.v1.CryptoService/GetServerTime", runtime.WithHTTPPathPattern("/crypto/v1/server_time"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/crypto.v1.CryptoService/GetServerTime", runtime.WithHTTPPathPattern("/api/v1/crypto/server-time"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -81,6 +116,26 @@ func RegisterCryptoServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 			return
 		}
 		forward_CryptoService_GetServerTime_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_CryptoService_GetKlines_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/crypto.v1.CryptoService/GetKlines", runtime.WithHTTPPathPattern("/api/v1/crypto/klines"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CryptoService_GetKlines_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoService_GetKlines_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 
 	return nil
@@ -126,7 +181,7 @@ func RegisterCryptoServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/crypto.v1.CryptoService/GetServerTime", runtime.WithHTTPPathPattern("/crypto/v1/server_time"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/crypto.v1.CryptoService/GetServerTime", runtime.WithHTTPPathPattern("/api/v1/crypto/server-time"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -139,13 +194,32 @@ func RegisterCryptoServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		}
 		forward_CryptoService_GetServerTime_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodGet, pattern_CryptoService_GetKlines_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/crypto.v1.CryptoService/GetKlines", runtime.WithHTTPPathPattern("/api/v1/crypto/klines"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_CryptoService_GetKlines_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoService_GetKlines_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	return nil
 }
 
 var (
-	pattern_CryptoService_GetServerTime_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"crypto", "v1", "server_time"}, ""))
+	pattern_CryptoService_GetServerTime_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "crypto", "server-time"}, ""))
+	pattern_CryptoService_GetKlines_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "crypto", "klines"}, ""))
 )
 
 var (
 	forward_CryptoService_GetServerTime_0 = runtime.ForwardResponseMessage
+	forward_CryptoService_GetKlines_0     = runtime.ForwardResponseMessage
 )
