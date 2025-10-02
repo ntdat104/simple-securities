@@ -59,7 +59,7 @@ func (*GetServerTimeRequest) Descriptor() ([]byte, []int) {
 
 type GetServerTimeResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ServerTime    *int64                 `protobuf:"varint,1,opt,name=server_time,json=serverTime,proto3,oneof" json:"server_time,omitempty"`
+	ServerTime    int64                  `protobuf:"varint,1,opt,name=server_time,json=serverTime,proto3" json:"server_time,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -95,10 +95,238 @@ func (*GetServerTimeResponse) Descriptor() ([]byte, []int) {
 }
 
 func (x *GetServerTimeResponse) GetServerTime() int64 {
-	if x != nil && x.ServerTime != nil {
-		return *x.ServerTime
+	if x != nil {
+		return x.ServerTime
 	}
 	return 0
+}
+
+type GetKlinesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Symbol        string                 `protobuf:"bytes,1,opt,name=symbol,proto3" json:"symbol,omitempty"`     // e.g., "BTCUSDT"
+	Interval      string                 `protobuf:"bytes,2,opt,name=interval,proto3" json:"interval,omitempty"` // e.g., "15m", "1h", "1d"
+	Limit         int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`      // max 1000
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetKlinesRequest) Reset() {
+	*x = GetKlinesRequest{}
+	mi := &file_crypto_v1_crypto_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetKlinesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetKlinesRequest) ProtoMessage() {}
+
+func (x *GetKlinesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_crypto_v1_crypto_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetKlinesRequest.ProtoReflect.Descriptor instead.
+func (*GetKlinesRequest) Descriptor() ([]byte, []int) {
+	return file_crypto_v1_crypto_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetKlinesRequest) GetSymbol() string {
+	if x != nil {
+		return x.Symbol
+	}
+	return ""
+}
+
+func (x *GetKlinesRequest) GetInterval() string {
+	if x != nil {
+		return x.Interval
+	}
+	return ""
+}
+
+func (x *GetKlinesRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+type GetKlinesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Klines        []*Kline               `protobuf:"bytes,1,rep,name=klines,proto3" json:"klines,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetKlinesResponse) Reset() {
+	*x = GetKlinesResponse{}
+	mi := &file_crypto_v1_crypto_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetKlinesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetKlinesResponse) ProtoMessage() {}
+
+func (x *GetKlinesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_crypto_v1_crypto_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetKlinesResponse.ProtoReflect.Descriptor instead.
+func (*GetKlinesResponse) Descriptor() ([]byte, []int) {
+	return file_crypto_v1_crypto_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetKlinesResponse) GetKlines() []*Kline {
+	if x != nil {
+		return x.Klines
+	}
+	return nil
+}
+
+type Kline struct {
+	state                    protoimpl.MessageState `protogen:"open.v1"`
+	OpenTime                 int64                  `protobuf:"varint,1,opt,name=open_time,json=openTime,proto3" json:"open_time,omitempty"`
+	Open                     string                 `protobuf:"bytes,2,opt,name=open,proto3" json:"open,omitempty"`
+	High                     string                 `protobuf:"bytes,3,opt,name=high,proto3" json:"high,omitempty"`
+	Low                      string                 `protobuf:"bytes,4,opt,name=low,proto3" json:"low,omitempty"`
+	Close                    string                 `protobuf:"bytes,5,opt,name=close,proto3" json:"close,omitempty"`
+	Volume                   string                 `protobuf:"bytes,6,opt,name=volume,proto3" json:"volume,omitempty"`
+	CloseTime                int64                  `protobuf:"varint,7,opt,name=close_time,json=closeTime,proto3" json:"close_time,omitempty"`
+	QuoteAssetVolume         string                 `protobuf:"bytes,8,opt,name=quote_asset_volume,json=quoteAssetVolume,proto3" json:"quote_asset_volume,omitempty"`
+	NumberOfTrades           int32                  `protobuf:"varint,9,opt,name=number_of_trades,json=numberOfTrades,proto3" json:"number_of_trades,omitempty"`
+	TakerBuyBaseAssetVolume  string                 `protobuf:"bytes,10,opt,name=taker_buy_base_asset_volume,json=takerBuyBaseAssetVolume,proto3" json:"taker_buy_base_asset_volume,omitempty"`
+	TakerBuyQuoteAssetVolume string                 `protobuf:"bytes,11,opt,name=taker_buy_quote_asset_volume,json=takerBuyQuoteAssetVolume,proto3" json:"taker_buy_quote_asset_volume,omitempty"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
+}
+
+func (x *Kline) Reset() {
+	*x = Kline{}
+	mi := &file_crypto_v1_crypto_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Kline) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Kline) ProtoMessage() {}
+
+func (x *Kline) ProtoReflect() protoreflect.Message {
+	mi := &file_crypto_v1_crypto_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Kline.ProtoReflect.Descriptor instead.
+func (*Kline) Descriptor() ([]byte, []int) {
+	return file_crypto_v1_crypto_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *Kline) GetOpenTime() int64 {
+	if x != nil {
+		return x.OpenTime
+	}
+	return 0
+}
+
+func (x *Kline) GetOpen() string {
+	if x != nil {
+		return x.Open
+	}
+	return ""
+}
+
+func (x *Kline) GetHigh() string {
+	if x != nil {
+		return x.High
+	}
+	return ""
+}
+
+func (x *Kline) GetLow() string {
+	if x != nil {
+		return x.Low
+	}
+	return ""
+}
+
+func (x *Kline) GetClose() string {
+	if x != nil {
+		return x.Close
+	}
+	return ""
+}
+
+func (x *Kline) GetVolume() string {
+	if x != nil {
+		return x.Volume
+	}
+	return ""
+}
+
+func (x *Kline) GetCloseTime() int64 {
+	if x != nil {
+		return x.CloseTime
+	}
+	return 0
+}
+
+func (x *Kline) GetQuoteAssetVolume() string {
+	if x != nil {
+		return x.QuoteAssetVolume
+	}
+	return ""
+}
+
+func (x *Kline) GetNumberOfTrades() int32 {
+	if x != nil {
+		return x.NumberOfTrades
+	}
+	return 0
+}
+
+func (x *Kline) GetTakerBuyBaseAssetVolume() string {
+	if x != nil {
+		return x.TakerBuyBaseAssetVolume
+	}
+	return ""
+}
+
+func (x *Kline) GetTakerBuyQuoteAssetVolume() string {
+	if x != nil {
+		return x.TakerBuyQuoteAssetVolume
+	}
+	return ""
 }
 
 var File_crypto_v1_crypto_proto protoreflect.FileDescriptor
@@ -106,13 +334,33 @@ var File_crypto_v1_crypto_proto protoreflect.FileDescriptor
 const file_crypto_v1_crypto_proto_rawDesc = "" +
 	"\n" +
 	"\x16crypto/v1/crypto.proto\x12\tcrypto.v1\"\x16\n" +
-	"\x14GetServerTimeRequest\"M\n" +
-	"\x15GetServerTimeResponse\x12$\n" +
-	"\vserver_time\x18\x01 \x01(\x03H\x00R\n" +
-	"serverTime\x88\x01\x01B\x0e\n" +
-	"\f_server_time2e\n" +
-	"\rCryptoService\x12T\n" +
-	"\rGetServerTime\x12\x1f.crypto.v1.GetServerTimeRequest\x1a .crypto.v1.GetServerTimeResponse\"\x00Bt\n" +
+	"\x14GetServerTimeRequest\"8\n" +
+	"\x15GetServerTimeResponse\x12\x1f\n" +
+	"\vserver_time\x18\x01 \x01(\x03R\n" +
+	"serverTime\"\\\n" +
+	"\x10GetKlinesRequest\x12\x16\n" +
+	"\x06symbol\x18\x01 \x01(\tR\x06symbol\x12\x1a\n" +
+	"\binterval\x18\x02 \x01(\tR\binterval\x12\x14\n" +
+	"\x05limit\x18\x03 \x01(\x05R\x05limit\"=\n" +
+	"\x11GetKlinesResponse\x12(\n" +
+	"\x06klines\x18\x01 \x03(\v2\x10.crypto.v1.KlineR\x06klines\"\x81\x03\n" +
+	"\x05Kline\x12\x1b\n" +
+	"\topen_time\x18\x01 \x01(\x03R\bopenTime\x12\x12\n" +
+	"\x04open\x18\x02 \x01(\tR\x04open\x12\x12\n" +
+	"\x04high\x18\x03 \x01(\tR\x04high\x12\x10\n" +
+	"\x03low\x18\x04 \x01(\tR\x03low\x12\x14\n" +
+	"\x05close\x18\x05 \x01(\tR\x05close\x12\x16\n" +
+	"\x06volume\x18\x06 \x01(\tR\x06volume\x12\x1d\n" +
+	"\n" +
+	"close_time\x18\a \x01(\x03R\tcloseTime\x12,\n" +
+	"\x12quote_asset_volume\x18\b \x01(\tR\x10quoteAssetVolume\x12(\n" +
+	"\x10number_of_trades\x18\t \x01(\x05R\x0enumberOfTrades\x12<\n" +
+	"\x1btaker_buy_base_asset_volume\x18\n" +
+	" \x01(\tR\x17takerBuyBaseAssetVolume\x12>\n" +
+	"\x1ctaker_buy_quote_asset_volume\x18\v \x01(\tR\x18takerBuyQuoteAssetVolume2\xab\x01\n" +
+	"\rCryptoService\x12R\n" +
+	"\rGetServerTime\x12\x1f.crypto.v1.GetServerTimeRequest\x1a .crypto.v1.GetServerTimeResponse\x12F\n" +
+	"\tGetKlines\x12\x1b.crypto.v1.GetKlinesRequest\x1a\x1c.crypto.v1.GetKlinesResponseBt\n" +
 	"\rcom.crypto.v1B\vCryptoProtoP\x01Z\x11/gen/go/crypto/v1\xa2\x02\x03CXX\xaa\x02\tCrypto.V1\xca\x02\tCrypto\\V1\xe2\x02\x15Crypto\\V1\\GPBMetadata\xea\x02\n" +
 	"Crypto::V1b\x06proto3"
 
@@ -128,19 +376,25 @@ func file_crypto_v1_crypto_proto_rawDescGZIP() []byte {
 	return file_crypto_v1_crypto_proto_rawDescData
 }
 
-var file_crypto_v1_crypto_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_crypto_v1_crypto_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_crypto_v1_crypto_proto_goTypes = []any{
 	(*GetServerTimeRequest)(nil),  // 0: crypto.v1.GetServerTimeRequest
 	(*GetServerTimeResponse)(nil), // 1: crypto.v1.GetServerTimeResponse
+	(*GetKlinesRequest)(nil),      // 2: crypto.v1.GetKlinesRequest
+	(*GetKlinesResponse)(nil),     // 3: crypto.v1.GetKlinesResponse
+	(*Kline)(nil),                 // 4: crypto.v1.Kline
 }
 var file_crypto_v1_crypto_proto_depIdxs = []int32{
-	0, // 0: crypto.v1.CryptoService.GetServerTime:input_type -> crypto.v1.GetServerTimeRequest
-	1, // 1: crypto.v1.CryptoService.GetServerTime:output_type -> crypto.v1.GetServerTimeResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	4, // 0: crypto.v1.GetKlinesResponse.klines:type_name -> crypto.v1.Kline
+	0, // 1: crypto.v1.CryptoService.GetServerTime:input_type -> crypto.v1.GetServerTimeRequest
+	2, // 2: crypto.v1.CryptoService.GetKlines:input_type -> crypto.v1.GetKlinesRequest
+	1, // 3: crypto.v1.CryptoService.GetServerTime:output_type -> crypto.v1.GetServerTimeResponse
+	3, // 4: crypto.v1.CryptoService.GetKlines:output_type -> crypto.v1.GetKlinesResponse
+	3, // [3:5] is the sub-list for method output_type
+	1, // [1:3] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_crypto_v1_crypto_proto_init() }
@@ -148,14 +402,13 @@ func file_crypto_v1_crypto_proto_init() {
 	if File_crypto_v1_crypto_proto != nil {
 		return
 	}
-	file_crypto_v1_crypto_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_crypto_v1_crypto_proto_rawDesc), len(file_crypto_v1_crypto_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

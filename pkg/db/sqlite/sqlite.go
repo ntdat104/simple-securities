@@ -26,10 +26,7 @@ func NewSQLiteClient() (*SQLiteClient, error) {
 		return nil, fmt.Errorf("failed to ping SQLite database: %w", err)
 	}
 
-	client := &SQLiteClient{DB: db}
-	client.AutoMigrate()
-
-	return client, nil
+	return &SQLiteClient{DB: db}, nil
 }
 
 func (c *SQLiteClient) AutoMigrate() {

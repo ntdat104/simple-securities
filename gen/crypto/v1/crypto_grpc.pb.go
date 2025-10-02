@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	CryptoService_GetServerTime_FullMethodName = "/crypto.v1.CryptoService/GetServerTime"
+	CryptoService_GetKlines_FullMethodName     = "/crypto.v1.CryptoService/GetKlines"
 )
 
 // CryptoServiceClient is the client API for CryptoService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CryptoServiceClient interface {
 	GetServerTime(ctx context.Context, in *GetServerTimeRequest, opts ...grpc.CallOption) (*GetServerTimeResponse, error)
+	GetKlines(ctx context.Context, in *GetKlinesRequest, opts ...grpc.CallOption) (*GetKlinesResponse, error)
 }
 
 type cryptoServiceClient struct {
@@ -47,11 +49,22 @@ func (c *cryptoServiceClient) GetServerTime(ctx context.Context, in *GetServerTi
 	return out, nil
 }
 
+func (c *cryptoServiceClient) GetKlines(ctx context.Context, in *GetKlinesRequest, opts ...grpc.CallOption) (*GetKlinesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetKlinesResponse)
+	err := c.cc.Invoke(ctx, CryptoService_GetKlines_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CryptoServiceServer is the server API for CryptoService service.
 // All implementations must embed UnimplementedCryptoServiceServer
 // for forward compatibility.
 type CryptoServiceServer interface {
 	GetServerTime(context.Context, *GetServerTimeRequest) (*GetServerTimeResponse, error)
+	GetKlines(context.Context, *GetKlinesRequest) (*GetKlinesResponse, error)
 	mustEmbedUnimplementedCryptoServiceServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedCryptoServiceServer struct{}
 
 func (UnimplementedCryptoServiceServer) GetServerTime(context.Context, *GetServerTimeRequest) (*GetServerTimeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetServerTime not implemented")
+}
+func (UnimplementedCryptoServiceServer) GetKlines(context.Context, *GetKlinesRequest) (*GetKlinesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetKlines not implemented")
 }
 func (UnimplementedCryptoServiceServer) mustEmbedUnimplementedCryptoServiceServer() {}
 func (UnimplementedCryptoServiceServer) testEmbeddedByValue()                       {}
@@ -104,6 +120,24 @@ func _CryptoService_GetServerTime_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CryptoService_GetKlines_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetKlinesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CryptoServiceServer).GetKlines(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CryptoService_GetKlines_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CryptoServiceServer).GetKlines(ctx, req.(*GetKlinesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CryptoService_ServiceDesc is the grpc.ServiceDesc for CryptoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var CryptoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetServerTime",
 			Handler:    _CryptoService_GetServerTime_Handler,
+		},
+		{
+			MethodName: "GetKlines",
+			Handler:    _CryptoService_GetKlines_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

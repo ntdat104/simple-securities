@@ -40,6 +40,7 @@ func main() {
 		log.Fatalf("Failed to connect to SQLite: %v", err)
 	}
 	defer db.Close(ctx)
+	db.AutoMigrate()
 
 	rdb, err := cache.NewRedisClient(cache.DefaultRedisConfig())
 	if err != nil {
