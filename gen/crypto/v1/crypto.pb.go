@@ -7,6 +7,7 @@
 package v1
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -105,14 +106,14 @@ var File_crypto_v1_crypto_proto protoreflect.FileDescriptor
 
 const file_crypto_v1_crypto_proto_rawDesc = "" +
 	"\n" +
-	"\x16crypto/v1/crypto.proto\x12\tcrypto.v1\"\x16\n" +
+	"\x16crypto/v1/crypto.proto\x12\tcrypto.v1\x1a\x1cgoogle/api/annotations.proto\"\x16\n" +
 	"\x14GetServerTimeRequest\"M\n" +
 	"\x15GetServerTimeResponse\x12$\n" +
 	"\vserver_time\x18\x01 \x01(\x03H\x00R\n" +
 	"serverTime\x88\x01\x01B\x0e\n" +
-	"\f_server_time2e\n" +
-	"\rCryptoService\x12T\n" +
-	"\rGetServerTime\x12\x1f.crypto.v1.GetServerTimeRequest\x1a .crypto.v1.GetServerTimeResponse\"\x00Bt\n" +
+	"\f_server_time2\x83\x01\n" +
+	"\rCryptoService\x12r\n" +
+	"\rGetServerTime\x12\x1f.crypto.v1.GetServerTimeRequest\x1a .crypto.v1.GetServerTimeResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/crypto/v1/server_timeBt\n" +
 	"\rcom.crypto.v1B\vCryptoProtoP\x01Z\x11/gen/go/crypto/v1\xa2\x02\x03CXX\xaa\x02\tCrypto.V1\xca\x02\tCrypto\\V1\xe2\x02\x15Crypto\\V1\\GPBMetadata\xea\x02\n" +
 	"Crypto::V1b\x06proto3"
 
