@@ -10,6 +10,7 @@ import (
 	"simple-securities/internal/notification/application/service"
 	grpcHandler "simple-securities/internal/notification/handler/grpc"
 	"simple-securities/internal/notification/infras/repo"
+	"simple-securities/internal/notification/middleware"
 	"simple-securities/pkg/conv"
 	"simple-securities/pkg/db/cache"
 	"simple-securities/pkg/db/sqlite"
@@ -28,7 +29,7 @@ func main() {
 	config.Init("./config", "notification")
 
 	logger.Init()
-	logger.Logger.Info("Application starting",
+	logger.Logger.Info("🚀 Application starting",
 		zap.String("service", config.GlobalConfig.App.Name),
 		zap.String("version", config.GlobalConfig.App.Version),
 		zap.String("port", conv.ConvertUInt32ToString(config.GlobalConfig.GrpcServer.Port)),
@@ -41,6 +42,10 @@ func main() {
 	defer db.Close(ctx)
 
 	rdb, err := cache.NewRedisClient(cache.DefaultRedisConfig())
+	if err != nil {
+		log.Fatalf("Failed to connect to Redis: %v", err)
+	}
+	defer rdb.Close()
 
 	notiRepo := repo.NewNotificationRepo(db.DB)
 	notiCacheRepo := repo.NewNotificationCacheRepo(rdb.Client)
@@ -64,6 +69,7 @@ func main() {
 				MinTime:             time.Duration(config.GlobalConfig.GrpcServer.MinTime),
 				PermitWithoutStream: config.GlobalConfig.GrpcServer.PermitWithoutStream,
 			},
+			UnaryInterceptor: middleware.LoggingInterceptor,
 		},
 	)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"simple-securities/internal/notification/application/dto"
 	"simple-securities/internal/notification/application/mapper"
 	"simple-securities/internal/notification/domain/repo"
+	"time"
 )
 
 type GetNotiByUserIdSvc interface {
@@ -32,6 +33,7 @@ func (s *getNotiByUserIdSvc) Handle(
 	limit uint32,
 	offset uint32,
 ) ([]*dto.NotificationDto, error) {
+	time.Sleep(time.Second * 1)
 	notifications, err := s.notiRepo.GetByUserId(ctx, userId, limit, offset)
 	if err != nil {
 		return nil, err

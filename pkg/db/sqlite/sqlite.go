@@ -3,6 +3,8 @@ package sqlite
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3" // SQLite driver
@@ -24,7 +26,25 @@ func NewSQLiteClient() (*SQLiteClient, error) {
 		return nil, fmt.Errorf("failed to ping SQLite database: %w", err)
 	}
 
-	return &SQLiteClient{DB: db}, nil
+	client := &SQLiteClient{DB: db}
+	client.AutoMigrate()
+
+	return client, nil
+}
+
+func (c *SQLiteClient) AutoMigrate() {
+	files := []string{
+		"migrations/sqlite/000001_init_notificationdb.up.sql",
+		"migrations/sqlite/000001_seed_notifications.up.sql",
+	}
+
+	for _, file := range files {
+		sql, err := os.ReadFile(file)
+		if err != nil {
+			log.Fatalf("failed to read migration file %s: %v", file, err)
+		}
+		c.DB.MustExec(string(sql))
+	}
 }
 
 func (c *SQLiteClient) GetDB(ctx context.Context) *sqlx.DB {

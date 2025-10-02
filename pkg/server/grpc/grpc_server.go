@@ -12,9 +12,10 @@ import (
 )
 
 type GrpcServerConfig struct {
-	Port            uint32
-	KeepaliveParams keepalive.ServerParameters
-	KeepalivePolicy keepalive.EnforcementPolicy
+	Port             uint32
+	KeepaliveParams  keepalive.ServerParameters
+	KeepalivePolicy  keepalive.EnforcementPolicy
+	UnaryInterceptor grpc.UnaryServerInterceptor
 }
 
 type GRPCServer interface {
@@ -45,6 +46,7 @@ func buildOptions(config GrpcServerConfig) ([]grpc.ServerOption, error) {
 	return []grpc.ServerOption{
 		grpc.KeepaliveParams(buildKeepaliveParams(config.KeepaliveParams)),
 		grpc.KeepaliveEnforcementPolicy(buildKeepalivePolicy(config.KeepalivePolicy)),
+		grpc.UnaryInterceptor(config.UnaryInterceptor),
 	}, nil
 }
 
