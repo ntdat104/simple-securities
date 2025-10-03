@@ -20,6 +20,29 @@ func NewNotificationRepo(db *sqlx.DB) repo.INotificationRepo {
 	return &NotificationRepo{db: db}
 }
 
+// withTransaction runs fn inside a transaction with proper commit/rollback handling
+func (r *NotificationRepo) withTransaction(ctx context.Context, fn func(*sqlx.Tx) error) (err error) {
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	// rollback/commit handler
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p) // rethrow panic after rollback
+		} else if err != nil {
+			_ = tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
+
+	err = fn(tx)
+	return err
+}
+
 // Create builds a new notification entity and persists it
 func (r *NotificationRepo) Create(ctx context.Context, noti *model.Notification) (*model.Notification, error) {
 	n := model.NewNotification(noti.UserID, noti.Type, noti.Title, noti.Body)
@@ -37,13 +60,19 @@ func (r *NotificationRepo) Create(ctx context.Context, noti *model.Notification)
 		RETURNING id
 	`
 
-	stmt, err := r.db.PrepareNamedContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
+	err := r.withTransaction(ctx, func(tx *sqlx.Tx) error {
+		stmt, err := tx.PrepareNamedContext(ctx, query)
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
 
-	if err := stmt.GetContext(ctx, &n.ID, n); err != nil {
+		if err := stmt.GetContext(ctx, &n.ID, n); err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
 		return nil, err
 	}
 
