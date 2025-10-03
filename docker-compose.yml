@@ -44,6 +44,17 @@ services:
       - redis_data:/data
     networks:
       - simple-securities
+      
+  redisinsight:
+    image: redis/redisinsight:2.70
+    container_name: redisinsight
+    restart: always
+    ports:
+      - "5540:5540"
+    volumes:
+      - redisinsight_data:/db
+    networks:
+      - simple-securities
 
   mongo:
     image: mongo:6
@@ -144,6 +155,7 @@ volumes:
   postgres_data:
   redis_data:
   mongo_data:
+  redisinsight_data:
 
 networks:
   simple-securities:
