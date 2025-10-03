@@ -14,9 +14,11 @@ import (
 	"simple-securities/pkg/conv"
 	"simple-securities/pkg/db/cache"
 	"simple-securities/pkg/db/sqlite"
+	"simple-securities/pkg/kafka"
 	"simple-securities/pkg/logger"
 	"simple-securities/pkg/server"
 	"simple-securities/pkg/server/grpc"
+	"simple-securities/pkg/uuid"
 
 	"go.uber.org/zap"
 	googleGrpc "google.golang.org/grpc"
@@ -29,11 +31,53 @@ func main() {
 	config.Init("./config", "notification")
 
 	logger.Init()
-	logger.Logger.Info("🚀 Application starting",
+	logger.Logger.Info("🚀 application starting",
 		zap.String("service", config.GlobalConfig.App.Name),
 		zap.String("version", config.GlobalConfig.App.Version),
 		zap.String("port", conv.ConvertUInt32ToString(config.GlobalConfig.GrpcServer.Port)),
 		zap.String("env", string(config.GlobalConfig.Env)))
+
+	// Kafka brokers
+	brokers := []string{"localhost:9092"}
+
+	// Create Kafka Manager
+	mgr := kafka.NewManager(brokers, logger.Logger)
+	defer mgr.Close()
+
+	// -----------------------------
+	// Producer loop
+	// -----------------------------
+	go func() {
+		for {
+			now := time.Now()
+			event := kafka.Event{
+				Meta: kafka.Meta{
+					ServiceName: "notification-service",
+					RequestID:   uuid.NewGoogleUUID(),
+					Code:        200,
+					Message:     "Success",
+					Timestamp:   now.Unix(),
+					Datetime:    now.Format("2006-01-02 15:04:05"),
+				},
+				Data: map[string]any{
+					"time":    now.String(),
+					"success": true,
+				},
+			}
+
+			// Send to metrics
+			if err := mgr.SendMessage(context.Background(), "metrics", "metrics-key", -1, event); err != nil {
+				logger.Logger.Error("failed to send metrics event", zap.Error(err))
+			}
+
+			// // Send to audit
+			if err := mgr.SendMessage(context.Background(), "audit", "audit-key", -1, event); err != nil {
+				logger.Logger.Error("failed to send audit event", zap.Error(err))
+			}
+
+			time.Sleep(4 * time.Second)
+		}
+	}()
 
 	db, err := sqlite.NewSQLiteClient()
 	if err != nil {

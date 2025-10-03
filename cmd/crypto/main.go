@@ -12,6 +12,7 @@ import (
 	"simple-securities/internal/crypto/middleware"
 	"simple-securities/pkg/conv"
 	"simple-securities/pkg/db/sqlite"
+	"simple-securities/pkg/kafka"
 	"simple-securities/pkg/logger"
 	"simple-securities/pkg/server"
 	"simple-securities/pkg/server/grpc"
@@ -38,6 +39,36 @@ func main() {
 		log.Fatalf("Failed to connect to SQLite: %v", err)
 	}
 	defer db.Close(ctx)
+
+	// Kafka brokers
+	brokers := []string{"localhost:9092", "localhost:9093", "localhost:9094"}
+
+	// Create Kafka Manager
+	mgr := kafka.NewManager(brokers, logger.Logger)
+	defer mgr.Close()
+
+	// Register consumers
+	if err := mgr.AddConsumer("metrics", "group-metrics", func(ctx context.Context, key, value []byte) error {
+		logger.Logger.Warn("🧹 consumer metrics",
+			zap.String("key", string(key)),
+			// zap.String("value", string(value)),
+		)
+		return nil
+	}); err != nil {
+		logger.Logger.Error("failed to add metrics consumer", zap.Error(err))
+	}
+
+	if err := mgr.AddConsumer("audit", "group-audit", func(ctx context.Context, key, value []byte) error {
+		logger.Logger.Warn("🧹 consumer audit",
+			zap.String("key", string(key)),
+			// zap.String("value", string(value)),
+		)
+		return nil
+	}); err != nil {
+		logger.Logger.Error("failed to add audit consumer", zap.Error(err))
+	}
+
+	mgr.StartAllConsumers(ctx)
 
 	getServerTimeSvc := service.NewGetServerTimeSvc()
 	getKlinesSvc := service.NewGetKlinesSvc()
