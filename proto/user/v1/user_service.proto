@@ -63,7 +63,4 @@ message GetUserProfileRequest {
 }
 message GetUserProfileResponse {
   common.v1.UserDto user = 1;
-  common.v1.UserStatus status = 2;
-  common.v1.KycStatus kyc_status = 3;
-  int64 created_at = 4;
 }

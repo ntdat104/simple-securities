@@ -44,8 +44,14 @@ func main() {
 	})
 
 	userRepo := repo.NewUserRepo(db.DB)
-	userSvc := service.NewUserSvc(userRepo)
-	userHandler := grpcHandler.NewUserGrpcHandler(userSvc)
+	userRegisterSvc := service.NewUserRegisterSvc(userRepo)
+	userLoginSvc := service.NewUserLoginSvc(userRepo)
+	userGetProfileSvc := service.NewUserGetProfileSvc(userRepo)
+	userHandler := grpcHandler.NewUserGrpcHandler(
+		userRegisterSvc,
+		userLoginSvc,
+		userGetProfileSvc,
+	)
 
 	// Create the gRPC server
 	grpcServer, err := grpc.NewGrpcServer(

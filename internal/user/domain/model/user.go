@@ -23,7 +23,15 @@ func (u User) TableName() string {
 	return "users"
 }
 
-func NewUser(email, hashedPassword string) *User {
+func NewUser(email, hashedPassword string) (*User, error) {
+	if email == "" {
+		return nil, ErrInvalidUserEmail
+	}
+
+	if hashedPassword == "" {
+		return nil, ErrUserPasswordMissing
+	}
+
 	now := time.Now()
 	return &User{
 		Uuid:           uuid.NewGoogleUUID(),
@@ -35,5 +43,5 @@ func NewUser(email, hashedPassword string) *User {
 		UpdatedAt:      now,
 		CreatedBy:      0,
 		UpdatedBy:      0,
-	}
+	}, nil
 }

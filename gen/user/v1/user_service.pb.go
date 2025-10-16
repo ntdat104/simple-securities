@@ -305,9 +305,6 @@ func (*GetUserProfileRequest) Descriptor() ([]byte, []int) {
 type GetUserProfileResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	User          *v1.UserDto            `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
-	Status        v1.UserStatus          `protobuf:"varint,2,opt,name=status,proto3,enum=common.v1.UserStatus" json:"status,omitempty"`
-	KycStatus     v1.KycStatus           `protobuf:"varint,3,opt,name=kyc_status,json=kycStatus,proto3,enum=common.v1.KycStatus" json:"kyc_status,omitempty"`
-	CreatedAt     int64                  `protobuf:"varint,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -349,27 +346,6 @@ func (x *GetUserProfileResponse) GetUser() *v1.UserDto {
 	return nil
 }
 
-func (x *GetUserProfileResponse) GetStatus() v1.UserStatus {
-	if x != nil {
-		return x.Status
-	}
-	return v1.UserStatus(0)
-}
-
-func (x *GetUserProfileResponse) GetKycStatus() v1.KycStatus {
-	if x != nil {
-		return x.KycStatus
-	}
-	return v1.KycStatus(0)
-}
-
-func (x *GetUserProfileResponse) GetCreatedAt() int64 {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return 0
-}
-
 var File_user_v1_user_service_proto protoreflect.FileDescriptor
 
 const file_user_v1_user_service_proto_rawDesc = "" +
@@ -393,14 +369,9 @@ const file_user_v1_user_service_proto_rawDesc = "" +
 	"\n" +
 	"token_type\x18\x03 \x01(\tR\ttokenType\x12\x10\n" +
 	"\x03exp\x18\x04 \x01(\x03R\x03exp\"\x17\n" +
-	"\x15GetUserProfileRequest\"\xc3\x01\n" +
+	"\x15GetUserProfileRequest\"@\n" +
 	"\x16GetUserProfileResponse\x12&\n" +
-	"\x04user\x18\x01 \x01(\v2\x12.common.v1.UserDtoR\x04user\x12-\n" +
-	"\x06status\x18\x02 \x01(\x0e2\x15.common.v1.UserStatusR\x06status\x123\n" +
-	"\n" +
-	"kyc_status\x18\x03 \x01(\x0e2\x14.common.v1.KycStatusR\tkycStatus\x12\x1d\n" +
-	"\n" +
-	"created_at\x18\x04 \x01(\x03R\tcreatedAt2\xb8\x02\n" +
+	"\x04user\x18\x01 \x01(\v2\x12.common.v1.UserDtoR\x04user2\xb8\x02\n" +
 	"\vUserService\x12a\n" +
 	"\bRegister\x12\x18.user.v1.RegisterRequest\x1a\x19.user.v1.RegisterResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/user/register\x12U\n" +
 	"\x05Login\x12\x15.user.v1.LoginRequest\x1a\x16.user.v1.LoginResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/user/login\x12o\n" +
@@ -428,26 +399,22 @@ var file_user_v1_user_service_proto_goTypes = []any{
 	(*GetUserProfileRequest)(nil),  // 4: user.v1.GetUserProfileRequest
 	(*GetUserProfileResponse)(nil), // 5: user.v1.GetUserProfileResponse
 	(*v1.UserDto)(nil),             // 6: common.v1.UserDto
-	(v1.UserStatus)(0),             // 7: common.v1.UserStatus
-	(v1.KycStatus)(0),              // 8: common.v1.KycStatus
 }
 var file_user_v1_user_service_proto_depIdxs = []int32{
 	6, // 0: user.v1.RegisterResponse.user:type_name -> common.v1.UserDto
 	6, // 1: user.v1.LoginResponse.user:type_name -> common.v1.UserDto
 	6, // 2: user.v1.GetUserProfileResponse.user:type_name -> common.v1.UserDto
-	7, // 3: user.v1.GetUserProfileResponse.status:type_name -> common.v1.UserStatus
-	8, // 4: user.v1.GetUserProfileResponse.kyc_status:type_name -> common.v1.KycStatus
-	0, // 5: user.v1.UserService.Register:input_type -> user.v1.RegisterRequest
-	2, // 6: user.v1.UserService.Login:input_type -> user.v1.LoginRequest
-	4, // 7: user.v1.UserService.GetUserProfile:input_type -> user.v1.GetUserProfileRequest
-	1, // 8: user.v1.UserService.Register:output_type -> user.v1.RegisterResponse
-	3, // 9: user.v1.UserService.Login:output_type -> user.v1.LoginResponse
-	5, // 10: user.v1.UserService.GetUserProfile:output_type -> user.v1.GetUserProfileResponse
-	8, // [8:11] is the sub-list for method output_type
-	5, // [5:8] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	0, // 3: user.v1.UserService.Register:input_type -> user.v1.RegisterRequest
+	2, // 4: user.v1.UserService.Login:input_type -> user.v1.LoginRequest
+	4, // 5: user.v1.UserService.GetUserProfile:input_type -> user.v1.GetUserProfileRequest
+	1, // 6: user.v1.UserService.Register:output_type -> user.v1.RegisterResponse
+	3, // 7: user.v1.UserService.Login:output_type -> user.v1.LoginResponse
+	5, // 8: user.v1.UserService.GetUserProfile:output_type -> user.v1.GetUserProfileResponse
+	6, // [6:9] is the sub-list for method output_type
+	3, // [3:6] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_user_v1_user_service_proto_init() }

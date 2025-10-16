@@ -1,0 +1,36 @@
+package util
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+)
+
+func GenerateAccessToken(
+	userId uint64,
+	userUuid,
+	email string,
+	jwtSecret string,
+) (string, int64, error) {
+	now := time.Now()
+	expireTime := now.Add(24 * time.Hour)
+	expireUnix := expireTime.Unix()
+
+	claims := jwt.MapClaims{
+		"user_id":   userId,
+		"user_uuid": userUuid,
+		"email":     email,
+		"exp":       expireUnix, // expires in 24h
+		"iat":       now.Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	accessToken, err := token.SignedString([]byte(jwtSecret))
+	if err != nil {
+		return "", 0, fmt.Errorf("Failed to generate token: %v", err)
+	}
+
+	return accessToken, expireUnix, nil
+}
