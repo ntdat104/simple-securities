@@ -84,7 +84,10 @@ func main() {
 		log.Fatalf("Failed to connect to SQLite: %v", err)
 	}
 	defer db.Close(ctx)
-	db.AutoMigrate()
+	db.AutoMigrate([]string{
+		"migrations/sqlite/000001_init_notificationdb.up.sql",
+		"migrations/sqlite/000001_seed_notifications.up.sql",
+	})
 
 	rdb, err := cache.NewRedisClient(cache.DefaultRedisConfig())
 	if err != nil {

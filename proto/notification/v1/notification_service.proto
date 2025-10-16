@@ -4,7 +4,7 @@ package notification.v1;
 
 import "google/api/annotations.proto";
 
-option go_package = "/gen/go/notification/v1";
+option go_package = "/gen/notification/v1";
 
 service NotificationService {
   rpc Send(SendRequest) returns (SendResponse) {

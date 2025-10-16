@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package common.v1;
+
+// ❗ Cần thêm dòng này để xác định đường dẫn gói Go
+option go_package = "simple-securities/gen/common/v1";
+
+// Trạng thái xác minh KYC của người dùng
+enum KycStatus {
+  KYC_STATUS_UNSPECIFIED = 0;
+  KYC_STATUS_PENDING = 1;
+  KYC_STATUS_VERIFIED = 2;
+  KYC_STATUS_FAILED = 3;
+}
+
+// Trạng thái chung của tài khoản người dùng
+enum UserStatus {
+  USER_STATUS_UNSPECIFIED = 0;
+  USER_STATUS_ACTIVE = 1;
+  USER_STATUS_INACTIVE = 2;
+  USER_STATUS_BANNED = 3;
+}
+
+// Chi tiết số dư của một loại tài sản
+message Balance {
+  string asset = 1;      // e.g., "USDT", "BTC"
+  string available = 2;  // Số dư có thể sử dụng (dùng string để tránh sai số float)
+  string locked = 3;     // Số dư đang bị khóa trong lệnh chờ
+}
+
+// Định nghĩa cơ bản cho một cặp giao dịch
+message TradingPair {
+  string symbol = 1; // e.g., "BTCUSDT"
+  string base_asset = 2;
+  string quote_asset = 3;
+  string min_qty = 4;
+}
+
+message UserDto {
+  uint64 id = 1;
+  string uuid = 2;
+  string email = 3;
+  optional int64 last_login_at = 4;
+  string status = 5;
+}

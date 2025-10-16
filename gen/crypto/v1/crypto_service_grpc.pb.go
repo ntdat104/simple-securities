@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             (unknown)
-// source: crypto/v1/crypto.proto
+// source: crypto/v1/crypto_service.proto
 
 package v1
 
@@ -155,5 +155,5 @@ var CryptoService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "crypto/v1/crypto.proto",
+	Metadata: "crypto/v1/crypto_service.proto",
 }

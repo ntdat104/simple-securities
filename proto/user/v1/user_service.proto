@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package user.v1;
+
+import "google/api/annotations.proto";
+import "common/v1/types.proto"; // Import định nghĩa chung
+
+option go_package = "/gen/user/v1";
+
+service UserService {
+  // @grpc-gateway: POST /api/v1/user/register
+  rpc Register(RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/user/register"
+      body: "*"
+    };
+  };
+
+  // @grpc-gateway: POST /api/v1/user/login
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/user/login"
+      body: "*"
+    };
+  };
+
+  // @grpc-gateway: GET /api/v1/user/profile
+  // Cần Authentication Middleware để xác thực user_id từ token.
+  rpc GetUserProfile(GetUserProfileRequest) returns (GetUserProfileResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/user/profile"
+    };
+  };
+}
+
+// MESSAGES CHO REGISTER
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+}
+message RegisterResponse {
+  common.v1.UserDto user = 1;
+  string access_token = 2;
+  string token_type = 3;
+  int64 exp = 4;
+}
+
+// MESSAGES CHO LOGIN
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+message LoginResponse {
+  common.v1.UserDto user = 1;
+  string access_token = 2;
+  string token_type = 3;
+  int64 exp = 4;
+}
+
+// MESSAGES CHO GETUSERPROFILE
+message GetUserProfileRequest {
+  // user_id thường được trích xuất từ Authentication Token
+}
+message GetUserProfileResponse {
+  common.v1.UserDto user = 1;
+  common.v1.UserStatus status = 2;
+  common.v1.KycStatus kyc_status = 3;
+  int64 created_at = 4;
+}

@@ -9,6 +9,7 @@ import (
 	crypto "simple-securities/gen/crypto/v1"
 	noti "simple-securities/gen/notification/v1"
 	stock "simple-securities/gen/stock/v1"
+	user "simple-securities/gen/user/v1"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
@@ -30,9 +31,14 @@ func main() {
 		cryptoAddr = "localhost:50053"
 	}
 
+	userAddr := os.Getenv("USER_ADDR")
+	if userAddr == "" {
+		userAddr = "localhost:50054"
+	}
+
 	stockAddr := os.Getenv("STOCK_ADDR")
 	if stockAddr == "" {
-		stockAddr = "localhost:50054"
+		stockAddr = "localhost:50055"
 	}
 
 	corePort := os.Getenv("CORE_PORT")
@@ -54,6 +60,10 @@ func main() {
 
 	if err := stock.RegisterStockServiceHandlerFromEndpoint(ctx, mux, stockAddr, opts); err != nil {
 		log.Fatalf("Failed to register StockService: %v", err)
+	}
+
+	if err := user.RegisterUserServiceHandlerFromEndpoint(ctx, mux, userAddr, opts); err != nil {
+		log.Fatalf("Failed to register UserService: %v", err)
 	}
 
 	if err := http.ListenAndServe(corePort, mux); err != nil {

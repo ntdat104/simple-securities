@@ -29,12 +29,7 @@ func NewSQLiteClient() (*SQLiteClient, error) {
 	return &SQLiteClient{DB: db}, nil
 }
 
-func (c *SQLiteClient) AutoMigrate() {
-	files := []string{
-		"migrations/sqlite/000001_init_notificationdb.up.sql",
-		"migrations/sqlite/000001_seed_notifications.up.sql",
-	}
-
+func (c *SQLiteClient) AutoMigrate(files []string) {
 	for _, file := range files {
 		sql, err := os.ReadFile(file)
 		if err != nil {
