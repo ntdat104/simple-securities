@@ -139,8 +139,6 @@ func callGetUserProfile(client userpb.UserServiceClient, accessToken string) {
 	log.Printf("✅ Phản hồi GetUserProfile thành công:")
 	log.Printf("   User ID: %d", res.GetUser().GetId())
 	log.Printf("   Email: %s", res.GetUser().GetEmail())
-	log.Printf("   Trạng thái tài khoản: %v", res.GetStatus()) // UserStatus
-	log.Printf("   Trạng thái KYC: %v", res.GetKycStatus())    // KycStatus
-	log.Printf("   Ngày tạo: %v", time.Unix(res.GetCreatedAt()/1000, 0))
+	log.Printf("   Trạng thái tài khoản: %v", res.GetUser().GetStatus()) // UserStatus
 	log.Println("----------------------------------")
 }

@@ -8,6 +8,7 @@ import (
 	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
 	"simple-securities/pkg/errors"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -45,10 +46,17 @@ func (s *userLoginSvc) Handle(ctx context.Context, req *dto.UserLoginReq) (*dto.
 		return nil, errors.New(errors.ErrorTypeUnauthorized, "Invalid email or password")
 	}
 
+	now := time.Now()
+	userExist.LastLoginAt = &now
+	userSaved, err := s.userRepo.Save(ctx, userExist)
+	if err != nil {
+		return nil, errors.Newf(errors.ErrorTypeBusiness, "Failed to save last login: %v", err)
+	}
+
 	accessToken, exp, err := util.GenerateAccessToken(
-		userExist.ID,
-		userExist.Uuid,
-		userExist.Email,
+		userSaved.ID,
+		userSaved.Uuid,
+		userSaved.Email,
 		"secret-key",
 	)
 	if err != nil {
@@ -56,7 +64,7 @@ func (s *userLoginSvc) Handle(ctx context.Context, req *dto.UserLoginReq) (*dto.
 	}
 
 	return &dto.UserLoginResp{
-		User:        mapper.ToUserDto(userExist),
+		User:        mapper.ToUserDto(userSaved),
 		AccessToken: accessToken,
 		TokenType:   "Bearer",
 		Exp:         exp,

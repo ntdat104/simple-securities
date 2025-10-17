@@ -65,12 +65,18 @@ func (h *UserGrpcHandler) Login(ctx context.Context, req *userpb.LoginRequest) (
 		return nil, err
 	}
 
+	var lastLoginAt int64
+
+	if res.User.LastLoginAt != nil {
+		lastLoginAt = res.User.LastLoginAt.UnixMilli()
+	}
+
 	return &userpb.LoginResponse{
 		User: &common.UserDto{
 			Id:          res.User.ID,
 			Uuid:        res.User.Uuid,
 			Email:       res.User.Email,
-			LastLoginAt: nil,
+			LastLoginAt: &lastLoginAt,
 			Status:      string(res.User.Status),
 		},
 		AccessToken: res.AccessToken,
@@ -105,7 +111,11 @@ func (h *UserGrpcHandler) GetUserProfile(ctx context.Context, req *userpb.GetUse
 		return nil, err
 	}
 
-	lastLoginAt := res.LastLoginAt.Unix()
+	var lastLoginAt int64
+
+	if res.LastLoginAt != nil {
+		lastLoginAt = res.LastLoginAt.UnixMilli()
+	}
 
 	return &userpb.GetUserProfileResponse{
 		User: &common.UserDto{
