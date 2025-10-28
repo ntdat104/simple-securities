@@ -3,9 +3,13 @@ package mysql
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type MySQLConfig struct {
@@ -55,6 +59,16 @@ func NewMySQLClient(conf MySQLConfig) (*MySQLClient, error) {
 	}
 
 	return &MySQLClient{DB: db}, nil
+}
+
+func (c *MySQLClient) AutoMigrate(files []string) {
+	for _, file := range files {
+		sql, err := os.ReadFile(file)
+		if err != nil {
+			log.Fatalf("failed to read migration file %s: %v", file, err)
+		}
+		c.DB.MustExec(string(sql))
+	}
 }
 
 func (c *MySQLClient) GetDB(ctx context.Context) *sqlx.DB {

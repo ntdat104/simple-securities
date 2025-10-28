@@ -40,7 +40,7 @@ mysql:
   password: root
   host: 127.0.0.1
   port: 3306
-  database: go_hexagonal
+  database: user_service
   max_idle_conns: 10
   max_open_conns: 100
   max_life_time: 300s

@@ -12,7 +12,7 @@ import (
 	"simple-securities/internal/user/infras/repo"
 	"simple-securities/internal/user/middleware"
 	"simple-securities/pkg/conv"
-	"simple-securities/pkg/db/sqlite"
+	"simple-securities/pkg/db/mysql"
 	"simple-securities/pkg/logger"
 	"simple-securities/pkg/server"
 	"simple-securities/pkg/server/grpc"
@@ -34,13 +34,26 @@ func main() {
 		zap.String("port", conv.ConvertUInt32ToString(config.GlobalConfig.GrpcServer.Port)),
 		zap.String("env", string(config.GlobalConfig.Env)))
 
-	db, err := sqlite.NewSQLiteClient()
+	db, err := mysql.NewMySQLClient(mysql.MySQLConfig{
+		User:         config.GlobalConfig.MySQL.User,
+		Password:     config.GlobalConfig.MySQL.Password,
+		Host:         config.GlobalConfig.MySQL.Host,
+		Port:         config.GlobalConfig.MySQL.Port,
+		Database:     config.GlobalConfig.MySQL.Database,
+		CharSet:      config.GlobalConfig.MySQL.CharSet,
+		ParseTime:    config.GlobalConfig.MySQL.ParseTime,
+		TimeZone:     config.GlobalConfig.MySQL.TimeZone,
+		MaxIdleConns: config.GlobalConfig.MySQL.MaxIdleConns,
+		MaxOpenConns: config.GlobalConfig.MySQL.MaxOpenConns,
+		MaxLifeTime:  30 * time.Minute,
+		MaxIdleTime:  10 * time.Minute,
+	})
 	if err != nil {
 		log.Fatalf("Failed to connect to SQLite: %v", err)
 	}
 	defer db.Close(ctx)
 	db.AutoMigrate([]string{
-		"migrations/sqlite/000002_init_userdb.up.sql",
+		"migrations/mysql/000002_init.userdb.up.sql",
 	})
 
 	userRepo := repo.NewUserRepo(db.DB)
