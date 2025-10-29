@@ -17,25 +17,28 @@ import (
 
 type UserGrpcHandler struct {
 	userpb.UnimplementedUserServiceServer
-	userRegisterSvc   service.UserRegisterSvc
-	userLoginSvc      service.UserLoginSvc
-	userGetProfileSvc service.UserGetProfileSvc
+	registerSvc       service.RegisterSvc
+	loginSvc          service.LoginSvc
+	refreshTokenSvc   service.RefreshTokenSvc
+	getUserProfileSvc service.GetUserProfileSvc
 }
 
 func NewUserGrpcHandler(
-	userRegisterSvc service.UserRegisterSvc,
-	userLoginSvc service.UserLoginSvc,
-	userGetProfileSvc service.UserGetProfileSvc,
+	registerSvc service.RegisterSvc,
+	loginSvc service.LoginSvc,
+	refreshTokenSvc service.RefreshTokenSvc,
+	getUserProfileSvc service.GetUserProfileSvc,
 ) userpb.UserServiceServer {
 	return &UserGrpcHandler{
-		userRegisterSvc:   userRegisterSvc,
-		userLoginSvc:      userLoginSvc,
-		userGetProfileSvc: userGetProfileSvc,
+		registerSvc:       registerSvc,
+		loginSvc:          loginSvc,
+		refreshTokenSvc:   refreshTokenSvc,
+		getUserProfileSvc: getUserProfileSvc,
 	}
 }
 
 func (h *UserGrpcHandler) Register(ctx context.Context, req *userpb.RegisterRequest) (*userpb.RegisterResponse, error) {
-	res, err := h.userRegisterSvc.Handle(ctx, &dto.UserRegisterReq{
+	res, err := h.registerSvc.Execute(ctx, &dto.RegisterReq{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -50,14 +53,15 @@ func (h *UserGrpcHandler) Register(ctx context.Context, req *userpb.RegisterRequ
 			LastLoginAt: nil,
 			Status:      string(res.User.Status),
 		},
-		AccessToken: res.AccessToken,
-		TokenType:   res.TokenType,
-		Exp:         res.Exp,
+		AccessToken:  res.AccessToken,
+		RefreshToken: res.RefreshToken,
+		TokenType:    res.TokenType,
+		Exp:          res.Exp,
 	}, nil
 }
 
 func (h *UserGrpcHandler) Login(ctx context.Context, req *userpb.LoginRequest) (*userpb.LoginResponse, error) {
-	res, err := h.userLoginSvc.Handle(ctx, &dto.UserLoginReq{
+	res, err := h.loginSvc.Execute(ctx, &dto.LoginReq{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -79,9 +83,36 @@ func (h *UserGrpcHandler) Login(ctx context.Context, req *userpb.LoginRequest) (
 			LastLoginAt: &lastLoginAt,
 			Status:      string(res.User.Status),
 		},
-		AccessToken: res.AccessToken,
-		TokenType:   res.TokenType,
-		Exp:         res.Exp,
+		AccessToken:  res.AccessToken,
+		RefreshToken: res.RefreshToken,
+		TokenType:    res.TokenType,
+		Exp:          res.Exp,
+	}, nil
+}
+
+func (h *UserGrpcHandler) RefreshToken(ctx context.Context, req *userpb.RefreshTokenRequest) (*userpb.RefreshTokenResponse, error) {
+	res, err := h.refreshTokenSvc.Execute(ctx, req.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+	var lastLoginAt int64
+
+	if res.User.LastLoginAt != nil {
+		lastLoginAt = res.User.LastLoginAt.UnixMilli()
+	}
+
+	return &userpb.RefreshTokenResponse{
+		User: &common.UserDto{
+			Id:          res.User.ID,
+			Uuid:        res.User.Uuid,
+			Email:       res.User.Email,
+			LastLoginAt: &lastLoginAt,
+			Status:      string(res.User.Status),
+		},
+		AccessToken:  res.AccessToken,
+		RefreshToken: res.RefreshToken,
+		TokenType:    res.TokenType,
+		Exp:          res.Exp,
 	}, nil
 }
 
@@ -106,7 +137,7 @@ func (h *UserGrpcHandler) GetUserProfile(ctx context.Context, req *userpb.GetUse
 		return nil, status.Error(codes.Unauthenticated, "Access token is empty.")
 	}
 
-	res, err := h.userGetProfileSvc.Handle(ctx, accessToken)
+	res, err := h.getUserProfileSvc.Execute(ctx, accessToken)
 	if err != nil {
 		return nil, err
 	}

@@ -44,7 +44,7 @@ func (r *UserRepo) withTransaction(ctx context.Context, fn func(*sqlx.Tx) error)
 func (r *UserRepo) FindById(ctx context.Context, id uint64) (*model.User, error) {
 	query := `
         SELECT 
-            id, uuid, email, hashed_password, status, last_login_at,
+            id, uuid, email, hashed_password, refresh_token, status, last_login_at,
             created_at, updated_at, created_by, updated_by
         FROM users
         WHERE id = $1
@@ -70,7 +70,7 @@ func (r *UserRepo) FindByIdIn(ctx context.Context, ids []uint64) ([]*model.User,
 	// In clause for sqlx
 	query, args, err := sqlx.In(`
         SELECT 
-            id, uuid, email, hashed_password, status, last_login_at,
+            id, uuid, email, hashed_password, refresh_token, status, last_login_at,
             created_at, updated_at, created_by, updated_by
         FROM users
         WHERE id IN (?)
@@ -93,7 +93,7 @@ func (r *UserRepo) FindByIdIn(ctx context.Context, ids []uint64) ([]*model.User,
 func (r *UserRepo) FindByUuid(ctx context.Context, uuid string) (*model.User, error) {
 	query := `
         SELECT 
-            id, uuid, email, hashed_password, status, last_login_at,
+            id, uuid, email, hashed_password, refresh_token, status, last_login_at,
             created_at, updated_at, created_by, updated_by
         FROM users
         WHERE uuid = $1
@@ -114,7 +114,7 @@ func (r *UserRepo) FindByUuid(ctx context.Context, uuid string) (*model.User, er
 func (r *UserRepo) FindByEmail(ctx context.Context, email string) (*model.User, error) {
 	query := `
         SELECT 
-            id, uuid, email, hashed_password, status, last_login_at,
+            id, uuid, email, hashed_password, refresh_token, status, last_login_at,
             created_at, updated_at, created_by, updated_by
         FROM users
         WHERE email = $1
@@ -177,6 +177,7 @@ func (r *UserRepo) Save(ctx context.Context, user *model.User) (*model.User, err
         UPDATE users SET
             email = :email,
             hashed_password = :hashed_password,
+			refresh_token = :refresh_token,
             status = :status,
             last_login_at = :last_login_at,
             updated_at = :updated_at,
@@ -241,6 +242,7 @@ func (r *UserRepo) SaveAll(ctx context.Context, users []*model.User) ([]*model.U
                     UPDATE users SET
                         email = :email,
                         hashed_password = :hashed_password,
+						refresh_token = :refresh_token,
                         status = :status,
                         last_login_at = :last_login_at,
                         updated_at = :updated_at,

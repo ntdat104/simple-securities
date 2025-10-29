@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     uuid TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE,
     hashed_password TEXT NOT NULL,
+    refresh_token TEXT NULL,
     last_login_at DATETIME NULL,
     -- Status is expected to be a string or integer based on the Go enum. 
     -- Assuming a TEXT representation for flexibility, matching Go's string conversion of enums.

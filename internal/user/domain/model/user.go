@@ -11,6 +11,7 @@ type User struct {
 	Uuid           string          `db:"uuid"`
 	Email          string          `db:"email"`
 	HashedPassword string          `db:"hashed_password"` // Store hash, not plaintext password
+	RefreshToken   string          `db:"refresh_token"`   // For session management
 	LastLoginAt    *time.Time      `db:"last_login_at"`
 	Status         enum.UserStatus `db:"status"`
 	CreatedAt      time.Time       `db:"created_at"`

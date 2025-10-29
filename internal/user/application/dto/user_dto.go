@@ -15,28 +15,35 @@ type UserDto struct {
 	UpdatedAt   time.Time       `json:"updated_at"`
 }
 
-// UserRegister
-type UserRegisterReq struct {
+type RegisterReq struct {
 	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }
 
-type UserRegisterResp struct {
-	User        *UserDto `json:"user"`
-	AccessToken string   `json:"access_token"`
-	TokenType   string   `json:"token_type"`
-	Exp         int64    `json:"exp"`
+type RegisterResp struct {
+	User         *UserDto `json:"user"`
+	AccessToken  string   `json:"access_token"`
+	RefreshToken string   `json:"refresh_token"`
+	TokenType    string   `json:"token_type"`
+	Exp          int64    `json:"exp"`
 }
-
-// UserLogin
-type UserLoginReq struct {
+type LoginReq struct {
 	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }
 
-type UserLoginResp struct {
-	User        *UserDto `json:"user"`
-	AccessToken string   `json:"access_token"`
-	TokenType   string   `json:"token_type"`
-	Exp         int64    `json:"exp"`
+type LoginResp struct {
+	User         *UserDto `json:"user"`
+	AccessToken  string   `json:"access_token"`
+	RefreshToken string   `json:"refresh_token"`
+	TokenType    string   `json:"token_type"`
+	Exp          int64    `json:"exp"`
+}
+
+type RefreshTokenResp struct {
+	User         *UserDto `json:"user"`
+	AccessToken  string   `json:"access_token"`
+	RefreshToken string   `json:"refresh_token"`
+	TokenType    string   `json:"token_type"`
+	Exp          int64    `json:"exp"`
 }

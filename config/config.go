@@ -38,6 +38,7 @@ func GetLastConfigChangeTime() time.Time {
 type Config struct {
 	Env           Env               `yaml:"env" mapstructure:"env"`
 	App           *AppConfig        `yaml:"app" mapstructure:"app"`
+	Jwt           *JwtConfig        `yaml:"jwt" mapstructure:"jwt"`
 	GrpcServer    *GrpcServerConfig `yaml:"grpc_server" mapstructure:"grpc_server"`
 	HTTPServer    *HttpServerConfig `yaml:"http_server" mapstructure:"http_server"`
 	MetricsServer *MetricsConfig    `yaml:"metrics_server" mapstructure:"metrics_server"`
@@ -55,30 +56,11 @@ type AppConfig struct {
 	Version string `yaml:"version" mapstructure:"version"`
 }
 
-type GrpcServerConfig struct {
-	Port                  uint32 `yaml:"port" mapstructure:"port"`
-	MaxConnectionIdle     int    `yaml:"max_connection_idle" mapstructure:"max_connection_idle"`
-	MaxConnectionAge      int    `yaml:"max_connection_age" mapstructure:"max_connection_age"`
-	MaxConnectionAgeGrace int    `yaml:"max_connection_age_grace" mapstructure:"max_connection_age_grace"`
-	Time                  int    `yaml:"time" mapstructure:"time"`
-	Timeout               int    `yaml:"timeout" mapstructure:"timeout"`
-	MinTime               int    `yaml:"min_time" mapstructure:"min_time"`
-	PermitWithoutStream   bool   `yaml:"permit_without_stream" mapstructure:"permit_without_stream"`
-}
-
-type HttpServerConfig struct {
-	Addr            string `yaml:"addr" mapstructure:"addr"`
-	Pprof           bool   `yaml:"pprof" mapstructure:"pprof"`
-	DefaultPageSize int    `yaml:"default_page_size" mapstructure:"default_page_size"`
-	MaxPageSize     int    `yaml:"max_page_size" mapstructure:"max_page_size"`
-	ReadTimeout     string `yaml:"read_timeout" mapstructure:"read_timeout"`
-	WriteTimeout    string `yaml:"write_timeout" mapstructure:"write_timeout"`
-}
-
-type MetricsConfig struct {
-	Addr    string `yaml:"addr" mapstructure:"addr"`
-	Enabled bool   `yaml:"enabled" mapstructure:"enabled"`
-	Path    string `yaml:"path" mapstructure:"path"`
+type JwtConfig struct {
+	TokenType          string `yaml:"token_type" mapstructure:"token_type"`
+	SecretKey          string `yaml:"secret_key" mapstructure:"secret_key"`
+	AccessTokenExpiry  uint32 `yaml:"access_token_expiry" mapstructure:"access_token_expiry"`
+	RefreshTokenExpiry uint32 `yaml:"refresh_token_expiry" mapstructure:"refresh_token_expiry"`
 }
 
 type LogConfig struct {
@@ -93,60 +75,6 @@ type LogConfig struct {
 	EnableColor      bool   `yaml:"enable_color" mapstructure:"enable_color"`
 	EnableCaller     bool   `yaml:"enable_caller" mapstructure:"enable_caller"`
 	EnableStacktrace bool   `yaml:"enable_stacktrace" mapstructure:"enable_stacktrace"`
-}
-
-type MySQLConfig struct {
-	User         string `yaml:"user" mapstructure:"user"`
-	Password     string `yaml:"password" mapstructure:"password"`
-	Host         string `yaml:"host" mapstructure:"host"`
-	Port         int    `yaml:"port" mapstructure:"port"`
-	Database     string `yaml:"database" mapstructure:"database"`
-	MaxIdleConns int    `yaml:"max_idle_conns" mapstructure:"max_idle_conns"`
-	MaxOpenConns int    `yaml:"max_open_conns" mapstructure:"max_open_conns"`
-	MaxLifeTime  string `yaml:"max_life_time" mapstructure:"max_life_time"`
-	MaxIdleTime  string `yaml:"max_idle_time" mapstructure:"max_idle_time"`
-	CharSet      string `yaml:"char_set" mapstructure:"char_set"`
-	ParseTime    bool   `yaml:"parse_time" mapstructure:"parse_time"`
-	TimeZone     string `yaml:"time_zone" mapstructure:"time_zone"`
-}
-
-type PostgreSQLConfig struct {
-	User            string `yaml:"user" mapstructure:"user"`
-	Password        string `yaml:"password" mapstructure:"password"`
-	Host            string `yaml:"host" mapstructure:"host"`
-	Port            int    `yaml:"port" mapstructure:"port"`
-	Database        string `yaml:"database" mapstructure:"database"`
-	SSLMode         string `yaml:"ssl_mode" mapstructure:"ssl_mode"`
-	Options         string `yaml:"options" mapstructure:"options"`
-	MaxConnections  int32  `yaml:"max_connections" mapstructure:"max_connections"`
-	MinConnections  int32  `yaml:"min_connections" mapstructure:"min_connections"`
-	MaxConnLifetime int    `yaml:"max_conn_lifetime" mapstructure:"max_conn_lifetime"`
-	IdleTimeout     int    `yaml:"idle_timeout" mapstructure:"idle_timeout"`
-	ConnectTimeout  int    `yaml:"connect_timeout" mapstructure:"connect_timeout"`
-	TimeZone        string `yaml:"time_zone" mapstructure:"time_zone"`
-}
-
-type RedisConfig struct {
-	Host         string `yaml:"host" mapstructure:"host"`
-	Port         int    `yaml:"port" mapstructure:"port"`
-	Password     string `yaml:"password" mapstructure:"password"`
-	DB           int    `yaml:"db" mapstructure:"db"`
-	PoolSize     int    `yaml:"poolSize" mapstructure:"poolSize"`
-	IdleTimeout  int    `yaml:"idleTimeout" mapstructure:"idleTimeout"`
-	MinIdleConns int    `yaml:"minIdleConns" mapstructure:"minIdleConns"`
-}
-
-type MongoDBConfig struct {
-	Host        string `yaml:"host" mapstructure:"host"`
-	Port        int    `yaml:"port" mapstructure:"port"`
-	Database    string `yaml:"database" mapstructure:"database"`
-	User        string `yaml:"user" mapstructure:"user"`
-	Password    string `yaml:"password" mapstructure:"password"`
-	AuthSource  string `yaml:"auth_source" mapstructure:"auth_source"`
-	Options     string `yaml:"options" mapstructure:"options"`
-	MinPoolSize int    `yaml:"min_pool_size" mapstructure:"min_pool_size"`
-	MaxPoolSize int    `yaml:"max_pool_size" mapstructure:"max_pool_size"`
-	IdleTimeout int    `yaml:"idle_timeout" mapstructure:"idle_timeout"`
 }
 
 func Load(configPath string, configFile string) (*Config, error) {

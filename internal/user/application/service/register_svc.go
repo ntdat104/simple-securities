@@ -2,31 +2,31 @@ package service
 
 import (
 	"context"
+	"simple-securities/config"
 	"simple-securities/internal/user/application/dto"
 	"simple-securities/internal/user/application/mapper"
 	"simple-securities/internal/user/application/util"
 	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
+	"simple-securities/pkg/bcrypt"
 	"simple-securities/pkg/errors"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
-type UserRegisterSvc interface {
-	Handle(ctx context.Context, req *dto.UserRegisterReq) (*dto.UserRegisterResp, error)
+type RegisterSvc interface {
+	Execute(ctx context.Context, req *dto.RegisterReq) (*dto.RegisterResp, error)
 }
 
-type userRegisterSvc struct {
+type registerSvc struct {
 	userRepo repo.IUserRepo
 }
 
-func NewUserRegisterSvc(userRepo repo.IUserRepo) UserRegisterSvc {
-	return &userRegisterSvc{
+func NewRegisterSvc(userRepo repo.IUserRepo) RegisterSvc {
+	return &registerSvc{
 		userRepo: userRepo,
 	}
 }
 
-func (s *userRegisterSvc) Handle(ctx context.Context, req *dto.UserRegisterReq) (*dto.UserRegisterResp, error) {
+func (s *registerSvc) Execute(ctx context.Context, req *dto.RegisterReq) (*dto.RegisterResp, error) {
 	if req.Email == "" {
 		return nil, model.ErrInvalidUserEmail
 	}
@@ -40,7 +40,7 @@ func (s *userRegisterSvc) Handle(ctx context.Context, req *dto.UserRegisterReq) 
 		return nil, model.ErrUserEmailTaken
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.HashPassword(req.Password)
 	if err != nil {
 		return nil, errors.Newf(errors.ErrorTypeBusiness, "Failed to hash password: %v", err)
 	}
@@ -55,20 +55,33 @@ func (s *userRegisterSvc) Handle(ctx context.Context, req *dto.UserRegisterReq) 
 		return nil, errors.Newf(errors.ErrorTypeSystem, "Internal system error during user save: %v", err)
 	}
 
-	accessToken, exp, err := util.GenerateAccessToken(
+	accessToken, exp, err := util.GenerateJwtToken(
 		userSaved.ID,
 		userSaved.Uuid,
 		userSaved.Email,
-		"secret-key",
+		config.GlobalConfig.Jwt.SecretKey,
+		config.GlobalConfig.Jwt.AccessTokenExpiry,
 	)
+
+	refreshToken, exp, err := util.GenerateJwtToken(
+		userSaved.ID,
+		userSaved.Uuid,
+		userSaved.Email,
+		config.GlobalConfig.Jwt.SecretKey,
+		config.GlobalConfig.Jwt.RefreshTokenExpiry,
+	)
+
+	userSaved.RefreshToken = refreshToken
+	_, err = s.userRepo.Save(ctx, userSaved)
 	if err != nil {
 		return nil, errors.Newf(errors.ErrorTypeBusiness, "Failed to generate access token: %v", err)
 	}
 
-	return &dto.UserRegisterResp{
-		User:        mapper.ToUserDto(userSaved),
-		AccessToken: accessToken,
-		TokenType:   "Bearer",
-		Exp:         exp,
+	return &dto.RegisterResp{
+		User:         mapper.ToUserDto(userSaved),
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		TokenType:    config.GlobalConfig.Jwt.TokenType,
+		Exp:          exp,
 	}, nil
 }

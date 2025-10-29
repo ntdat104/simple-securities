@@ -7,14 +7,15 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateAccessToken(
+func GenerateJwtToken(
 	userId uint64,
 	userUuid,
 	email string,
 	jwtSecret string,
+	expire uint32,
 ) (string, int64, error) {
 	now := time.Now()
-	expireTime := now.Add(24 * time.Hour)
+	expireTime := now.Add(time.Duration(expire) * time.Second)
 	expireUnix := expireTime.Unix()
 
 	claims := jwt.MapClaims{
