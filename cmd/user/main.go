@@ -63,10 +63,12 @@ func main() {
 	refreshTokenSvc := service.NewRefreshTokenSvc(userRepo)
 	getUserProfileSvc := service.NewGetUserProfileSvc(userRepo)
 	userHandler := grpcHandler.NewUserGrpcHandler(
-		registerSvc,
-		loginSvc,
-		refreshTokenSvc,
-		getUserProfileSvc,
+		grpcHandler.UserGrpcSvc{
+			LoginSvc:          loginSvc,
+			RegisterSvc:       registerSvc,
+			GetUserProfileSvc: getUserProfileSvc,
+			RefreshTokenSvc:   refreshTokenSvc,
+		},
 	)
 
 	// Create the gRPC server

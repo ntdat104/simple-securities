@@ -48,7 +48,7 @@ func TestUserRepo_CRUD(t *testing.T) {
 	saved, err := userRepo.Save(ctx, newUser)
 	assert.NoError(t, err)
 	assert.NotZero(t, saved.ID)
-	assert.Equal(t, enum.StatusPending, saved.Status)
+	assert.Equal(t, enum.UserProcessing, saved.Status)
 
 	// 2️⃣ Find by Email
 	foundByEmail, err := userRepo.FindByEmail(ctx, saved.Email)
@@ -67,14 +67,14 @@ func TestUserRepo_CRUD(t *testing.T) {
 
 	// 5️⃣ Update user
 	saved.Email = "updated_" + saved.Email
-	saved.Status = enum.StatusActive
+	saved.Status = enum.UserActive
 	saved.LastLoginAt = &now
 	saved.UpdatedAt = now
 	saved.UpdatedBy = 0
 
 	updated, err := userRepo.Save(ctx, saved)
 	assert.NoError(t, err)
-	assert.Equal(t, enum.StatusActive, updated.Status)
+	assert.Equal(t, enum.UserActive, updated.Status)
 
 	// 6️⃣ FindByIdIn
 	list, err := userRepo.FindByIdIn(ctx, []uint64{saved.ID})

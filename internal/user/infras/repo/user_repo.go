@@ -2,134 +2,50 @@ package repo
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
+
+	pkgRepo "simple-securities/pkg/db/repo"
 
 	"github.com/jmoiron/sqlx"
 )
 
 type UserRepo struct {
-	db *sqlx.DB
+	*pkgRepo.BaseRepo[model.User]
+	db          *sqlx.DB
+	queryFields string
+	tableName   string
 }
 
 func NewUserRepo(db *sqlx.DB) repo.IUserRepo {
-	return &UserRepo{db: db}
-}
-
-// withTransaction runs fn inside a transaction with proper commit/rollback handling
-func (r *UserRepo) withTransaction(ctx context.Context, fn func(*sqlx.Tx) error) (err error) {
-	tx, err := r.db.BeginTxx(ctx, nil)
-	if err != nil {
-		return err
+	m := model.User{}
+	return &UserRepo{
+		BaseRepo:    pkgRepo.NewBaseRepo[model.User](db),
+		db:          db,
+		tableName:   m.TableName(),
+		queryFields: m.QueryFields(),
 	}
-
-	// rollback/commit handler
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p) // rethrow panic after rollback
-		} else if err != nil {
-			_ = tx.Rollback()
-		} else {
-			err = tx.Commit()
-		}
-	}()
-
-	err = fn(tx)
-	return err
 }
 
 func (r *UserRepo) FindById(ctx context.Context, id uint64) (*model.User, error) {
-	query := `
-        SELECT 
-            id, uuid, email, hashed_password, refresh_token, status, last_login_at,
-            created_at, updated_at, created_by, updated_by
-        FROM users
-        WHERE id = $1
-        LIMIT 1
-    `
-
-	var user model.User
-	if err := r.db.GetContext(ctx, &user, query, id); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil // Return nil if user not found
-		}
-		return nil, err
-	}
-
-	return &user, nil
-}
-
-func (r *UserRepo) FindByIdIn(ctx context.Context, ids []uint64) ([]*model.User, error) {
-	if len(ids) == 0 {
-		return []*model.User{}, nil
-	}
-
-	// In clause for sqlx
-	query, args, err := sqlx.In(`
-        SELECT 
-            id, uuid, email, hashed_password, refresh_token, status, last_login_at,
-            created_at, updated_at, created_by, updated_by
-        FROM users
-        WHERE id IN (?)
-    `, ids)
-	if err != nil {
-		return nil, err
-	}
-
-	// Rebind for specific database (e.g., PostgreSQL uses $1, $2, etc.)
-	query = r.db.Rebind(query)
-
-	users := make([]*model.User, 0)
-	if err := r.db.SelectContext(ctx, &users, query, args...); err != nil {
-		return nil, err
-	}
-
-	return users, nil
+	query := fmt.Sprintf("SELECT %s FROM %s WHERE id = $1 LIMIT 1", r.queryFields, r.tableName)
+	return r.FindOne(ctx, query, id)
 }
 
 func (r *UserRepo) FindByUuid(ctx context.Context, uuid string) (*model.User, error) {
-	query := `
-        SELECT 
-            id, uuid, email, hashed_password, refresh_token, status, last_login_at,
-            created_at, updated_at, created_by, updated_by
-        FROM users
-        WHERE uuid = $1
-        LIMIT 1
-    `
-
-	var user model.User
-	if err := r.db.GetContext(ctx, &user, query, uuid); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil // Return nil if user not found
-		}
-		return nil, err
-	}
-
-	return &user, nil
+	query := fmt.Sprintf("SELECT %s FROM %s WHERE uuid = $1 LIMIT 1", r.queryFields, r.tableName)
+	return r.FindOne(ctx, query, uuid)
 }
 
 func (r *UserRepo) FindByEmail(ctx context.Context, email string) (*model.User, error) {
-	query := `
-        SELECT 
-            id, uuid, email, hashed_password, refresh_token, status, last_login_at,
-            created_at, updated_at, created_by, updated_by
-        FROM users
-        WHERE email = $1
-        LIMIT 1
-    `
+	query := fmt.Sprintf("SELECT %s FROM %s WHERE email = $1 LIMIT 1", r.queryFields, r.tableName)
+	return r.FindOne(ctx, query, email)
+}
 
-	var user model.User
-	if err := r.db.GetContext(ctx, &user, query, email); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil // Return nil if user not found
-		}
-		return nil, err
-	}
-
-	return &user, nil
+func (r *UserRepo) FindByIdIn(ctx context.Context, ids []uint64) ([]*model.User, error) {
+	query := fmt.Sprintf("SELECT %s FROM %s WHERE id IN (?)", r.queryFields, r.tableName)
+	return r.FindMany(ctx, query, ids)
 }
 
 // Save handles both creating (insert) and updating (update) a user.
@@ -156,7 +72,7 @@ func (r *UserRepo) Save(ctx context.Context, user *model.User) (*model.User, err
             )
             RETURNING id
         `
-		err := r.withTransaction(ctx, func(tx *sqlx.Tx) error {
+		err := r.WithTransaction(ctx, func(tx *sqlx.Tx) error {
 			stmt, err := tx.PrepareNamedContext(ctx, query)
 			if err != nil {
 				return err
@@ -185,7 +101,7 @@ func (r *UserRepo) Save(ctx context.Context, user *model.User) (*model.User, err
         WHERE id = :id
     `
 
-	err := r.withTransaction(ctx, func(tx *sqlx.Tx) error {
+	err := r.WithTransaction(ctx, func(tx *sqlx.Tx) error {
 		res, err := tx.NamedExecContext(ctx, query, user)
 		if err != nil {
 			return err
@@ -213,7 +129,7 @@ func (r *UserRepo) SaveAll(ctx context.Context, users []*model.User) ([]*model.U
 	// For simplicity, and due to the difficulty of mixed operations in a single bulk query,
 	// we'll iterate and call the Save logic for each user in a transaction.
 
-	err := r.withTransaction(ctx, func(tx *sqlx.Tx) error {
+	err := r.WithTransaction(ctx, func(tx *sqlx.Tx) error {
 		for _, user := range users {
 			if user.ID == 0 {
 				// INSERT logic (similar to Save's insert block)

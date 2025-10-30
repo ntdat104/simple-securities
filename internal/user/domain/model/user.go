@@ -1,8 +1,10 @@
 package model
 
 import (
+	"reflect"
 	"simple-securities/internal/user/application/enum"
 	"simple-securities/pkg/uuid"
+	"strings"
 	"time"
 )
 
@@ -24,6 +26,20 @@ func (u User) TableName() string {
 	return "users"
 }
 
+func (u User) QueryFields() string {
+	t := reflect.TypeOf(u)
+	var fields []string
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		dbTag := field.Tag.Get("db")
+		if dbTag != "" {
+			parts := strings.Split(dbTag, ",")
+			fields = append(fields, parts[0])
+		}
+	}
+	return strings.Join(fields, ", ")
+}
+
 func NewUser(email, hashedPassword string) (*User, error) {
 	if email == "" {
 		return nil, ErrInvalidUserEmail
@@ -38,7 +54,7 @@ func NewUser(email, hashedPassword string) (*User, error) {
 		Uuid:           uuid.NewGoogleUUID(),
 		Email:          email,
 		HashedPassword: hashedPassword,
-		Status:         enum.StatusPending, // Default to pending until confirmed
+		Status:         enum.UserProcessing, // Default to pending until confirmed
 		LastLoginAt:    nil,
 		CreatedAt:      now,
 		UpdatedAt:      now,
