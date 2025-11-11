@@ -21,7 +21,7 @@ func NewConsumer(brokers []string, topic, groupID string, handler EventHandler, 
 		Brokers:  brokers,
 		Topic:    topic,
 		GroupID:  groupID,
-		MinBytes: 10e3, // 10KB
+		MinBytes: 1, // 10KB || 10e3
 		MaxBytes: 10e6, // 10MB
 	})
 

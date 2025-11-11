@@ -19,8 +19,9 @@ func NewProducer(brokers []string, logger *zap.Logger) *Producer {
 	writer := &kafka.Writer{
 		Addr:         kafka.TCP(brokers...),
 		Balancer:     &kafka.LeastBytes{},
-		RequiredAcks: kafka.RequireOne,
-		Async:        false,
+		RequiredAcks: kafka.RequireOne, // wait for leader
+		Async:        false, // wait for ack
+		BatchTimeout: 0, // send immediately || time.Second * 2
 	}
 
 	return &Producer{

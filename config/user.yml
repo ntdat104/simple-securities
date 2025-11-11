@@ -44,7 +44,7 @@ mysql:
   user: root
   password: root
   host: 127.0.0.1
-  port: 3306
+  port: 3106
   database: user_service
   max_idle_conns: 10
   max_open_conns: 100
@@ -55,7 +55,7 @@ mysql:
   time_zone: Local
 redis:
   host: 127.0.0.1
-  port: 6379
+  port: 6179
   password: ""
   db: 0
   poolSize: 10
@@ -65,7 +65,7 @@ postgres:
   user: postgres
   password: postgres
   host: 127.0.0.1
-  port: 5432
+  port: 5132
   database: go_hexagonal
   ssl_mode: disable
   options: ""
@@ -77,7 +77,7 @@ postgres:
   time_zone: UTC
 mongodb:
   host: 127.0.0.1
-  port: 27017
+  port: 21017
   database: go_hexagonal
   user: ""
   password: ""

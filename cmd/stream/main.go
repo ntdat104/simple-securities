@@ -20,7 +20,7 @@ var (
 	clients   = make(map[*websocket.Conn]map[string]bool)
 	clientsMu sync.Mutex
 	rdb       = redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: "localhost:6179",
 	})
 	ctx = context.Background()
 )

@@ -11,7 +11,7 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: pass
     ports:
-      - "3306:3306"
+      - "3106:3306"
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
       - mysql_data:/var/lib/mysql
@@ -27,7 +27,7 @@ services:
       POSTGRES_PASSWORD: pass
       POSTGRES_DB: user_service
     ports:
-      - "5432:5432"
+      - "5132:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -39,18 +39,18 @@ services:
     restart: always
     command: ["redis-server", "--appendonly", "yes"]
     ports:
-      - "6379:6379"
+      - "6179:6379"
     volumes:
       - redis_data:/data
     networks:
       - simple-securities
-      
+
   redisinsight:
     image: redis/redisinsight:2.70
     container_name: redisinsight
     restart: always
     ports:
-      - "5540:5540"
+      - "5140:5540"
     volumes:
       - redisinsight_data:/db
     networks:
@@ -63,7 +63,7 @@ services:
     environment:
       MONGO_INITDB_DATABASE: user_service
     ports:
-      - "27017:27017"
+      - "21017:27017"
     volumes:
       - mongo_data:/data/db
     networks:

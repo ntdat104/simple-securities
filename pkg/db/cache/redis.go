@@ -45,7 +45,7 @@ type RedisClient struct {
 
 func DefaultRedisConfig() *RedisConfig {
 	return &RedisConfig{
-		Address:         "localhost:6379",
+		Address:         "localhost:6179",
 		Password:        "",
 		DB:              0,
 		PoolSize:        10,

@@ -193,7 +193,7 @@ func getAllCryptoSymbols() ([]string, error) {
 func main() {
 	// Create Redis client
 	rdb := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379", // Redis server address
+		Addr: "localhost:6179", // Redis server address
 	})
 
 	// Tickers to subscribe to
