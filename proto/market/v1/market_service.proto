@@ -1,0 +1,374 @@
+syntax = "proto3";
+
+package market.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "/gen/market/v1";
+
+service MarketDataService {
+  // --- General endpoints ---
+  // @grpc-gateway: GET /api/v1/market/ping
+  rpc Ping (PingRequest) returns (PingResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/market/ping"
+    };
+  }
+
+  // @grpc-gateway: GET /api/v1/market/time
+  rpc GetServerTime (GetServerTimeRequest) returns (GetServerTimeResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/market/time"
+    };
+  }
+
+  // --- Exchange Info ---
+  // @grpc-gateway: GET /api/v1/market/exchangeInfo
+  rpc GetExchangeInfo (GetExchangeInfoRequest) returns (GetExchangeInfoResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/market/exchangeInfo"
+    };
+  }
+
+  // --- Market Depth / Order Book ---
+  // @grpc-gateway: GET /api/v1/market/depth
+  rpc GetOrderBook (GetOrderBookRequest) returns (GetOrderBookResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/market/depth"
+    };
+  }
+
+  // --- Recent Trades ---
+  // @grpc-gateway: GET /api/v1/market/trades
+  rpc GetRecentTrades (GetRecentTradesRequest) returns (GetRecentTradesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/market/trades"
+    };
+  }
+
+  // --- Historical Trades ---
+  // @grpc-gateway: GET /api/v1/market/historicalTrades
+  rpc GetHistoricalTrades (GetHistoricalTradesRequest) returns (GetHistoricalTradesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/market/historicalTrades"
+    };
+  }
+
+  // --- Aggregate Trades ---
+  // @grpc-gateway: GET /api/v1/market/aggTrades
+  rpc GetAggTrades (GetAggTradesRequest) returns (GetAggTradesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/market/aggTrades"
+    };
+  }
+
+  // --- Klines / Candlestick ---
+  // @grpc-gateway: GET /api/v1/market/klines
+  rpc GetKlines (GetKlinesRequest) returns (GetKlinesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/market/klines"
+    };
+  }
+
+  // --- UI Klines ---
+  // @grpc-gateway: GET /api/v1/market/uiKlines
+  rpc GetUiKlines (GetUiKlinesRequest) returns (GetUiKlinesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/market/uiKlines"
+    };
+  }
+
+  // --- Average Price ---
+  // @grpc-gateway: GET /api/v1/market/avgPrice
+  rpc GetAvgPrice (GetAvgPriceRequest) returns (GetAvgPriceResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/market/avgPrice"
+    };
+  }
+
+  // --- 24hr Ticker ---
+  // @grpc-gateway: GET /api/v1/market/ticker/24hr
+  rpc GetTicker24hr (GetTicker24hrRequest) returns (GetTicker24hrResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/market/ticker/24hr"
+    };
+  }
+
+  // --- Symbol Price ---
+  // @grpc-gateway: GET /api/v1/market/ticker/price
+  rpc GetTickerPrice (GetTickerPriceRequest) returns (GetTickerPriceResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/market/ticker/price"
+    };
+  }
+
+  // --- Book Ticker ---
+  // @grpc-gateway: GET /api/v1/market/ticker/bookTicker
+  rpc GetBookTicker (GetBookTickerRequest) returns (GetBookTickerResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/market/ticker/bookTicker"
+    };
+  }
+
+  // --- Rolling Ticker ---
+  // @grpc-gateway: GET /api/v1/market/ticker
+  rpc GetRollingTicker (GetRollingTickerRequest) returns (GetRollingTickerResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/market/ticker"
+    };
+  }
+}
+
+// ========== Messages ==========
+
+// Ping
+message PingRequest {}
+message PingResponse {}
+
+// Server Time
+message GetServerTimeRequest {}
+message GetServerTimeResponse {
+  int64 server_time = 1;
+}
+
+// Exchange Info
+message GetExchangeInfoRequest {
+  optional string symbol = 1;
+  repeated string symbols = 2;
+  optional string permissions = 3;
+  optional bool show_permission_sets = 4;
+  optional string symbol_status = 5;
+}
+
+message GetExchangeInfoResponse {
+  string timezone = 1;
+  int64 server_time = 2;
+  repeated RateLimit rate_limits = 3;
+  repeated ExchangeFilter exchange_filters = 4;
+  repeated SymbolInfo symbols = 5;
+}
+
+message RateLimit {
+  string rate_limit_type = 1;
+  string interval = 2;
+  int32 limit = 3;
+}
+
+message ExchangeFilter {
+  string filter_type = 1;
+  int64 max_num_algo_orders = 2;
+}
+
+message SymbolInfo {
+  string symbol = 1;
+  string status = 2;
+  string base_asset = 3;
+  int64 base_asset_precision = 4;
+  string quote_asset = 5;
+  int64 quote_precision = 6;
+  repeated string order_types = 7;
+  bool iceberg_allowed = 8;
+  bool is_spot_trading_allowed = 9;
+  repeated SymbolFilter filters = 10;
+}
+
+message SymbolFilter {
+  string filter_type = 1;
+  string min_price = 2;
+  string max_price = 3;
+  string tick_size = 4;
+  string min_qty = 5;
+  string max_qty = 6;
+  string step_size = 7;
+}
+
+// Order Book
+message GetOrderBookRequest {
+  string symbol = 1;
+  int32 limit = 2;
+}
+message GetOrderBookResponse {
+  int64 last_update_id = 1;
+  repeated OrderLevel bids = 2;
+  repeated OrderLevel asks = 3;
+}
+message OrderLevel {
+  string price = 1;
+  string qty = 2;
+}
+
+// Recent Trades
+message GetRecentTradesRequest {
+  string symbol = 1;
+  int32 limit = 2;
+}
+message GetRecentTradesResponse {
+  repeated Trade trades = 1;
+}
+message Trade {
+  int64 id = 1;
+  string price = 2;
+  string qty = 3;
+  int64 time = 4;
+  string quote_qty = 5;
+  bool is_buyer_maker = 6;
+  bool is_best_match = 7;
+}
+
+// Historical Trades
+message GetHistoricalTradesRequest {
+  string symbol = 1;
+  uint32 limit = 2;
+  int64 from_id = 3;
+}
+message GetHistoricalTradesResponse {
+  repeated Trade trades = 1;
+}
+
+// Aggregate Trades
+message GetAggTradesRequest {
+  string symbol = 1;
+  int32 limit = 2;
+  int64 from_id = 3;
+  uint64 start_time = 4;
+  uint64 end_time = 5;
+}
+message GetAggTradesResponse {
+  repeated AggTrade trades = 1;
+}
+message AggTrade {
+  int64 agg_trade_id = 1;
+  string price = 2;
+  string qty = 3;
+  int64 first_trade_id = 4;
+  int64 last_trade_id = 5;
+  int64 time = 6;
+  bool is_buyer_maker = 7;
+  bool is_best_match = 8;
+}
+
+// Klines
+message GetKlinesRequest {
+  string symbol = 1;
+  string interval = 2;
+  int32 limit = 3;
+  uint64 start_time = 4;
+  uint64 end_time = 5;
+}
+message GetKlinesResponse {
+  repeated Kline klines = 1;
+}
+message Kline {
+  uint64 open_time = 1;
+  string open = 2;
+  string high = 3;
+  string low = 4;
+  string close = 5;
+  string volume = 6;
+  uint64 close_time = 7;
+  string quote_asset_volume = 8;
+  uint64 number_of_trades = 9;
+  string taker_buy_base_asset_volume = 10;
+  string taker_buy_quote_asset_volume = 11;
+}
+
+// UiKlines
+message GetUiKlinesRequest {
+  string symbol = 1;
+  string interval = 2;
+  int32 limit = 3;
+  uint64 start_time = 4;
+  uint64 end_time = 5;
+}
+message GetUiKlinesResponse {
+  repeated UiKline klines = 1;
+}
+message UiKline {
+  uint64 open_time = 1;
+  string open = 2;
+  string high = 3;
+  string low = 4;
+  string close = 5;
+  string volume = 6;
+  uint64 close_time = 7;
+  string quote_asset_volume = 8;
+  uint64 number_of_trades = 9;
+  string taker_buy_base_asset_volume = 10;
+  string taker_buy_quote_asset_volume = 11;
+}
+
+// Avg Price
+message GetAvgPriceRequest {
+  string symbol = 1;
+}
+message GetAvgPriceResponse {
+  uint64 mins = 1;
+  string price = 2;
+}
+
+// 24hr Ticker
+message GetTicker24hrRequest {
+  optional string symbol = 1;
+  repeated string symbols = 2;
+}
+message GetTicker24hrResponse {
+  repeated Ticker24hr tickers = 1;
+}
+message Ticker24hr {
+  string symbol = 1;
+  string price_change = 2;
+  string price_change_percent = 3;
+  string weighted_avg_price = 4;
+  string last_price = 5;
+  string volume = 6;
+  string quote_volume = 7;
+  uint64 open_time = 8;
+  uint64 close_time = 9;
+}
+
+// Ticker Price
+message GetTickerPriceRequest {
+  optional string symbol = 1;
+  repeated string symbols = 2;
+}
+message GetTickerPriceResponse {
+  repeated TickerPrice tickers = 1;
+}
+message TickerPrice {
+  string symbol = 1;
+  string price = 2;
+}
+
+// Book Ticker
+message GetBookTickerRequest {
+  optional string symbol = 1;
+  repeated string symbols = 2;
+}
+message GetBookTickerResponse {
+  repeated BookTicker tickers = 1;
+}
+message BookTicker {
+  string symbol = 1;
+  string bid_price = 2;
+  string bid_qty = 3;
+  string ask_price = 4;
+  string ask_qty = 5;
+}
+
+// Rolling Ticker
+message GetRollingTickerRequest {
+  string symbol = 1;
+  string window_size = 2;
+  string type = 3;
+}
+message GetRollingTickerResponse {
+  string symbol = 1;
+  string price_change = 2;
+  string price_change_percent = 3;
+  string weighted_avg_price = 4;
+  string last_price = 5;
+  string volume = 6;
+  string quote_volume = 7;
+  uint64 open_time = 8;
+  uint64 close_time = 9;
+}
