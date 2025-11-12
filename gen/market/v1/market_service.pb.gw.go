@@ -35,7 +35,7 @@ var (
 	_ = metadata.Join
 )
 
-func request_MarketDataService_Ping_0(ctx context.Context, marshaler runtime.Marshaler, client MarketDataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MarketService_Ping_0(ctx context.Context, marshaler runtime.Marshaler, client MarketServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq PingRequest
 		metadata runtime.ServerMetadata
@@ -47,7 +47,7 @@ func request_MarketDataService_Ping_0(ctx context.Context, marshaler runtime.Mar
 	return msg, metadata, err
 }
 
-func local_request_MarketDataService_Ping_0(ctx context.Context, marshaler runtime.Marshaler, server MarketDataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MarketService_Ping_0(ctx context.Context, marshaler runtime.Marshaler, server MarketServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq PingRequest
 		metadata runtime.ServerMetadata
@@ -56,7 +56,7 @@ func local_request_MarketDataService_Ping_0(ctx context.Context, marshaler runti
 	return msg, metadata, err
 }
 
-func request_MarketDataService_GetServerTime_0(ctx context.Context, marshaler runtime.Marshaler, client MarketDataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MarketService_GetServerTime_0(ctx context.Context, marshaler runtime.Marshaler, client MarketServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetServerTimeRequest
 		metadata runtime.ServerMetadata
@@ -68,7 +68,7 @@ func request_MarketDataService_GetServerTime_0(ctx context.Context, marshaler ru
 	return msg, metadata, err
 }
 
-func local_request_MarketDataService_GetServerTime_0(ctx context.Context, marshaler runtime.Marshaler, server MarketDataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MarketService_GetServerTime_0(ctx context.Context, marshaler runtime.Marshaler, server MarketServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetServerTimeRequest
 		metadata runtime.ServerMetadata
@@ -77,9 +77,9 @@ func local_request_MarketDataService_GetServerTime_0(ctx context.Context, marsha
 	return msg, metadata, err
 }
 
-var filter_MarketDataService_GetExchangeInfo_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var filter_MarketService_GetExchangeInfo_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
-func request_MarketDataService_GetExchangeInfo_0(ctx context.Context, marshaler runtime.Marshaler, client MarketDataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MarketService_GetExchangeInfo_0(ctx context.Context, marshaler runtime.Marshaler, client MarketServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetExchangeInfoRequest
 		metadata runtime.ServerMetadata
@@ -90,14 +90,14 @@ func request_MarketDataService_GetExchangeInfo_0(ctx context.Context, marshaler 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetExchangeInfo_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetExchangeInfo_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := client.GetExchangeInfo(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MarketDataService_GetExchangeInfo_0(ctx context.Context, marshaler runtime.Marshaler, server MarketDataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MarketService_GetExchangeInfo_0(ctx context.Context, marshaler runtime.Marshaler, server MarketServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetExchangeInfoRequest
 		metadata runtime.ServerMetadata
@@ -105,16 +105,16 @@ func local_request_MarketDataService_GetExchangeInfo_0(ctx context.Context, mars
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetExchangeInfo_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetExchangeInfo_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := server.GetExchangeInfo(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-var filter_MarketDataService_GetOrderBook_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var filter_MarketService_GetOrderBook_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
-func request_MarketDataService_GetOrderBook_0(ctx context.Context, marshaler runtime.Marshaler, client MarketDataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MarketService_GetOrderBook_0(ctx context.Context, marshaler runtime.Marshaler, client MarketServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetOrderBookRequest
 		metadata runtime.ServerMetadata
@@ -125,14 +125,14 @@ func request_MarketDataService_GetOrderBook_0(ctx context.Context, marshaler run
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetOrderBook_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetOrderBook_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := client.GetOrderBook(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MarketDataService_GetOrderBook_0(ctx context.Context, marshaler runtime.Marshaler, server MarketDataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MarketService_GetOrderBook_0(ctx context.Context, marshaler runtime.Marshaler, server MarketServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetOrderBookRequest
 		metadata runtime.ServerMetadata
@@ -140,16 +140,16 @@ func local_request_MarketDataService_GetOrderBook_0(ctx context.Context, marshal
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetOrderBook_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetOrderBook_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := server.GetOrderBook(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-var filter_MarketDataService_GetRecentTrades_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var filter_MarketService_GetRecentTrades_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
-func request_MarketDataService_GetRecentTrades_0(ctx context.Context, marshaler runtime.Marshaler, client MarketDataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MarketService_GetRecentTrades_0(ctx context.Context, marshaler runtime.Marshaler, client MarketServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetRecentTradesRequest
 		metadata runtime.ServerMetadata
@@ -160,14 +160,14 @@ func request_MarketDataService_GetRecentTrades_0(ctx context.Context, marshaler 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetRecentTrades_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetRecentTrades_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := client.GetRecentTrades(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MarketDataService_GetRecentTrades_0(ctx context.Context, marshaler runtime.Marshaler, server MarketDataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MarketService_GetRecentTrades_0(ctx context.Context, marshaler runtime.Marshaler, server MarketServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetRecentTradesRequest
 		metadata runtime.ServerMetadata
@@ -175,16 +175,16 @@ func local_request_MarketDataService_GetRecentTrades_0(ctx context.Context, mars
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetRecentTrades_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetRecentTrades_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := server.GetRecentTrades(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-var filter_MarketDataService_GetHistoricalTrades_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var filter_MarketService_GetHistoricalTrades_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
-func request_MarketDataService_GetHistoricalTrades_0(ctx context.Context, marshaler runtime.Marshaler, client MarketDataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MarketService_GetHistoricalTrades_0(ctx context.Context, marshaler runtime.Marshaler, client MarketServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetHistoricalTradesRequest
 		metadata runtime.ServerMetadata
@@ -195,14 +195,14 @@ func request_MarketDataService_GetHistoricalTrades_0(ctx context.Context, marsha
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetHistoricalTrades_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetHistoricalTrades_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := client.GetHistoricalTrades(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MarketDataService_GetHistoricalTrades_0(ctx context.Context, marshaler runtime.Marshaler, server MarketDataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MarketService_GetHistoricalTrades_0(ctx context.Context, marshaler runtime.Marshaler, server MarketServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetHistoricalTradesRequest
 		metadata runtime.ServerMetadata
@@ -210,16 +210,16 @@ func local_request_MarketDataService_GetHistoricalTrades_0(ctx context.Context, 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetHistoricalTrades_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetHistoricalTrades_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := server.GetHistoricalTrades(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-var filter_MarketDataService_GetAggTrades_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var filter_MarketService_GetAggTrades_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
-func request_MarketDataService_GetAggTrades_0(ctx context.Context, marshaler runtime.Marshaler, client MarketDataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MarketService_GetAggTrades_0(ctx context.Context, marshaler runtime.Marshaler, client MarketServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetAggTradesRequest
 		metadata runtime.ServerMetadata
@@ -230,14 +230,14 @@ func request_MarketDataService_GetAggTrades_0(ctx context.Context, marshaler run
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetAggTrades_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetAggTrades_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := client.GetAggTrades(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MarketDataService_GetAggTrades_0(ctx context.Context, marshaler runtime.Marshaler, server MarketDataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MarketService_GetAggTrades_0(ctx context.Context, marshaler runtime.Marshaler, server MarketServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetAggTradesRequest
 		metadata runtime.ServerMetadata
@@ -245,16 +245,16 @@ func local_request_MarketDataService_GetAggTrades_0(ctx context.Context, marshal
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetAggTrades_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetAggTrades_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := server.GetAggTrades(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-var filter_MarketDataService_GetKlines_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var filter_MarketService_GetKlines_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
-func request_MarketDataService_GetKlines_0(ctx context.Context, marshaler runtime.Marshaler, client MarketDataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MarketService_GetKlines_0(ctx context.Context, marshaler runtime.Marshaler, client MarketServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetKlinesRequest
 		metadata runtime.ServerMetadata
@@ -265,14 +265,14 @@ func request_MarketDataService_GetKlines_0(ctx context.Context, marshaler runtim
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetKlines_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetKlines_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := client.GetKlines(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MarketDataService_GetKlines_0(ctx context.Context, marshaler runtime.Marshaler, server MarketDataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MarketService_GetKlines_0(ctx context.Context, marshaler runtime.Marshaler, server MarketServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetKlinesRequest
 		metadata runtime.ServerMetadata
@@ -280,16 +280,16 @@ func local_request_MarketDataService_GetKlines_0(ctx context.Context, marshaler 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetKlines_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetKlines_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := server.GetKlines(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-var filter_MarketDataService_GetUiKlines_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var filter_MarketService_GetUiKlines_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
-func request_MarketDataService_GetUiKlines_0(ctx context.Context, marshaler runtime.Marshaler, client MarketDataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MarketService_GetUiKlines_0(ctx context.Context, marshaler runtime.Marshaler, client MarketServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetUiKlinesRequest
 		metadata runtime.ServerMetadata
@@ -300,14 +300,14 @@ func request_MarketDataService_GetUiKlines_0(ctx context.Context, marshaler runt
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetUiKlines_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetUiKlines_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := client.GetUiKlines(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MarketDataService_GetUiKlines_0(ctx context.Context, marshaler runtime.Marshaler, server MarketDataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MarketService_GetUiKlines_0(ctx context.Context, marshaler runtime.Marshaler, server MarketServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetUiKlinesRequest
 		metadata runtime.ServerMetadata
@@ -315,16 +315,16 @@ func local_request_MarketDataService_GetUiKlines_0(ctx context.Context, marshale
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetUiKlines_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetUiKlines_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := server.GetUiKlines(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-var filter_MarketDataService_GetAvgPrice_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var filter_MarketService_GetAvgPrice_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
-func request_MarketDataService_GetAvgPrice_0(ctx context.Context, marshaler runtime.Marshaler, client MarketDataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MarketService_GetAvgPrice_0(ctx context.Context, marshaler runtime.Marshaler, client MarketServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetAvgPriceRequest
 		metadata runtime.ServerMetadata
@@ -335,14 +335,14 @@ func request_MarketDataService_GetAvgPrice_0(ctx context.Context, marshaler runt
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetAvgPrice_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetAvgPrice_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := client.GetAvgPrice(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MarketDataService_GetAvgPrice_0(ctx context.Context, marshaler runtime.Marshaler, server MarketDataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MarketService_GetAvgPrice_0(ctx context.Context, marshaler runtime.Marshaler, server MarketServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetAvgPriceRequest
 		metadata runtime.ServerMetadata
@@ -350,16 +350,16 @@ func local_request_MarketDataService_GetAvgPrice_0(ctx context.Context, marshale
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetAvgPrice_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetAvgPrice_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := server.GetAvgPrice(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-var filter_MarketDataService_GetTicker24Hr_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var filter_MarketService_GetTicker24Hr_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
-func request_MarketDataService_GetTicker24Hr_0(ctx context.Context, marshaler runtime.Marshaler, client MarketDataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MarketService_GetTicker24Hr_0(ctx context.Context, marshaler runtime.Marshaler, client MarketServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetTicker24HrRequest
 		metadata runtime.ServerMetadata
@@ -370,14 +370,14 @@ func request_MarketDataService_GetTicker24Hr_0(ctx context.Context, marshaler ru
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetTicker24Hr_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetTicker24Hr_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := client.GetTicker24Hr(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MarketDataService_GetTicker24Hr_0(ctx context.Context, marshaler runtime.Marshaler, server MarketDataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MarketService_GetTicker24Hr_0(ctx context.Context, marshaler runtime.Marshaler, server MarketServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetTicker24HrRequest
 		metadata runtime.ServerMetadata
@@ -385,16 +385,16 @@ func local_request_MarketDataService_GetTicker24Hr_0(ctx context.Context, marsha
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetTicker24Hr_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetTicker24Hr_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := server.GetTicker24Hr(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-var filter_MarketDataService_GetTickerPrice_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var filter_MarketService_GetTickerPrice_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
-func request_MarketDataService_GetTickerPrice_0(ctx context.Context, marshaler runtime.Marshaler, client MarketDataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MarketService_GetTickerPrice_0(ctx context.Context, marshaler runtime.Marshaler, client MarketServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetTickerPriceRequest
 		metadata runtime.ServerMetadata
@@ -405,14 +405,14 @@ func request_MarketDataService_GetTickerPrice_0(ctx context.Context, marshaler r
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetTickerPrice_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetTickerPrice_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := client.GetTickerPrice(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MarketDataService_GetTickerPrice_0(ctx context.Context, marshaler runtime.Marshaler, server MarketDataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MarketService_GetTickerPrice_0(ctx context.Context, marshaler runtime.Marshaler, server MarketServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetTickerPriceRequest
 		metadata runtime.ServerMetadata
@@ -420,16 +420,16 @@ func local_request_MarketDataService_GetTickerPrice_0(ctx context.Context, marsh
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetTickerPrice_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetTickerPrice_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := server.GetTickerPrice(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-var filter_MarketDataService_GetBookTicker_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var filter_MarketService_GetBookTicker_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
-func request_MarketDataService_GetBookTicker_0(ctx context.Context, marshaler runtime.Marshaler, client MarketDataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MarketService_GetBookTicker_0(ctx context.Context, marshaler runtime.Marshaler, client MarketServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetBookTickerRequest
 		metadata runtime.ServerMetadata
@@ -440,14 +440,14 @@ func request_MarketDataService_GetBookTicker_0(ctx context.Context, marshaler ru
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetBookTicker_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetBookTicker_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := client.GetBookTicker(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MarketDataService_GetBookTicker_0(ctx context.Context, marshaler runtime.Marshaler, server MarketDataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MarketService_GetBookTicker_0(ctx context.Context, marshaler runtime.Marshaler, server MarketServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetBookTickerRequest
 		metadata runtime.ServerMetadata
@@ -455,16 +455,16 @@ func local_request_MarketDataService_GetBookTicker_0(ctx context.Context, marsha
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetBookTicker_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetBookTicker_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := server.GetBookTicker(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-var filter_MarketDataService_GetRollingTicker_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var filter_MarketService_GetRollingTicker_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
-func request_MarketDataService_GetRollingTicker_0(ctx context.Context, marshaler runtime.Marshaler, client MarketDataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_MarketService_GetRollingTicker_0(ctx context.Context, marshaler runtime.Marshaler, client MarketServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetRollingTickerRequest
 		metadata runtime.ServerMetadata
@@ -475,14 +475,14 @@ func request_MarketDataService_GetRollingTicker_0(ctx context.Context, marshaler
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetRollingTicker_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetRollingTicker_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := client.GetRollingTicker(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MarketDataService_GetRollingTicker_0(ctx context.Context, marshaler runtime.Marshaler, server MarketDataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_MarketService_GetRollingTicker_0(ctx context.Context, marshaler runtime.Marshaler, server MarketServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetRollingTickerRequest
 		metadata runtime.ServerMetadata
@@ -490,306 +490,306 @@ func local_request_MarketDataService_GetRollingTicker_0(ctx context.Context, mar
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketDataService_GetRollingTicker_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MarketService_GetRollingTicker_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := server.GetRollingTicker(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-// RegisterMarketDataServiceHandlerServer registers the http handlers for service MarketDataService to "mux".
-// UnaryRPC     :call MarketDataServiceServer directly.
+// RegisterMarketServiceHandlerServer registers the http handlers for service MarketService to "mux".
+// UnaryRPC     :call MarketServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterMarketDataServiceHandlerFromEndpoint instead.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterMarketServiceHandlerFromEndpoint instead.
 // GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
-func RegisterMarketDataServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server MarketDataServiceServer) error {
-	mux.Handle(http.MethodGet, pattern_MarketDataService_Ping_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+func RegisterMarketServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server MarketServiceServer) error {
+	mux.Handle(http.MethodGet, pattern_MarketService_Ping_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketDataService/Ping", runtime.WithHTTPPathPattern("/api/v1/market/ping"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketService/Ping", runtime.WithHTTPPathPattern("/api/v1/market/ping"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_MarketDataService_Ping_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MarketService_Ping_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_Ping_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_Ping_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetServerTime_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetServerTime_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketDataService/GetServerTime", runtime.WithHTTPPathPattern("/api/v1/market/time"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketService/GetServerTime", runtime.WithHTTPPathPattern("/api/v1/market/time"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_MarketDataService_GetServerTime_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MarketService_GetServerTime_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetServerTime_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetServerTime_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetExchangeInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetExchangeInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketDataService/GetExchangeInfo", runtime.WithHTTPPathPattern("/api/v1/market/exchangeInfo"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketService/GetExchangeInfo", runtime.WithHTTPPathPattern("/api/v1/market/exchangeInfo"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_MarketDataService_GetExchangeInfo_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MarketService_GetExchangeInfo_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetExchangeInfo_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetExchangeInfo_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetOrderBook_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetOrderBook_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketDataService/GetOrderBook", runtime.WithHTTPPathPattern("/api/v1/market/depth"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketService/GetOrderBook", runtime.WithHTTPPathPattern("/api/v1/market/depth"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_MarketDataService_GetOrderBook_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MarketService_GetOrderBook_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetOrderBook_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetOrderBook_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetRecentTrades_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetRecentTrades_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketDataService/GetRecentTrades", runtime.WithHTTPPathPattern("/api/v1/market/trades"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketService/GetRecentTrades", runtime.WithHTTPPathPattern("/api/v1/market/trades"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_MarketDataService_GetRecentTrades_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MarketService_GetRecentTrades_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetRecentTrades_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetRecentTrades_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetHistoricalTrades_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetHistoricalTrades_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketDataService/GetHistoricalTrades", runtime.WithHTTPPathPattern("/api/v1/market/historicalTrades"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketService/GetHistoricalTrades", runtime.WithHTTPPathPattern("/api/v1/market/historicalTrades"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_MarketDataService_GetHistoricalTrades_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MarketService_GetHistoricalTrades_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetHistoricalTrades_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetHistoricalTrades_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetAggTrades_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetAggTrades_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketDataService/GetAggTrades", runtime.WithHTTPPathPattern("/api/v1/market/aggTrades"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketService/GetAggTrades", runtime.WithHTTPPathPattern("/api/v1/market/aggTrades"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_MarketDataService_GetAggTrades_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MarketService_GetAggTrades_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetAggTrades_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetAggTrades_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetKlines_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetKlines_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketDataService/GetKlines", runtime.WithHTTPPathPattern("/api/v1/market/klines"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketService/GetKlines", runtime.WithHTTPPathPattern("/api/v1/market/klines"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_MarketDataService_GetKlines_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MarketService_GetKlines_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetKlines_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetKlines_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetUiKlines_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetUiKlines_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketDataService/GetUiKlines", runtime.WithHTTPPathPattern("/api/v1/market/uiKlines"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketService/GetUiKlines", runtime.WithHTTPPathPattern("/api/v1/market/uiKlines"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_MarketDataService_GetUiKlines_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MarketService_GetUiKlines_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetUiKlines_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetUiKlines_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetAvgPrice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetAvgPrice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketDataService/GetAvgPrice", runtime.WithHTTPPathPattern("/api/v1/market/avgPrice"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketService/GetAvgPrice", runtime.WithHTTPPathPattern("/api/v1/market/avgPrice"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_MarketDataService_GetAvgPrice_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MarketService_GetAvgPrice_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetAvgPrice_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetAvgPrice_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetTicker24Hr_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetTicker24Hr_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketDataService/GetTicker24Hr", runtime.WithHTTPPathPattern("/api/v1/market/ticker/24hr"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketService/GetTicker24Hr", runtime.WithHTTPPathPattern("/api/v1/market/ticker/24hr"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_MarketDataService_GetTicker24Hr_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MarketService_GetTicker24Hr_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetTicker24Hr_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetTicker24Hr_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetTickerPrice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetTickerPrice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketDataService/GetTickerPrice", runtime.WithHTTPPathPattern("/api/v1/market/ticker/price"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketService/GetTickerPrice", runtime.WithHTTPPathPattern("/api/v1/market/ticker/price"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_MarketDataService_GetTickerPrice_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MarketService_GetTickerPrice_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetTickerPrice_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetTickerPrice_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetBookTicker_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetBookTicker_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketDataService/GetBookTicker", runtime.WithHTTPPathPattern("/api/v1/market/ticker/bookTicker"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketService/GetBookTicker", runtime.WithHTTPPathPattern("/api/v1/market/ticker/bookTicker"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_MarketDataService_GetBookTicker_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MarketService_GetBookTicker_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetBookTicker_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetBookTicker_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetRollingTicker_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetRollingTicker_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketDataService/GetRollingTicker", runtime.WithHTTPPathPattern("/api/v1/market/ticker"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/market.v1.MarketService/GetRollingTicker", runtime.WithHTTPPathPattern("/api/v1/market/ticker"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_MarketDataService_GetRollingTicker_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_MarketService_GetRollingTicker_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetRollingTicker_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetRollingTicker_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 
 	return nil
 }
 
-// RegisterMarketDataServiceHandlerFromEndpoint is same as RegisterMarketDataServiceHandler but
+// RegisterMarketServiceHandlerFromEndpoint is same as RegisterMarketServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterMarketDataServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterMarketServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.NewClient(endpoint, opts...)
 	if err != nil {
 		return err
@@ -808,292 +808,292 @@ func RegisterMarketDataServiceHandlerFromEndpoint(ctx context.Context, mux *runt
 			}
 		}()
 	}()
-	return RegisterMarketDataServiceHandler(ctx, mux, conn)
+	return RegisterMarketServiceHandler(ctx, mux, conn)
 }
 
-// RegisterMarketDataServiceHandler registers the http handlers for service MarketDataService to "mux".
+// RegisterMarketServiceHandler registers the http handlers for service MarketService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterMarketDataServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterMarketDataServiceHandlerClient(ctx, mux, NewMarketDataServiceClient(conn))
+func RegisterMarketServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterMarketServiceHandlerClient(ctx, mux, NewMarketServiceClient(conn))
 }
 
-// RegisterMarketDataServiceHandlerClient registers the http handlers for service MarketDataService
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "MarketDataServiceClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "MarketDataServiceClient"
+// RegisterMarketServiceHandlerClient registers the http handlers for service MarketService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "MarketServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "MarketServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "MarketDataServiceClient" to call the correct interceptors. This client ignores the HTTP middlewares.
-func RegisterMarketDataServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client MarketDataServiceClient) error {
-	mux.Handle(http.MethodGet, pattern_MarketDataService_Ping_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+// "MarketServiceClient" to call the correct interceptors. This client ignores the HTTP middlewares.
+func RegisterMarketServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client MarketServiceClient) error {
+	mux.Handle(http.MethodGet, pattern_MarketService_Ping_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketDataService/Ping", runtime.WithHTTPPathPattern("/api/v1/market/ping"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketService/Ping", runtime.WithHTTPPathPattern("/api/v1/market/ping"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_MarketDataService_Ping_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MarketService_Ping_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_Ping_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_Ping_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetServerTime_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetServerTime_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketDataService/GetServerTime", runtime.WithHTTPPathPattern("/api/v1/market/time"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketService/GetServerTime", runtime.WithHTTPPathPattern("/api/v1/market/time"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_MarketDataService_GetServerTime_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MarketService_GetServerTime_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetServerTime_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetServerTime_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetExchangeInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetExchangeInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketDataService/GetExchangeInfo", runtime.WithHTTPPathPattern("/api/v1/market/exchangeInfo"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketService/GetExchangeInfo", runtime.WithHTTPPathPattern("/api/v1/market/exchangeInfo"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_MarketDataService_GetExchangeInfo_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MarketService_GetExchangeInfo_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetExchangeInfo_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetExchangeInfo_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetOrderBook_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetOrderBook_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketDataService/GetOrderBook", runtime.WithHTTPPathPattern("/api/v1/market/depth"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketService/GetOrderBook", runtime.WithHTTPPathPattern("/api/v1/market/depth"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_MarketDataService_GetOrderBook_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MarketService_GetOrderBook_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetOrderBook_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetOrderBook_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetRecentTrades_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetRecentTrades_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketDataService/GetRecentTrades", runtime.WithHTTPPathPattern("/api/v1/market/trades"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketService/GetRecentTrades", runtime.WithHTTPPathPattern("/api/v1/market/trades"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_MarketDataService_GetRecentTrades_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MarketService_GetRecentTrades_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetRecentTrades_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetRecentTrades_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetHistoricalTrades_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetHistoricalTrades_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketDataService/GetHistoricalTrades", runtime.WithHTTPPathPattern("/api/v1/market/historicalTrades"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketService/GetHistoricalTrades", runtime.WithHTTPPathPattern("/api/v1/market/historicalTrades"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_MarketDataService_GetHistoricalTrades_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MarketService_GetHistoricalTrades_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetHistoricalTrades_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetHistoricalTrades_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetAggTrades_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetAggTrades_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketDataService/GetAggTrades", runtime.WithHTTPPathPattern("/api/v1/market/aggTrades"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketService/GetAggTrades", runtime.WithHTTPPathPattern("/api/v1/market/aggTrades"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_MarketDataService_GetAggTrades_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MarketService_GetAggTrades_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetAggTrades_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetAggTrades_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetKlines_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetKlines_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketDataService/GetKlines", runtime.WithHTTPPathPattern("/api/v1/market/klines"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketService/GetKlines", runtime.WithHTTPPathPattern("/api/v1/market/klines"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_MarketDataService_GetKlines_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MarketService_GetKlines_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetKlines_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetKlines_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetUiKlines_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetUiKlines_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketDataService/GetUiKlines", runtime.WithHTTPPathPattern("/api/v1/market/uiKlines"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketService/GetUiKlines", runtime.WithHTTPPathPattern("/api/v1/market/uiKlines"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_MarketDataService_GetUiKlines_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MarketService_GetUiKlines_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetUiKlines_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetUiKlines_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetAvgPrice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetAvgPrice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketDataService/GetAvgPrice", runtime.WithHTTPPathPattern("/api/v1/market/avgPrice"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketService/GetAvgPrice", runtime.WithHTTPPathPattern("/api/v1/market/avgPrice"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_MarketDataService_GetAvgPrice_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MarketService_GetAvgPrice_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetAvgPrice_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetAvgPrice_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetTicker24Hr_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetTicker24Hr_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketDataService/GetTicker24Hr", runtime.WithHTTPPathPattern("/api/v1/market/ticker/24hr"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketService/GetTicker24Hr", runtime.WithHTTPPathPattern("/api/v1/market/ticker/24hr"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_MarketDataService_GetTicker24Hr_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MarketService_GetTicker24Hr_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetTicker24Hr_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetTicker24Hr_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetTickerPrice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetTickerPrice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketDataService/GetTickerPrice", runtime.WithHTTPPathPattern("/api/v1/market/ticker/price"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketService/GetTickerPrice", runtime.WithHTTPPathPattern("/api/v1/market/ticker/price"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_MarketDataService_GetTickerPrice_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MarketService_GetTickerPrice_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetTickerPrice_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetTickerPrice_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetBookTicker_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetBookTicker_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketDataService/GetBookTicker", runtime.WithHTTPPathPattern("/api/v1/market/ticker/bookTicker"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketService/GetBookTicker", runtime.WithHTTPPathPattern("/api/v1/market/ticker/bookTicker"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_MarketDataService_GetBookTicker_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MarketService_GetBookTicker_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetBookTicker_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetBookTicker_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_MarketDataService_GetRollingTicker_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_MarketService_GetRollingTicker_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketDataService/GetRollingTicker", runtime.WithHTTPPathPattern("/api/v1/market/ticker"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/market.v1.MarketService/GetRollingTicker", runtime.WithHTTPPathPattern("/api/v1/market/ticker"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_MarketDataService_GetRollingTicker_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_MarketService_GetRollingTicker_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MarketDataService_GetRollingTicker_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_MarketService_GetRollingTicker_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	return nil
 }
 
 var (
-	pattern_MarketDataService_Ping_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "ping"}, ""))
-	pattern_MarketDataService_GetServerTime_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "time"}, ""))
-	pattern_MarketDataService_GetExchangeInfo_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "exchangeInfo"}, ""))
-	pattern_MarketDataService_GetOrderBook_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "depth"}, ""))
-	pattern_MarketDataService_GetRecentTrades_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "trades"}, ""))
-	pattern_MarketDataService_GetHistoricalTrades_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "historicalTrades"}, ""))
-	pattern_MarketDataService_GetAggTrades_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "aggTrades"}, ""))
-	pattern_MarketDataService_GetKlines_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "klines"}, ""))
-	pattern_MarketDataService_GetUiKlines_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "uiKlines"}, ""))
-	pattern_MarketDataService_GetAvgPrice_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "avgPrice"}, ""))
-	pattern_MarketDataService_GetTicker24Hr_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "market", "ticker", "24hr"}, ""))
-	pattern_MarketDataService_GetTickerPrice_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "market", "ticker", "price"}, ""))
-	pattern_MarketDataService_GetBookTicker_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "market", "ticker", "bookTicker"}, ""))
-	pattern_MarketDataService_GetRollingTicker_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "ticker"}, ""))
+	pattern_MarketService_Ping_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "ping"}, ""))
+	pattern_MarketService_GetServerTime_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "time"}, ""))
+	pattern_MarketService_GetExchangeInfo_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "exchangeInfo"}, ""))
+	pattern_MarketService_GetOrderBook_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "depth"}, ""))
+	pattern_MarketService_GetRecentTrades_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "trades"}, ""))
+	pattern_MarketService_GetHistoricalTrades_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "historicalTrades"}, ""))
+	pattern_MarketService_GetAggTrades_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "aggTrades"}, ""))
+	pattern_MarketService_GetKlines_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "klines"}, ""))
+	pattern_MarketService_GetUiKlines_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "uiKlines"}, ""))
+	pattern_MarketService_GetAvgPrice_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "avgPrice"}, ""))
+	pattern_MarketService_GetTicker24Hr_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "market", "ticker", "24hr"}, ""))
+	pattern_MarketService_GetTickerPrice_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "market", "ticker", "price"}, ""))
+	pattern_MarketService_GetBookTicker_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "market", "ticker", "bookTicker"}, ""))
+	pattern_MarketService_GetRollingTicker_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "market", "ticker"}, ""))
 )
 
 var (
-	forward_MarketDataService_Ping_0                = runtime.ForwardResponseMessage
-	forward_MarketDataService_GetServerTime_0       = runtime.ForwardResponseMessage
-	forward_MarketDataService_GetExchangeInfo_0     = runtime.ForwardResponseMessage
-	forward_MarketDataService_GetOrderBook_0        = runtime.ForwardResponseMessage
-	forward_MarketDataService_GetRecentTrades_0     = runtime.ForwardResponseMessage
-	forward_MarketDataService_GetHistoricalTrades_0 = runtime.ForwardResponseMessage
-	forward_MarketDataService_GetAggTrades_0        = runtime.ForwardResponseMessage
-	forward_MarketDataService_GetKlines_0           = runtime.ForwardResponseMessage
-	forward_MarketDataService_GetUiKlines_0         = runtime.ForwardResponseMessage
-	forward_MarketDataService_GetAvgPrice_0         = runtime.ForwardResponseMessage
-	forward_MarketDataService_GetTicker24Hr_0       = runtime.ForwardResponseMessage
-	forward_MarketDataService_GetTickerPrice_0      = runtime.ForwardResponseMessage
-	forward_MarketDataService_GetBookTicker_0       = runtime.ForwardResponseMessage
-	forward_MarketDataService_GetRollingTicker_0    = runtime.ForwardResponseMessage
+	forward_MarketService_Ping_0                = runtime.ForwardResponseMessage
+	forward_MarketService_GetServerTime_0       = runtime.ForwardResponseMessage
+	forward_MarketService_GetExchangeInfo_0     = runtime.ForwardResponseMessage
+	forward_MarketService_GetOrderBook_0        = runtime.ForwardResponseMessage
+	forward_MarketService_GetRecentTrades_0     = runtime.ForwardResponseMessage
+	forward_MarketService_GetHistoricalTrades_0 = runtime.ForwardResponseMessage
+	forward_MarketService_GetAggTrades_0        = runtime.ForwardResponseMessage
+	forward_MarketService_GetKlines_0           = runtime.ForwardResponseMessage
+	forward_MarketService_GetUiKlines_0         = runtime.ForwardResponseMessage
+	forward_MarketService_GetAvgPrice_0         = runtime.ForwardResponseMessage
+	forward_MarketService_GetTicker24Hr_0       = runtime.ForwardResponseMessage
+	forward_MarketService_GetTickerPrice_0      = runtime.ForwardResponseMessage
+	forward_MarketService_GetBookTicker_0       = runtime.ForwardResponseMessage
+	forward_MarketService_GetRollingTicker_0    = runtime.ForwardResponseMessage
 )

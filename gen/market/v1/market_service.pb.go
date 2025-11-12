@@ -2831,8 +2831,8 @@ const file_market_v1_market_service_proto_rawDesc = "" +
 	"\fquote_volume\x18\a \x01(\tR\vquoteVolume\x12\x1b\n" +
 	"\topen_time\x18\b \x01(\x04R\bopenTime\x12\x1d\n" +
 	"\n" +
-	"close_time\x18\t \x01(\x04R\tcloseTime2\xf7\f\n" +
-	"\x11MarketDataService\x12T\n" +
+	"close_time\x18\t \x01(\x04R\tcloseTime2\xf3\f\n" +
+	"\rMarketService\x12T\n" +
 	"\x04Ping\x12\x16.market.v1.PingRequest\x1a\x17.market.v1.PingResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/market/ping\x12o\n" +
 	"\rGetServerTime\x12\x1f.market.v1.GetServerTimeRequest\x1a .market.v1.GetServerTimeResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/market/time\x12}\n" +
 	"\x0fGetExchangeInfo\x12!.market.v1.GetExchangeInfoRequest\x1a\".market.v1.GetExchangeInfoResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/api/v1/market/exchangeInfo\x12m\n" +
@@ -2920,34 +2920,34 @@ var file_market_v1_market_service_proto_depIdxs = []int32{
 	31, // 11: market.v1.GetTicker24hrResponse.tickers:type_name -> market.v1.Ticker24hr
 	34, // 12: market.v1.GetTickerPriceResponse.tickers:type_name -> market.v1.TickerPrice
 	37, // 13: market.v1.GetBookTickerResponse.tickers:type_name -> market.v1.BookTicker
-	0,  // 14: market.v1.MarketDataService.Ping:input_type -> market.v1.PingRequest
-	2,  // 15: market.v1.MarketDataService.GetServerTime:input_type -> market.v1.GetServerTimeRequest
-	4,  // 16: market.v1.MarketDataService.GetExchangeInfo:input_type -> market.v1.GetExchangeInfoRequest
-	10, // 17: market.v1.MarketDataService.GetOrderBook:input_type -> market.v1.GetOrderBookRequest
-	13, // 18: market.v1.MarketDataService.GetRecentTrades:input_type -> market.v1.GetRecentTradesRequest
-	16, // 19: market.v1.MarketDataService.GetHistoricalTrades:input_type -> market.v1.GetHistoricalTradesRequest
-	18, // 20: market.v1.MarketDataService.GetAggTrades:input_type -> market.v1.GetAggTradesRequest
-	21, // 21: market.v1.MarketDataService.GetKlines:input_type -> market.v1.GetKlinesRequest
-	24, // 22: market.v1.MarketDataService.GetUiKlines:input_type -> market.v1.GetUiKlinesRequest
-	27, // 23: market.v1.MarketDataService.GetAvgPrice:input_type -> market.v1.GetAvgPriceRequest
-	29, // 24: market.v1.MarketDataService.GetTicker24hr:input_type -> market.v1.GetTicker24hrRequest
-	32, // 25: market.v1.MarketDataService.GetTickerPrice:input_type -> market.v1.GetTickerPriceRequest
-	35, // 26: market.v1.MarketDataService.GetBookTicker:input_type -> market.v1.GetBookTickerRequest
-	38, // 27: market.v1.MarketDataService.GetRollingTicker:input_type -> market.v1.GetRollingTickerRequest
-	1,  // 28: market.v1.MarketDataService.Ping:output_type -> market.v1.PingResponse
-	3,  // 29: market.v1.MarketDataService.GetServerTime:output_type -> market.v1.GetServerTimeResponse
-	5,  // 30: market.v1.MarketDataService.GetExchangeInfo:output_type -> market.v1.GetExchangeInfoResponse
-	11, // 31: market.v1.MarketDataService.GetOrderBook:output_type -> market.v1.GetOrderBookResponse
-	14, // 32: market.v1.MarketDataService.GetRecentTrades:output_type -> market.v1.GetRecentTradesResponse
-	17, // 33: market.v1.MarketDataService.GetHistoricalTrades:output_type -> market.v1.GetHistoricalTradesResponse
-	19, // 34: market.v1.MarketDataService.GetAggTrades:output_type -> market.v1.GetAggTradesResponse
-	22, // 35: market.v1.MarketDataService.GetKlines:output_type -> market.v1.GetKlinesResponse
-	25, // 36: market.v1.MarketDataService.GetUiKlines:output_type -> market.v1.GetUiKlinesResponse
-	28, // 37: market.v1.MarketDataService.GetAvgPrice:output_type -> market.v1.GetAvgPriceResponse
-	30, // 38: market.v1.MarketDataService.GetTicker24hr:output_type -> market.v1.GetTicker24hrResponse
-	33, // 39: market.v1.MarketDataService.GetTickerPrice:output_type -> market.v1.GetTickerPriceResponse
-	36, // 40: market.v1.MarketDataService.GetBookTicker:output_type -> market.v1.GetBookTickerResponse
-	39, // 41: market.v1.MarketDataService.GetRollingTicker:output_type -> market.v1.GetRollingTickerResponse
+	0,  // 14: market.v1.MarketService.Ping:input_type -> market.v1.PingRequest
+	2,  // 15: market.v1.MarketService.GetServerTime:input_type -> market.v1.GetServerTimeRequest
+	4,  // 16: market.v1.MarketService.GetExchangeInfo:input_type -> market.v1.GetExchangeInfoRequest
+	10, // 17: market.v1.MarketService.GetOrderBook:input_type -> market.v1.GetOrderBookRequest
+	13, // 18: market.v1.MarketService.GetRecentTrades:input_type -> market.v1.GetRecentTradesRequest
+	16, // 19: market.v1.MarketService.GetHistoricalTrades:input_type -> market.v1.GetHistoricalTradesRequest
+	18, // 20: market.v1.MarketService.GetAggTrades:input_type -> market.v1.GetAggTradesRequest
+	21, // 21: market.v1.MarketService.GetKlines:input_type -> market.v1.GetKlinesRequest
+	24, // 22: market.v1.MarketService.GetUiKlines:input_type -> market.v1.GetUiKlinesRequest
+	27, // 23: market.v1.MarketService.GetAvgPrice:input_type -> market.v1.GetAvgPriceRequest
+	29, // 24: market.v1.MarketService.GetTicker24hr:input_type -> market.v1.GetTicker24hrRequest
+	32, // 25: market.v1.MarketService.GetTickerPrice:input_type -> market.v1.GetTickerPriceRequest
+	35, // 26: market.v1.MarketService.GetBookTicker:input_type -> market.v1.GetBookTickerRequest
+	38, // 27: market.v1.MarketService.GetRollingTicker:input_type -> market.v1.GetRollingTickerRequest
+	1,  // 28: market.v1.MarketService.Ping:output_type -> market.v1.PingResponse
+	3,  // 29: market.v1.MarketService.GetServerTime:output_type -> market.v1.GetServerTimeResponse
+	5,  // 30: market.v1.MarketService.GetExchangeInfo:output_type -> market.v1.GetExchangeInfoResponse
+	11, // 31: market.v1.MarketService.GetOrderBook:output_type -> market.v1.GetOrderBookResponse
+	14, // 32: market.v1.MarketService.GetRecentTrades:output_type -> market.v1.GetRecentTradesResponse
+	17, // 33: market.v1.MarketService.GetHistoricalTrades:output_type -> market.v1.GetHistoricalTradesResponse
+	19, // 34: market.v1.MarketService.GetAggTrades:output_type -> market.v1.GetAggTradesResponse
+	22, // 35: market.v1.MarketService.GetKlines:output_type -> market.v1.GetKlinesResponse
+	25, // 36: market.v1.MarketService.GetUiKlines:output_type -> market.v1.GetUiKlinesResponse
+	28, // 37: market.v1.MarketService.GetAvgPrice:output_type -> market.v1.GetAvgPriceResponse
+	30, // 38: market.v1.MarketService.GetTicker24hr:output_type -> market.v1.GetTicker24hrResponse
+	33, // 39: market.v1.MarketService.GetTickerPrice:output_type -> market.v1.GetTickerPriceResponse
+	36, // 40: market.v1.MarketService.GetBookTicker:output_type -> market.v1.GetBookTickerResponse
+	39, // 41: market.v1.MarketService.GetRollingTicker:output_type -> market.v1.GetRollingTickerResponse
 	28, // [28:42] is the sub-list for method output_type
 	14, // [14:28] is the sub-list for method input_type
 	14, // [14:14] is the sub-list for extension type_name

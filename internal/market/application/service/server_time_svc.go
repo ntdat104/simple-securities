@@ -26,19 +26,30 @@ func NewServerTimeSvc(c *client.Client) ServerTimeSvc {
 }
 
 func (s *serverTimeSvc) Execute(ctx context.Context, opts ...client.RequestOption) (res *response.ServerTimeResponse, err error) {
-	r := &client.Request{
-		Method:   http.MethodGet,
-		Endpoint: "/api/v3/time",
-		SecType:  client.SecTypeNone,
-	}
-	data, err := s.c.CallAPI(ctx, r, opts...)
+	val, err, _ := s.sf.Do("serverTime", func() (any, error) {
+		r := &client.Request{
+			Method:   http.MethodGet,
+			Endpoint: "/api/v3/time",
+			SecType:  client.SecTypeNone,
+		}
+		data, callErr := s.c.CallAPI(ctx, r, opts...)
+		if callErr != nil {
+			return nil, callErr
+		}
+		return data, nil
+	})
+
 	if err != nil {
 		return nil, err
 	}
+
+	data := val.([]byte)
+
 	res = new(response.ServerTimeResponse)
 	err = json.Unmarshal(data, res)
 	if err != nil {
 		return nil, err
 	}
+
 	return res, nil
 }

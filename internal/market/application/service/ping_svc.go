@@ -10,7 +10,6 @@ import (
 
 type PingSvc interface {
 	Execute(ctx context.Context, opts ...client.RequestOption) error
-	ExecuteSf(ctx context.Context, opts ...client.RequestOption) error
 }
 
 type pingSvc struct {
@@ -25,21 +24,7 @@ func NewPingSvc(c *client.Client) PingSvc {
 }
 
 func (s *pingSvc) Execute(ctx context.Context, opts ...client.RequestOption) (err error) {
-	r := &client.Request{
-		Method:   http.MethodGet,
-		Endpoint: "/api/v3/ping",
-		SecType:  client.SecTypeNone,
-	}
-	_, err = s.c.CallAPI(ctx, r, opts...)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *pingSvc) ExecuteSf(ctx context.Context, opts ...client.RequestOption) (err error) {
-	// All concurrent calls with the same key ("ping") will share one API call
-	_, err, _ = s.sf.Do("ping", func() (interface{}, error) {
+	_, err, _ = s.sf.Do("ping", func() (any, error) {
 		r := &client.Request{
 			Method:   http.MethodGet,
 			Endpoint: "/api/v3/ping",

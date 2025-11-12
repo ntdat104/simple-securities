@@ -90,10 +90,10 @@ func (c *Client) parseRequest(r *Request, opts ...RequestOption) (err error) {
 
 	fullURL := fmt.Sprintf("%s%s", c.BaseURL, r.Endpoint)
 	if r.RecvWindow > 0 {
-		r.setParam(RECVWINDOW, r.RecvWindow)
+		r.SetParam(RECVWINDOW, r.RecvWindow)
 	}
 	if r.SecType == SecTypeSigned {
-		r.setParam(RECVWINDOW, currentTimestamp()-c.TimeOffset)
+		r.SetParam(RECVWINDOW, currentTimestamp()-c.TimeOffset)
 	}
 	queryString := r.Query.Encode()
 	body := &bytes.Buffer{}

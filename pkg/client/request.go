@@ -31,7 +31,7 @@ type Request struct {
 }
 
 // addParam add param with key/value to query string
-func (r *Request) addParam(key string, value any) *Request {
+func (r *Request) AddParam(key string, value any) *Request {
 	if r.Query == nil {
 		r.Query = url.Values{}
 	}
@@ -40,7 +40,7 @@ func (r *Request) addParam(key string, value any) *Request {
 }
 
 // setParam set param with key/value to query string
-func (r *Request) setParam(key string, value any) *Request {
+func (r *Request) SetParam(key string, value any) *Request {
 	if r.Query == nil {
 		r.Query = url.Values{}
 	}
@@ -49,9 +49,9 @@ func (r *Request) setParam(key string, value any) *Request {
 }
 
 // setParams set params with key/values to query string
-func (r *Request) setParams(m params) *Request {
+func (r *Request) SetParams(m params) *Request {
 	for k, v := range m {
-		r.setParam(k, v)
+		r.SetParam(k, v)
 	}
 	return r
 }

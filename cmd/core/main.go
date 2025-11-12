@@ -7,6 +7,7 @@ import (
 	"os"
 
 	crypto "simple-securities/gen/crypto/v1"
+	market "simple-securities/gen/market/v1"
 	noti "simple-securities/gen/notification/v1"
 	stock "simple-securities/gen/stock/v1"
 	user "simple-securities/gen/user/v1"
@@ -41,6 +42,11 @@ func main() {
 		stockAddr = "localhost:50055"
 	}
 
+	marketAddr := os.Getenv("MARKET_ADDR")
+	if marketAddr == "" {
+		marketAddr = "localhost:50055"
+	}
+
 	corePort := os.Getenv("CORE_PORT")
 	if corePort == "" {
 		corePort = ":8080"
@@ -59,6 +65,10 @@ func main() {
 	}
 
 	if err := stock.RegisterStockServiceHandlerFromEndpoint(ctx, mux, stockAddr, opts); err != nil {
+		log.Fatalf("Failed to register StockService: %v", err)
+	}
+
+	if err := market.RegisterMarketServiceHandlerFromEndpoint(ctx, mux, stockAddr, opts); err != nil {
 		log.Fatalf("Failed to register StockService: %v", err)
 	}
 

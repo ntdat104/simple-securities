@@ -19,26 +19,26 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MarketDataService_Ping_FullMethodName                = "/market.v1.MarketDataService/Ping"
-	MarketDataService_GetServerTime_FullMethodName       = "/market.v1.MarketDataService/GetServerTime"
-	MarketDataService_GetExchangeInfo_FullMethodName     = "/market.v1.MarketDataService/GetExchangeInfo"
-	MarketDataService_GetOrderBook_FullMethodName        = "/market.v1.MarketDataService/GetOrderBook"
-	MarketDataService_GetRecentTrades_FullMethodName     = "/market.v1.MarketDataService/GetRecentTrades"
-	MarketDataService_GetHistoricalTrades_FullMethodName = "/market.v1.MarketDataService/GetHistoricalTrades"
-	MarketDataService_GetAggTrades_FullMethodName        = "/market.v1.MarketDataService/GetAggTrades"
-	MarketDataService_GetKlines_FullMethodName           = "/market.v1.MarketDataService/GetKlines"
-	MarketDataService_GetUiKlines_FullMethodName         = "/market.v1.MarketDataService/GetUiKlines"
-	MarketDataService_GetAvgPrice_FullMethodName         = "/market.v1.MarketDataService/GetAvgPrice"
-	MarketDataService_GetTicker24Hr_FullMethodName       = "/market.v1.MarketDataService/GetTicker24hr"
-	MarketDataService_GetTickerPrice_FullMethodName      = "/market.v1.MarketDataService/GetTickerPrice"
-	MarketDataService_GetBookTicker_FullMethodName       = "/market.v1.MarketDataService/GetBookTicker"
-	MarketDataService_GetRollingTicker_FullMethodName    = "/market.v1.MarketDataService/GetRollingTicker"
+	MarketService_Ping_FullMethodName                = "/market.v1.MarketService/Ping"
+	MarketService_GetServerTime_FullMethodName       = "/market.v1.MarketService/GetServerTime"
+	MarketService_GetExchangeInfo_FullMethodName     = "/market.v1.MarketService/GetExchangeInfo"
+	MarketService_GetOrderBook_FullMethodName        = "/market.v1.MarketService/GetOrderBook"
+	MarketService_GetRecentTrades_FullMethodName     = "/market.v1.MarketService/GetRecentTrades"
+	MarketService_GetHistoricalTrades_FullMethodName = "/market.v1.MarketService/GetHistoricalTrades"
+	MarketService_GetAggTrades_FullMethodName        = "/market.v1.MarketService/GetAggTrades"
+	MarketService_GetKlines_FullMethodName           = "/market.v1.MarketService/GetKlines"
+	MarketService_GetUiKlines_FullMethodName         = "/market.v1.MarketService/GetUiKlines"
+	MarketService_GetAvgPrice_FullMethodName         = "/market.v1.MarketService/GetAvgPrice"
+	MarketService_GetTicker24Hr_FullMethodName       = "/market.v1.MarketService/GetTicker24hr"
+	MarketService_GetTickerPrice_FullMethodName      = "/market.v1.MarketService/GetTickerPrice"
+	MarketService_GetBookTicker_FullMethodName       = "/market.v1.MarketService/GetBookTicker"
+	MarketService_GetRollingTicker_FullMethodName    = "/market.v1.MarketService/GetRollingTicker"
 )
 
-// MarketDataServiceClient is the client API for MarketDataService service.
+// MarketServiceClient is the client API for MarketService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type MarketDataServiceClient interface {
+type MarketServiceClient interface {
 	// --- General endpoints ---
 	// @grpc-gateway: GET /api/v1/market/ping
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
@@ -82,158 +82,158 @@ type MarketDataServiceClient interface {
 	GetRollingTicker(ctx context.Context, in *GetRollingTickerRequest, opts ...grpc.CallOption) (*GetRollingTickerResponse, error)
 }
 
-type marketDataServiceClient struct {
+type marketServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewMarketDataServiceClient(cc grpc.ClientConnInterface) MarketDataServiceClient {
-	return &marketDataServiceClient{cc}
+func NewMarketServiceClient(cc grpc.ClientConnInterface) MarketServiceClient {
+	return &marketServiceClient{cc}
 }
 
-func (c *marketDataServiceClient) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error) {
+func (c *marketServiceClient) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PingResponse)
-	err := c.cc.Invoke(ctx, MarketDataService_Ping_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MarketService_Ping_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *marketDataServiceClient) GetServerTime(ctx context.Context, in *GetServerTimeRequest, opts ...grpc.CallOption) (*GetServerTimeResponse, error) {
+func (c *marketServiceClient) GetServerTime(ctx context.Context, in *GetServerTimeRequest, opts ...grpc.CallOption) (*GetServerTimeResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetServerTimeResponse)
-	err := c.cc.Invoke(ctx, MarketDataService_GetServerTime_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MarketService_GetServerTime_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *marketDataServiceClient) GetExchangeInfo(ctx context.Context, in *GetExchangeInfoRequest, opts ...grpc.CallOption) (*GetExchangeInfoResponse, error) {
+func (c *marketServiceClient) GetExchangeInfo(ctx context.Context, in *GetExchangeInfoRequest, opts ...grpc.CallOption) (*GetExchangeInfoResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetExchangeInfoResponse)
-	err := c.cc.Invoke(ctx, MarketDataService_GetExchangeInfo_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MarketService_GetExchangeInfo_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *marketDataServiceClient) GetOrderBook(ctx context.Context, in *GetOrderBookRequest, opts ...grpc.CallOption) (*GetOrderBookResponse, error) {
+func (c *marketServiceClient) GetOrderBook(ctx context.Context, in *GetOrderBookRequest, opts ...grpc.CallOption) (*GetOrderBookResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetOrderBookResponse)
-	err := c.cc.Invoke(ctx, MarketDataService_GetOrderBook_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MarketService_GetOrderBook_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *marketDataServiceClient) GetRecentTrades(ctx context.Context, in *GetRecentTradesRequest, opts ...grpc.CallOption) (*GetRecentTradesResponse, error) {
+func (c *marketServiceClient) GetRecentTrades(ctx context.Context, in *GetRecentTradesRequest, opts ...grpc.CallOption) (*GetRecentTradesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetRecentTradesResponse)
-	err := c.cc.Invoke(ctx, MarketDataService_GetRecentTrades_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MarketService_GetRecentTrades_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *marketDataServiceClient) GetHistoricalTrades(ctx context.Context, in *GetHistoricalTradesRequest, opts ...grpc.CallOption) (*GetHistoricalTradesResponse, error) {
+func (c *marketServiceClient) GetHistoricalTrades(ctx context.Context, in *GetHistoricalTradesRequest, opts ...grpc.CallOption) (*GetHistoricalTradesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetHistoricalTradesResponse)
-	err := c.cc.Invoke(ctx, MarketDataService_GetHistoricalTrades_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MarketService_GetHistoricalTrades_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *marketDataServiceClient) GetAggTrades(ctx context.Context, in *GetAggTradesRequest, opts ...grpc.CallOption) (*GetAggTradesResponse, error) {
+func (c *marketServiceClient) GetAggTrades(ctx context.Context, in *GetAggTradesRequest, opts ...grpc.CallOption) (*GetAggTradesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetAggTradesResponse)
-	err := c.cc.Invoke(ctx, MarketDataService_GetAggTrades_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MarketService_GetAggTrades_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *marketDataServiceClient) GetKlines(ctx context.Context, in *GetKlinesRequest, opts ...grpc.CallOption) (*GetKlinesResponse, error) {
+func (c *marketServiceClient) GetKlines(ctx context.Context, in *GetKlinesRequest, opts ...grpc.CallOption) (*GetKlinesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetKlinesResponse)
-	err := c.cc.Invoke(ctx, MarketDataService_GetKlines_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MarketService_GetKlines_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *marketDataServiceClient) GetUiKlines(ctx context.Context, in *GetUiKlinesRequest, opts ...grpc.CallOption) (*GetUiKlinesResponse, error) {
+func (c *marketServiceClient) GetUiKlines(ctx context.Context, in *GetUiKlinesRequest, opts ...grpc.CallOption) (*GetUiKlinesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetUiKlinesResponse)
-	err := c.cc.Invoke(ctx, MarketDataService_GetUiKlines_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MarketService_GetUiKlines_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *marketDataServiceClient) GetAvgPrice(ctx context.Context, in *GetAvgPriceRequest, opts ...grpc.CallOption) (*GetAvgPriceResponse, error) {
+func (c *marketServiceClient) GetAvgPrice(ctx context.Context, in *GetAvgPriceRequest, opts ...grpc.CallOption) (*GetAvgPriceResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetAvgPriceResponse)
-	err := c.cc.Invoke(ctx, MarketDataService_GetAvgPrice_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MarketService_GetAvgPrice_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *marketDataServiceClient) GetTicker24Hr(ctx context.Context, in *GetTicker24HrRequest, opts ...grpc.CallOption) (*GetTicker24HrResponse, error) {
+func (c *marketServiceClient) GetTicker24Hr(ctx context.Context, in *GetTicker24HrRequest, opts ...grpc.CallOption) (*GetTicker24HrResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetTicker24HrResponse)
-	err := c.cc.Invoke(ctx, MarketDataService_GetTicker24Hr_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MarketService_GetTicker24Hr_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *marketDataServiceClient) GetTickerPrice(ctx context.Context, in *GetTickerPriceRequest, opts ...grpc.CallOption) (*GetTickerPriceResponse, error) {
+func (c *marketServiceClient) GetTickerPrice(ctx context.Context, in *GetTickerPriceRequest, opts ...grpc.CallOption) (*GetTickerPriceResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetTickerPriceResponse)
-	err := c.cc.Invoke(ctx, MarketDataService_GetTickerPrice_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MarketService_GetTickerPrice_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *marketDataServiceClient) GetBookTicker(ctx context.Context, in *GetBookTickerRequest, opts ...grpc.CallOption) (*GetBookTickerResponse, error) {
+func (c *marketServiceClient) GetBookTicker(ctx context.Context, in *GetBookTickerRequest, opts ...grpc.CallOption) (*GetBookTickerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetBookTickerResponse)
-	err := c.cc.Invoke(ctx, MarketDataService_GetBookTicker_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MarketService_GetBookTicker_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *marketDataServiceClient) GetRollingTicker(ctx context.Context, in *GetRollingTickerRequest, opts ...grpc.CallOption) (*GetRollingTickerResponse, error) {
+func (c *marketServiceClient) GetRollingTicker(ctx context.Context, in *GetRollingTickerRequest, opts ...grpc.CallOption) (*GetRollingTickerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetRollingTickerResponse)
-	err := c.cc.Invoke(ctx, MarketDataService_GetRollingTicker_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MarketService_GetRollingTicker_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// MarketDataServiceServer is the server API for MarketDataService service.
-// All implementations must embed UnimplementedMarketDataServiceServer
+// MarketServiceServer is the server API for MarketService service.
+// All implementations must embed UnimplementedMarketServiceServer
 // for forward compatibility.
-type MarketDataServiceServer interface {
+type MarketServiceServer interface {
 	// --- General endpoints ---
 	// @grpc-gateway: GET /api/v1/market/ping
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
@@ -275,393 +275,393 @@ type MarketDataServiceServer interface {
 	// --- Rolling Ticker ---
 	// @grpc-gateway: GET /api/v1/market/ticker
 	GetRollingTicker(context.Context, *GetRollingTickerRequest) (*GetRollingTickerResponse, error)
-	mustEmbedUnimplementedMarketDataServiceServer()
+	mustEmbedUnimplementedMarketServiceServer()
 }
 
-// UnimplementedMarketDataServiceServer must be embedded to have
+// UnimplementedMarketServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedMarketDataServiceServer struct{}
+type UnimplementedMarketServiceServer struct{}
 
-func (UnimplementedMarketDataServiceServer) Ping(context.Context, *PingRequest) (*PingResponse, error) {
+func (UnimplementedMarketServiceServer) Ping(context.Context, *PingRequest) (*PingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
 }
-func (UnimplementedMarketDataServiceServer) GetServerTime(context.Context, *GetServerTimeRequest) (*GetServerTimeResponse, error) {
+func (UnimplementedMarketServiceServer) GetServerTime(context.Context, *GetServerTimeRequest) (*GetServerTimeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetServerTime not implemented")
 }
-func (UnimplementedMarketDataServiceServer) GetExchangeInfo(context.Context, *GetExchangeInfoRequest) (*GetExchangeInfoResponse, error) {
+func (UnimplementedMarketServiceServer) GetExchangeInfo(context.Context, *GetExchangeInfoRequest) (*GetExchangeInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetExchangeInfo not implemented")
 }
-func (UnimplementedMarketDataServiceServer) GetOrderBook(context.Context, *GetOrderBookRequest) (*GetOrderBookResponse, error) {
+func (UnimplementedMarketServiceServer) GetOrderBook(context.Context, *GetOrderBookRequest) (*GetOrderBookResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrderBook not implemented")
 }
-func (UnimplementedMarketDataServiceServer) GetRecentTrades(context.Context, *GetRecentTradesRequest) (*GetRecentTradesResponse, error) {
+func (UnimplementedMarketServiceServer) GetRecentTrades(context.Context, *GetRecentTradesRequest) (*GetRecentTradesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRecentTrades not implemented")
 }
-func (UnimplementedMarketDataServiceServer) GetHistoricalTrades(context.Context, *GetHistoricalTradesRequest) (*GetHistoricalTradesResponse, error) {
+func (UnimplementedMarketServiceServer) GetHistoricalTrades(context.Context, *GetHistoricalTradesRequest) (*GetHistoricalTradesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetHistoricalTrades not implemented")
 }
-func (UnimplementedMarketDataServiceServer) GetAggTrades(context.Context, *GetAggTradesRequest) (*GetAggTradesResponse, error) {
+func (UnimplementedMarketServiceServer) GetAggTrades(context.Context, *GetAggTradesRequest) (*GetAggTradesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAggTrades not implemented")
 }
-func (UnimplementedMarketDataServiceServer) GetKlines(context.Context, *GetKlinesRequest) (*GetKlinesResponse, error) {
+func (UnimplementedMarketServiceServer) GetKlines(context.Context, *GetKlinesRequest) (*GetKlinesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetKlines not implemented")
 }
-func (UnimplementedMarketDataServiceServer) GetUiKlines(context.Context, *GetUiKlinesRequest) (*GetUiKlinesResponse, error) {
+func (UnimplementedMarketServiceServer) GetUiKlines(context.Context, *GetUiKlinesRequest) (*GetUiKlinesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUiKlines not implemented")
 }
-func (UnimplementedMarketDataServiceServer) GetAvgPrice(context.Context, *GetAvgPriceRequest) (*GetAvgPriceResponse, error) {
+func (UnimplementedMarketServiceServer) GetAvgPrice(context.Context, *GetAvgPriceRequest) (*GetAvgPriceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAvgPrice not implemented")
 }
-func (UnimplementedMarketDataServiceServer) GetTicker24Hr(context.Context, *GetTicker24HrRequest) (*GetTicker24HrResponse, error) {
+func (UnimplementedMarketServiceServer) GetTicker24Hr(context.Context, *GetTicker24HrRequest) (*GetTicker24HrResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTicker24Hr not implemented")
 }
-func (UnimplementedMarketDataServiceServer) GetTickerPrice(context.Context, *GetTickerPriceRequest) (*GetTickerPriceResponse, error) {
+func (UnimplementedMarketServiceServer) GetTickerPrice(context.Context, *GetTickerPriceRequest) (*GetTickerPriceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTickerPrice not implemented")
 }
-func (UnimplementedMarketDataServiceServer) GetBookTicker(context.Context, *GetBookTickerRequest) (*GetBookTickerResponse, error) {
+func (UnimplementedMarketServiceServer) GetBookTicker(context.Context, *GetBookTickerRequest) (*GetBookTickerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBookTicker not implemented")
 }
-func (UnimplementedMarketDataServiceServer) GetRollingTicker(context.Context, *GetRollingTickerRequest) (*GetRollingTickerResponse, error) {
+func (UnimplementedMarketServiceServer) GetRollingTicker(context.Context, *GetRollingTickerRequest) (*GetRollingTickerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRollingTicker not implemented")
 }
-func (UnimplementedMarketDataServiceServer) mustEmbedUnimplementedMarketDataServiceServer() {}
-func (UnimplementedMarketDataServiceServer) testEmbeddedByValue()                           {}
+func (UnimplementedMarketServiceServer) mustEmbedUnimplementedMarketServiceServer() {}
+func (UnimplementedMarketServiceServer) testEmbeddedByValue()                       {}
 
-// UnsafeMarketDataServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to MarketDataServiceServer will
+// UnsafeMarketServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to MarketServiceServer will
 // result in compilation errors.
-type UnsafeMarketDataServiceServer interface {
-	mustEmbedUnimplementedMarketDataServiceServer()
+type UnsafeMarketServiceServer interface {
+	mustEmbedUnimplementedMarketServiceServer()
 }
 
-func RegisterMarketDataServiceServer(s grpc.ServiceRegistrar, srv MarketDataServiceServer) {
-	// If the following call pancis, it indicates UnimplementedMarketDataServiceServer was
+func RegisterMarketServiceServer(s grpc.ServiceRegistrar, srv MarketServiceServer) {
+	// If the following call pancis, it indicates UnimplementedMarketServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&MarketDataService_ServiceDesc, srv)
+	s.RegisterService(&MarketService_ServiceDesc, srv)
 }
 
-func _MarketDataService_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MarketService_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PingRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MarketDataServiceServer).Ping(ctx, in)
+		return srv.(MarketServiceServer).Ping(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MarketDataService_Ping_FullMethodName,
+		FullMethod: MarketService_Ping_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MarketDataServiceServer).Ping(ctx, req.(*PingRequest))
+		return srv.(MarketServiceServer).Ping(ctx, req.(*PingRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MarketDataService_GetServerTime_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MarketService_GetServerTime_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetServerTimeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MarketDataServiceServer).GetServerTime(ctx, in)
+		return srv.(MarketServiceServer).GetServerTime(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MarketDataService_GetServerTime_FullMethodName,
+		FullMethod: MarketService_GetServerTime_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MarketDataServiceServer).GetServerTime(ctx, req.(*GetServerTimeRequest))
+		return srv.(MarketServiceServer).GetServerTime(ctx, req.(*GetServerTimeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MarketDataService_GetExchangeInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MarketService_GetExchangeInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetExchangeInfoRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MarketDataServiceServer).GetExchangeInfo(ctx, in)
+		return srv.(MarketServiceServer).GetExchangeInfo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MarketDataService_GetExchangeInfo_FullMethodName,
+		FullMethod: MarketService_GetExchangeInfo_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MarketDataServiceServer).GetExchangeInfo(ctx, req.(*GetExchangeInfoRequest))
+		return srv.(MarketServiceServer).GetExchangeInfo(ctx, req.(*GetExchangeInfoRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MarketDataService_GetOrderBook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MarketService_GetOrderBook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetOrderBookRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MarketDataServiceServer).GetOrderBook(ctx, in)
+		return srv.(MarketServiceServer).GetOrderBook(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MarketDataService_GetOrderBook_FullMethodName,
+		FullMethod: MarketService_GetOrderBook_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MarketDataServiceServer).GetOrderBook(ctx, req.(*GetOrderBookRequest))
+		return srv.(MarketServiceServer).GetOrderBook(ctx, req.(*GetOrderBookRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MarketDataService_GetRecentTrades_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MarketService_GetRecentTrades_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetRecentTradesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MarketDataServiceServer).GetRecentTrades(ctx, in)
+		return srv.(MarketServiceServer).GetRecentTrades(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MarketDataService_GetRecentTrades_FullMethodName,
+		FullMethod: MarketService_GetRecentTrades_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MarketDataServiceServer).GetRecentTrades(ctx, req.(*GetRecentTradesRequest))
+		return srv.(MarketServiceServer).GetRecentTrades(ctx, req.(*GetRecentTradesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MarketDataService_GetHistoricalTrades_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MarketService_GetHistoricalTrades_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetHistoricalTradesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MarketDataServiceServer).GetHistoricalTrades(ctx, in)
+		return srv.(MarketServiceServer).GetHistoricalTrades(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MarketDataService_GetHistoricalTrades_FullMethodName,
+		FullMethod: MarketService_GetHistoricalTrades_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MarketDataServiceServer).GetHistoricalTrades(ctx, req.(*GetHistoricalTradesRequest))
+		return srv.(MarketServiceServer).GetHistoricalTrades(ctx, req.(*GetHistoricalTradesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MarketDataService_GetAggTrades_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MarketService_GetAggTrades_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetAggTradesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MarketDataServiceServer).GetAggTrades(ctx, in)
+		return srv.(MarketServiceServer).GetAggTrades(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MarketDataService_GetAggTrades_FullMethodName,
+		FullMethod: MarketService_GetAggTrades_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MarketDataServiceServer).GetAggTrades(ctx, req.(*GetAggTradesRequest))
+		return srv.(MarketServiceServer).GetAggTrades(ctx, req.(*GetAggTradesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MarketDataService_GetKlines_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MarketService_GetKlines_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetKlinesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MarketDataServiceServer).GetKlines(ctx, in)
+		return srv.(MarketServiceServer).GetKlines(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MarketDataService_GetKlines_FullMethodName,
+		FullMethod: MarketService_GetKlines_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MarketDataServiceServer).GetKlines(ctx, req.(*GetKlinesRequest))
+		return srv.(MarketServiceServer).GetKlines(ctx, req.(*GetKlinesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MarketDataService_GetUiKlines_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MarketService_GetUiKlines_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUiKlinesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MarketDataServiceServer).GetUiKlines(ctx, in)
+		return srv.(MarketServiceServer).GetUiKlines(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MarketDataService_GetUiKlines_FullMethodName,
+		FullMethod: MarketService_GetUiKlines_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MarketDataServiceServer).GetUiKlines(ctx, req.(*GetUiKlinesRequest))
+		return srv.(MarketServiceServer).GetUiKlines(ctx, req.(*GetUiKlinesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MarketDataService_GetAvgPrice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MarketService_GetAvgPrice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetAvgPriceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MarketDataServiceServer).GetAvgPrice(ctx, in)
+		return srv.(MarketServiceServer).GetAvgPrice(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MarketDataService_GetAvgPrice_FullMethodName,
+		FullMethod: MarketService_GetAvgPrice_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MarketDataServiceServer).GetAvgPrice(ctx, req.(*GetAvgPriceRequest))
+		return srv.(MarketServiceServer).GetAvgPrice(ctx, req.(*GetAvgPriceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MarketDataService_GetTicker24Hr_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MarketService_GetTicker24Hr_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetTicker24HrRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MarketDataServiceServer).GetTicker24Hr(ctx, in)
+		return srv.(MarketServiceServer).GetTicker24Hr(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MarketDataService_GetTicker24Hr_FullMethodName,
+		FullMethod: MarketService_GetTicker24Hr_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MarketDataServiceServer).GetTicker24Hr(ctx, req.(*GetTicker24HrRequest))
+		return srv.(MarketServiceServer).GetTicker24Hr(ctx, req.(*GetTicker24HrRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MarketDataService_GetTickerPrice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MarketService_GetTickerPrice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetTickerPriceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MarketDataServiceServer).GetTickerPrice(ctx, in)
+		return srv.(MarketServiceServer).GetTickerPrice(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MarketDataService_GetTickerPrice_FullMethodName,
+		FullMethod: MarketService_GetTickerPrice_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MarketDataServiceServer).GetTickerPrice(ctx, req.(*GetTickerPriceRequest))
+		return srv.(MarketServiceServer).GetTickerPrice(ctx, req.(*GetTickerPriceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MarketDataService_GetBookTicker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MarketService_GetBookTicker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetBookTickerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MarketDataServiceServer).GetBookTicker(ctx, in)
+		return srv.(MarketServiceServer).GetBookTicker(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MarketDataService_GetBookTicker_FullMethodName,
+		FullMethod: MarketService_GetBookTicker_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MarketDataServiceServer).GetBookTicker(ctx, req.(*GetBookTickerRequest))
+		return srv.(MarketServiceServer).GetBookTicker(ctx, req.(*GetBookTickerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MarketDataService_GetRollingTicker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MarketService_GetRollingTicker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetRollingTickerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MarketDataServiceServer).GetRollingTicker(ctx, in)
+		return srv.(MarketServiceServer).GetRollingTicker(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MarketDataService_GetRollingTicker_FullMethodName,
+		FullMethod: MarketService_GetRollingTicker_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MarketDataServiceServer).GetRollingTicker(ctx, req.(*GetRollingTickerRequest))
+		return srv.(MarketServiceServer).GetRollingTicker(ctx, req.(*GetRollingTickerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// MarketDataService_ServiceDesc is the grpc.ServiceDesc for MarketDataService service.
+// MarketService_ServiceDesc is the grpc.ServiceDesc for MarketService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var MarketDataService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "market.v1.MarketDataService",
-	HandlerType: (*MarketDataServiceServer)(nil),
+var MarketService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "market.v1.MarketService",
+	HandlerType: (*MarketServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Ping",
-			Handler:    _MarketDataService_Ping_Handler,
+			Handler:    _MarketService_Ping_Handler,
 		},
 		{
 			MethodName: "GetServerTime",
-			Handler:    _MarketDataService_GetServerTime_Handler,
+			Handler:    _MarketService_GetServerTime_Handler,
 		},
 		{
 			MethodName: "GetExchangeInfo",
-			Handler:    _MarketDataService_GetExchangeInfo_Handler,
+			Handler:    _MarketService_GetExchangeInfo_Handler,
 		},
 		{
 			MethodName: "GetOrderBook",
-			Handler:    _MarketDataService_GetOrderBook_Handler,
+			Handler:    _MarketService_GetOrderBook_Handler,
 		},
 		{
 			MethodName: "GetRecentTrades",
-			Handler:    _MarketDataService_GetRecentTrades_Handler,
+			Handler:    _MarketService_GetRecentTrades_Handler,
 		},
 		{
 			MethodName: "GetHistoricalTrades",
-			Handler:    _MarketDataService_GetHistoricalTrades_Handler,
+			Handler:    _MarketService_GetHistoricalTrades_Handler,
 		},
 		{
 			MethodName: "GetAggTrades",
-			Handler:    _MarketDataService_GetAggTrades_Handler,
+			Handler:    _MarketService_GetAggTrades_Handler,
 		},
 		{
 			MethodName: "GetKlines",
-			Handler:    _MarketDataService_GetKlines_Handler,
+			Handler:    _MarketService_GetKlines_Handler,
 		},
 		{
 			MethodName: "GetUiKlines",
-			Handler:    _MarketDataService_GetUiKlines_Handler,
+			Handler:    _MarketService_GetUiKlines_Handler,
 		},
 		{
 			MethodName: "GetAvgPrice",
-			Handler:    _MarketDataService_GetAvgPrice_Handler,
+			Handler:    _MarketService_GetAvgPrice_Handler,
 		},
 		{
 			MethodName: "GetTicker24hr",
-			Handler:    _MarketDataService_GetTicker24Hr_Handler,
+			Handler:    _MarketService_GetTicker24Hr_Handler,
 		},
 		{
 			MethodName: "GetTickerPrice",
-			Handler:    _MarketDataService_GetTickerPrice_Handler,
+			Handler:    _MarketService_GetTickerPrice_Handler,
 		},
 		{
 			MethodName: "GetBookTicker",
-			Handler:    _MarketDataService_GetBookTicker_Handler,
+			Handler:    _MarketService_GetBookTicker_Handler,
 		},
 		{
 			MethodName: "GetRollingTicker",
-			Handler:    _MarketDataService_GetRollingTicker_Handler,
+			Handler:    _MarketService_GetRollingTicker_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
