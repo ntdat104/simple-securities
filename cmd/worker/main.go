@@ -4,229 +4,215 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"strings"
-	"syscall"
+	"simple-securities/pkg/db/cache"
+	"sync"
 	"time"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/websocket"
 )
 
-type KlineMessage struct {
-	Stream string `json:"stream"`
-	Data   struct {
-		EventType string `json:"e"`
-		Time      int64  `json:"E"`
-		Symbol    string `json:"s"`
-		Kline     struct {
-			StartTime    int64  `json:"t"`
-			CloseTime    int64  `json:"T"`
-			Interval     string `json:"i"`
-			FirstTradeID int64  `json:"f"`
-			LastTradeID  int64  `json:"L"`
-			OpenPrice    string `json:"o"`
-			ClosePrice   string `json:"c"`
-			HighPrice    string `json:"h"`
-			LowPrice     string `json:"l"`
-			Volume       string `json:"v"`
-			IsFinal      bool   `json:"x"`
-		} `json:"k"`
-	} `json:"data"`
+type Event struct {
+	Method string   `json:"method"`
+	Params []string `json:"params"`
+	ID     int      `json:"id"`
 }
 
-const wsURL = "wss://stream.binance.com/stream"
+const (
+	DefaultURL = "wss://stream.binance.com/stream"
+)
 
-type BinanceService struct {
-	tickers []string
-	rdb     *redis.Client
-	conn    *websocket.Conn
+type BinanceWsClient struct {
+	url    string
+	conn   *websocket.Conn
+	params map[string]uint16 // subscription reference counter
+	mu     sync.Mutex        // protects params map & conn
 }
 
-// NewBinanceService creates a new BinanceService instance, accepting a pre-configured Redis client
-func NewBinanceService(tickers []string, rdb *redis.Client) (*BinanceService, error) {
-	conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to WebSocket: %w", err)
+// -------------------------------------------------------------
+// Constructor
+// -------------------------------------------------------------
+func NewBinanceWsClient(baseURL ...string) (*BinanceWsClient, error) {
+	url := DefaultURL
+	if len(baseURL) > 0 {
+		url = baseURL[0]
 	}
 
-	return &BinanceService{
-		tickers: tickers,
-		rdb:     rdb,
-		conn:    conn,
+	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect: %w", err)
+	}
+
+	return &BinanceWsClient{
+		url:    url,
+		conn:   conn,
+		params: make(map[string]uint16),
 	}, nil
 }
 
-// Subscribe subscribes to Binance WebSocket streams
-func (b *BinanceService) Subscribe() error {
-	const batchSize = 100
-	// intervals := []string{
-	// 	"1s",
-	// 	"1m",
-	// 	"3m",
-	// 	"5m",
-	// 	"15m",
-	// 	"30m",
-	// 	"1h",
-	// 	"2h",
-	// 	"4h",
-	// 	"6h",
-	// 	"8h",
-	// 	"12h",
-	// 	"1d",
-	// 	"3d",
-	// 	"1w",
-	// 	"1M",
-	// }
-	intervals := []string{"1s"}
+// -------------------------------------------------------------
+// Internal helper to send message over WS
+// -------------------------------------------------------------
+func (c *BinanceWsClient) sendWSMessage(event Event) error {
+	data, err := json.Marshal(event)
+	if err != nil {
+		return fmt.Errorf("marshal event error: %w", err)
+	}
+	return c.conn.WriteMessage(websocket.TextMessage, data)
+}
 
-	for _, interval := range intervals {
-		for i := 0; i < len(b.tickers); i += batchSize {
-			end := i + batchSize
-			if end > len(b.tickers) {
-				end = len(b.tickers)
+// -------------------------------------------------------------
+// Subscribe / Unsubscribe
+// -------------------------------------------------------------
+func (c *BinanceWsClient) Send(ctx context.Context, event Event) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// SUBSCRIBE
+	if event.Method == "SUBSCRIBE" {
+		newSubParams := []string{}
+
+		for _, p := range event.Params {
+			if c.params[p] == 0 {
+				newSubParams = append(newSubParams, p)
 			}
-			batch := b.tickers[i:end]
-			params := make([]string, len(batch))
-			for j, ticker := range batch {
-				params[j] = fmt.Sprintf("%s@kline_%s", strings.ToLower(ticker), interval)
+			c.params[p]++
+		}
+
+		if len(newSubParams) > 0 {
+			return c.sendWSMessage(Event{
+				Method: "SUBSCRIBE",
+				Params: newSubParams,
+				ID:     1,
+			})
+		}
+	}
+
+	// UNSUBSCRIBE
+	if event.Method == "UNSUBSCRIBE" {
+		newUnSubParams := []string{}
+
+		for _, p := range event.Params {
+			if c.params[p] == 1 {
+				newUnSubParams = append(newUnSubParams, p)
+				delete(c.params, p)
+			} else if c.params[p] > 1 {
+				c.params[p]--
 			}
-			subMessage := map[string]interface{}{
-				"method": "SUBSCRIBE",
-				"params": params,
-				"id":     1,
-			}
-			if err := b.conn.WriteJSON(subMessage); err != nil {
-				return fmt.Errorf("failed to send subscription message for batch starting at %d with interval %s: %w", i, interval, err)
-			}
-			log.Printf("Subscribed to Binance WebSocket stream for tickers: %v with interval: %s\n", len(batch), interval)
-			time.Sleep(300 * time.Millisecond)
+		}
+
+		if len(newUnSubParams) > 0 {
+			return c.sendWSMessage(Event{
+				Method: "UNSUBSCRIBE",
+				Params: newUnSubParams,
+				ID:     1,
+			})
 		}
 	}
 
 	return nil
 }
 
-// ReadAndPublish reads messages from the WebSocket and publishes them to Redis
-func (b *BinanceService) ReadAndPublish(ctx context.Context) {
+// -------------------------------------------------------------
+// Listen to Binance messages and publish to Redis
+// -------------------------------------------------------------
+func (c *BinanceWsClient) SubscribeBinance(ctx context.Context, redisClient *cache.RedisClient) {
 	for {
-		_, message, err := b.conn.ReadMessage()
-		if err != nil {
-			log.Fatalf("Failed to read WebSocket message: %v", err)
-		}
+		select {
+		case <-ctx.Done():
+			log.Println("Binance subscription stopped.")
+			return
+		default:
+			_, msg, err := c.conn.ReadMessage()
+			if err != nil {
+				log.Println("WS read error:", err)
+				time.Sleep(1 * time.Second)
+				continue
+			}
 
-		var klineMsg KlineMessage
-		if err := json.Unmarshal(message, &klineMsg); err != nil {
-			log.Printf("Failed to unmarshal WebSocket message: %v", err)
-			continue
-		}
+			var raw map[string]any
+			if err := json.Unmarshal(msg, &raw); err != nil {
+				log.Println("JSON parse error:", err)
+				continue
+			}
 
-		channel := strings.ToUpper(klineMsg.Data.Symbol)
-		if channel == "" {
-			continue
-		}
+			stream, ok := raw["stream"].(string)
+			if !ok {
+				log.Println("No stream field in message")
+				continue
+			}
 
-		if err := b.rdb.Publish(ctx, channel, message).Err(); err != nil {
-			log.Printf("Failed to publish to Redis channel %s: %v", channel, err)
-			continue
+			// Publish to Redis
+			if err := redisClient.Client.Publish(redisClient.Client.Context(), stream, msg).Err(); err != nil {
+				log.Println("Redis publish error:", err)
+			}
 		}
-		// log.Printf("Published %s: %v\n", channel, klineMsg.Data.Kline.ClosePrice)
 	}
 }
 
-// Close closes the WebSocket connection
-func (b *BinanceService) Close() {
-	if err := b.conn.Close(); err != nil {
-		log.Printf("Failed to close WebSocket connection: %v", err)
-	} else {
-		log.Println("WebSocket connection closed successfully.")
-	}
-}
+// -------------------------------------------------------------
+// Listen to Redis events and send to Binance
+// -------------------------------------------------------------
+func (c *BinanceWsClient) SubscribeRedis(ctx context.Context, redisClient *cache.RedisClient, channel string) {
+	pubsub := redisClient.Client.Subscribe(redisClient.Client.Context(), channel)
+	defer pubsub.Close()
 
-type ExchangeInfo struct {
-	Symbols []struct {
-		Symbol string `json:"symbol"`
-	} `json:"symbols"`
-}
+	ch := pubsub.Channel()
 
-func getAllCryptoSymbols() ([]string, error) {
-	url := "https://api.binance.com/api/v3/exchangeInfo"
+	for {
+		select {
+		case <-ctx.Done():
+			log.Println("Redis subscription stopped.")
+			return
+		case msg := <-ch:
+			if msg == nil {
+				continue
+			}
 
-	// Send GET request
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch data: %v", err)
-	}
-	defer resp.Body.Close()
+			var event Event
+			if err := json.Unmarshal([]byte(msg.Payload), &event); err != nil {
+				log.Println("Invalid event from Redis:", err)
+				continue
+			}
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
-
-	// Read and parse response
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %v", err)
-	}
-
-	var exchangeInfo ExchangeInfo
-	err = json.Unmarshal(body, &exchangeInfo)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse JSON: %v", err)
-	}
-
-	// Extract symbols
-	var symbols []string
-	for _, s := range exchangeInfo.Symbols {
-		if strings.Contains(s.Symbol, "USDT") {
-			symbols = append(symbols, s.Symbol)
+			if err := c.Send(ctx, event); err != nil {
+				log.Println("Failed to send event to Binance:", err)
+			}
 		}
 	}
-
-	return symbols, nil
 }
 
+// -------------------------------------------------------------
+// Main
+// -------------------------------------------------------------
 func main() {
-	// Create Redis client
-	rdb := redis.NewClient(&redis.Options{
-		Addr: "localhost:6179", // Redis server address
-	})
+	ctx := context.Background()
 
-	// Tickers to subscribe to
-	tickers, err := getAllCryptoSymbols()
+	binanceClient, err := NewBinanceWsClient()
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		return
+		panic(err)
 	}
-	// tickers := []string{"BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "ADAUSDT", "AVAXUSDT", "SUIUSDT", "GALAUSDT", "C98USDT"}
 
-	// Create Binance service with the pre-configured Redis client
-	service, err := NewBinanceService(tickers, rdb)
+	redisClient, err := cache.NewRedisClient(nil)
 	if err != nil {
-		log.Fatalf("Failed to create Binance service: %v", err)
-	}
-	defer service.Close() // Ensure the WebSocket connection is closed
-
-	// Subscribe to streams
-	if err := service.Subscribe(); err != nil {
-		log.Fatalf("Failed to subscribe to Binance streams: %v", err)
+		panic(err)
 	}
 
-	// Handle graceful shutdown
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	err = redisClient.HealthCheck(ctx)
+	if err != nil {
+		panic(err)
+	}
 
-	go service.ReadAndPublish(ctx)
+	// Binance → Redis
+	go binanceClient.SubscribeBinance(ctx, redisClient)
 
-	// Wait for termination signals
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	// Redis → Binance (listen to "binance-events" channel)
+	go binanceClient.SubscribeRedis(ctx, redisClient, "binance-events")
 
-	log.Println("Service is running. Press Ctrl+C to stop.")
-	<-sigs
-	log.Println("Shutting down...")
+	// binanceClient.Send(ctx, Event{
+	// 	Method: "SUBSCRIBE",
+	// 	Params: []string{"btcusdt@kline_1m", "ethusdt@kline_1m", "bnbusdt@kline_1m"},
+	// })
+
+	select {}
 }
