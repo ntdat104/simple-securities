@@ -79,7 +79,11 @@ func (c *BinanceWsClient) Send(ctx context.Context, event Event) error {
 			c.params[p]++
 		}
 
+		b, _ := json.MarshalIndent(c.params, "", "  ")
+		log.Printf("[Params]: %v", string(b))
+
 		if len(newSubParams) > 0 {
+			log.Printf("[SUBSCRIBE]: %v", newSubParams)
 			return c.sendWSMessage(Event{
 				Method: "SUBSCRIBE",
 				Params: newSubParams,
@@ -101,7 +105,11 @@ func (c *BinanceWsClient) Send(ctx context.Context, event Event) error {
 			}
 		}
 
+		b, _ := json.MarshalIndent(c.params, "", "  ")
+		log.Printf("[Params]: %v", string(b))
+
 		if len(newUnSubParams) > 0 {
+			log.Printf("[UNSUBSCRIBE]: %v", newUnSubParams)
 			return c.sendWSMessage(Event{
 				Method: "UNSUBSCRIBE",
 				Params: newUnSubParams,
@@ -138,7 +146,6 @@ func (c *BinanceWsClient) SubscribeBinance(ctx context.Context, redisClient *cac
 
 			stream, ok := raw["stream"].(string)
 			if !ok {
-				log.Println("No stream field in message")
 				continue
 			}
 

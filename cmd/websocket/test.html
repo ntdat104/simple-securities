@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>WebSocket Binary Tester</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      padding: 18px;
+      max-width: 900px;
+      margin: 0 auto;
+      color: #111;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    input[type="text"],
+    select {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      min-width: 220px;
+    }
+
+    button {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 0;
+      background: #0b84ff;
+      color: white;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #6b7280;
+    }
+
+    button.danger {
+      background: #ef4444;
+    }
+
+    #log {
+      border: 1px solid #e6e6e6;
+      padding: 12px;
+      height: 360px;
+      overflow: auto;
+      background: #fafafa;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      font-family: Menlo, monospace;
+      font-size: 13px;
+    }
+
+    .meta {
+      color: #6b7280;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    label {
+      font-size: 13px;
+      color: #333;
+    }
+
+    .flex {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@msgpack/msgpack@3.1.2/dist.umd/msgpack.min.js"></script>
+</head>
+
+<body>
+  <h1>WebSocket Binary Tester</h1>
+
+  <div class="row">
+    <label for="url">WebSocket URL</label>
+    <input id="url" type="text" value="ws://localhost:8888/ws" />
+    <button id="connectBtn">Connect</button>
+    <button id="disconnectBtn" class="secondary" disabled>Disconnect</button>
+  </div>
+
+  <div class="row">
+    <label for="mode">Send mode</label>
+    <select id="mode">
+      <option value="text">Text (JSON text frame)</option>
+      <option value="binary">Binary (ArrayBuffer)</option>
+    </select>
+
+    <label for="channels">Channels (comma-separated)</label>
+    <input id="channels" type="text" placeholder="btcusdt@kline_1m,ethusdt@kline_1m" />
+
+    <button id="subscribeBtn">SUBSCRIBE</button>
+    <button id="unsubscribeBtn" class="secondary">UNSUBSCRIBE</button>
+  </div>
+
+  <div class="row">
+    <label for="rawSend">Custom JSON to send</label>
+    <input id="rawSend" type="text" style="flex:1" placeholder='{"method":"SUBSCRIBE","params":["btcusdt@kline_1m"]}' />
+    <button id="sendCustom">Send</button>
+  </div>
+
+  <div class="meta" id="status">Status: <strong>disconnected</strong></div>
+
+  <h2 style="font-size:16px;margin-top:12px;margin-bottom:6px">Log</h2>
+  <div id="log"></div>
+
+  <script>
+    (function () {
+      const urlInput = document.getElementById('url');
+      const connectBtn = document.getElementById('connectBtn');
+      const disconnectBtn = document.getElementById('disconnectBtn');
+      const modeSelect = document.getElementById('mode');
+      const channelsInput = document.getElementById('channels');
+      const subscribeBtn = document.getElementById('subscribeBtn');
+      const unsubscribeBtn = document.getElementById('unsubscribeBtn');
+      const rawSendInput = document.getElementById('rawSend');
+      const sendCustomBtn = document.getElementById('sendCustom');
+      const logEl = document.getElementById('log');
+      const statusEl = document.getElementById('status');
+
+      let ws = null;
+
+      function log(direction, msg, meta = '') {
+        const time = new Date().toISOString();
+        const header = `[${time}] ${direction}`;
+        if (typeof msg === 'object') {
+          msg = JSON.stringify(msg, null, 2);
+        }
+        logEl.textContent = `${header} ${meta}\n${msg}\n\n` + logEl.textContent;
+      }
+
+      function setStatus(connected) {
+        statusEl.innerHTML = 'Status: ' + (connected ? '<strong style="color:green">connected</strong>' : '<strong>disconnected</strong>');
+        connectBtn.disabled = connected;
+        disconnectBtn.disabled = !connected;
+        subscribeBtn.disabled = !connected;
+        unsubscribeBtn.disabled = !connected;
+        sendCustomBtn.disabled = !connected;
+      }
+
+      function ensureWS(url) {
+        if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+        ws = new WebSocket(url);
+        // we expect binary frames from server
+        ws.binaryType = 'arraybuffer';
+
+        ws.onopen = () => {
+          setStatus(true);
+          log('SYSTEM', 'WebSocket opened');
+        };
+
+        ws.onclose = (ev) => {
+          setStatus(false);
+          log('SYSTEM', 'WebSocket closed', `code=${ev.code} reason=${ev.reason || ''}`);
+        };
+
+        ws.onerror = (ev) => {
+          log('SYSTEM', 'WebSocket error', '');
+        };
+
+        ws.onmessage = (e) => {
+          // Could be ArrayBuffer (binary) or string (text)
+          if (e.data instanceof ArrayBuffer) {
+            const ab = e.data;
+            const len = ab.byteLength;
+            // decode to string (assume UTF-8 JSON)
+            const decoder = new TextDecoder('utf-8');
+            const str = decoder.decode(new Uint8Array(ab));
+            try {
+              const parsed = JSON.parse(str);
+              log('RECEIVE (binary-json)', parsed, `(bytes=${len})`);
+            } catch (err) {
+              const decoded = window.MessagePack.decode(new Uint8Array(e.data));
+              log("RECEIVE (binary-msgpack)", decoded);
+            }
+          } else if (typeof e.data === 'string') {
+            try {
+              const parsed = JSON.parse(e.data);
+              log('RECEIVE (text)', parsed, `(chars=${e.data.length})`);
+            } catch (err) {
+              log('RECEIVE (text)', e.data, `(chars=${e.data.length})`);
+            }
+          } else {
+            log('RECEIVE', '(unknown message type)');
+          }
+        };
+      }
+
+      connectBtn.addEventListener('click', () => {
+        ensureWS(urlInput.value);
+      });
+
+      disconnectBtn.addEventListener('click', () => {
+        if (!ws) return;
+        ws.close();
+        ws = null;
+        setStatus(false);
+      });
+
+      function buildMessage(method, channels) {
+        const params = channels.split(',').map(s => s.trim()).filter(Boolean);
+        return { method: method, params: params };
+      }
+
+      function sendMessage(message) {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+          alert('WebSocket is not open');
+          return;
+        }
+        const json = JSON.stringify(message);
+        if (modeSelect.value === 'text') {
+          ws.send(json);
+          log('SEND (text)', message, `(chars=${json.length})`);
+        } else {
+          // binary
+          const encoder = new TextEncoder();
+          const bytes = encoder.encode(json);
+          ws.send(bytes.buffer);
+          log('SEND (binary)', message, `(bytes=${bytes.length})`);
+        }
+      }
+
+      subscribeBtn.addEventListener('click', () => {
+        const channels = channelsInput.value || '';
+        if (!channels) { alert('Provide channels'); return; }
+        const msg = buildMessage('SUBSCRIBE', channels);
+        sendMessage(msg);
+      });
+
+      unsubscribeBtn.addEventListener('click', () => {
+        const channels = channelsInput.value || '';
+        if (!channels) { alert('Provide channels'); return; }
+        const msg = buildMessage('UNSUBSCRIBE', channels);
+        sendMessage(msg);
+      });
+
+      sendCustomBtn.addEventListener('click', () => {
+        let raw = rawSendInput.value.trim();
+        if (!raw) { alert('Provide raw JSON'); return; }
+        try {
+          const parsed = JSON.parse(raw);
+          sendMessage(parsed);
+        } catch (err) {
+          alert('Invalid JSON: ' + err.message);
+        }
+      });
+
+      // quick example
+      rawSendInput.value = JSON.stringify({
+        method: "SUBSCRIBE", params: [
+          "!miniTicker@arr@3000ms",
+          "btcusdt@aggTrade",
+          "btcusdt@depth",
+          "usdtusdt@aggTrade",
+          "btcusdt@kline_3m"
+        ]
+      });
+
+      // try to auto-connect? comment if not desired
+      //ensureWS(urlInput.value);
+      setStatus(false);
+    })();
+  </script>
+</body>
+
+</html>
