@@ -1,409 +1,391 @@
 package main
 
 import (
-	"container/heap"
-	"context"
+	"container/list"
 	"fmt"
 	"math/rand"
-	"sort"
-	"sync"
 	"sync/atomic"
 	"time"
 )
 
-// Simple exchange simulation in Go
-// Features:
-// - Order gateway receiving orders concurrently
-// - Per-symbol matching engine (sharded)
-// - In-memory order books (price-time priority)
-// - Wallet/reserve checks
-// - Event-driven trade publishing
-// - Async persistence (simulated)
-// - Basic rate-limiting per user
-
-// Run: go run main.go
-
-// ---------- Types ----------
+// ================= Basic Types =================
 
 type Side int
 
 const (
-	Buy Side = iota
-	Sell
+	Bid Side = iota
+	Ask
 )
 
 type Order struct {
-	ID        uint64
-	User      string
-	Symbol    string
-	Side      Side
-	Price     float64
-	Qty       float64
-	Timestamp time.Time
+	ID         uint64
+	Price      int64
+	Quantity   int64
+	Side       Side
+	Node       *list.Element
+	PriceLevel *PriceLevel
 }
 
-type Trade struct {
-	BuyOrderID  uint64
-	SellOrderID uint64
-	Price       float64
-	Qty         float64
-	Symbol      string
-	Timestamp   time.Time
+type PriceLevel struct {
+	Price  int64
+	Orders *list.List
+	Total  int64
 }
 
-// ---------- Priority queues for orderbook ----------
+// ================= AVL Tree for Price Levels =================
 
-type OrderItem struct {
-	order *Order
-	index int
+type PriceLevelNode struct {
+	PL     *PriceLevel
+	Left   *PriceLevelNode
+	Right  *PriceLevelNode
+	Height int
 }
 
-// Buy heap: highest price first, earlier timestamp first
-// Sell heap: lowest price first, earlier timestamp first
-
-type OrderHeap struct {
-	items []*OrderItem
-	isBuy bool
-}
-
-func (h OrderHeap) Len() int { return len(h.items) }
-func (h OrderHeap) Less(i, j int) bool {
-	a := h.items[i].order
-	b := h.items[j].order
-	if h.isBuy {
-		if a.Price == b.Price {
-			return a.Timestamp.Before(b.Timestamp)
-		}
-		return a.Price > b.Price
-	}
-	if a.Price == b.Price {
-		return a.Timestamp.Before(b.Timestamp)
-	}
-	return a.Price < b.Price
-}
-func (h OrderHeap) Swap(i, j int) {
-	h.items[i], h.items[j] = h.items[j], h.items[i]
-	h.items[i].index = i
-	h.items[j].index = j
-}
-func (h *OrderHeap) Push(x interface{}) {
-	it := x.(*OrderItem)
-	it.index = len(h.items)
-	h.items = append(h.items, it)
-}
-func (h *OrderHeap) Pop() interface{} {
-	old := h.items
-	n := len(old)
-	it := old[n-1]
-	old[n-1] = nil
-	h.items = old[:n-1]
-	return it
-}
-
-// ---------- OrderBook ----------
-
-type OrderBook struct {
-	symbol string
-	buys   *OrderHeap
-	sells  *OrderHeap
-	lock   sync.Mutex
-}
-
-func NewOrderBook(symbol string) *OrderBook {
-	b := &OrderHeap{isBuy: true}
-	s := &OrderHeap{isBuy: false}
-	heap.Init(b)
-	heap.Init(s)
-	return &OrderBook{
-		symbol: symbol,
-		buys:   b,
-		sells:  s,
-	}
-}
-
-// ---------- Wallet & Risk ----------
-
-type Wallets struct {
-	balances sync.Map // map[user]map[symbol]float64 or map[string]float64
-}
-
-func (w *Wallets) Ensure(user string) *sync.Map {
-	v, ok := w.balances.Load(user)
-	if ok {
-		return v.(*sync.Map)
-	}
-	m := &sync.Map{}
-	w.balances.Store(user, m)
-	return m
-}
-
-func (w *Wallets) GetBalance(user, asset string) float64 {
-	m := w.Ensure(user)
-	v, ok := m.Load(asset)
-	if !ok {
+func height(n *PriceLevelNode) int {
+	if n == nil {
 		return 0
 	}
-	return v.(float64)
+	return n.Height
 }
 
-func (w *Wallets) Add(user, asset string, amt float64) {
-	m := w.Ensure(user)
-	v, _ := m.LoadOrStore(asset, 0.0)
-	m.Store(asset, v.(float64)+amt)
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
 
-func (w *Wallets) Sub(user, asset string, amt float64) bool {
-	m := w.Ensure(user)
-	v, _ := m.LoadOrStore(asset, 0.0)
-	bal := v.(float64)
-	if bal < amt {
+func rotateRight(y *PriceLevelNode) *PriceLevelNode {
+	x := y.Left
+	T2 := x.Right
+	x.Right = y
+	y.Left = T2
+	y.Height = max(height(y.Left), height(y.Right)) + 1
+	x.Height = max(height(x.Left), height(x.Right)) + 1
+	return x
+}
+
+func rotateLeft(x *PriceLevelNode) *PriceLevelNode {
+	y := x.Right
+	T2 := y.Left
+	y.Left = x
+	x.Right = T2
+	x.Height = max(height(x.Left), height(x.Right)) + 1
+	y.Height = max(height(y.Left), height(y.Right)) + 1
+	return y
+}
+
+func getBalance(n *PriceLevelNode) int {
+	if n == nil {
+		return 0
+	}
+	return height(n.Left) - height(n.Right)
+}
+
+func insertNode(root *PriceLevelNode, pl *PriceLevel, cmp func(a, b int64) bool) *PriceLevelNode {
+	if root == nil {
+		return &PriceLevelNode{PL: pl, Height: 1}
+	}
+	if cmp(pl.Price, root.PL.Price) {
+		root.Left = insertNode(root.Left, pl, cmp)
+	} else if cmp(root.PL.Price, pl.Price) {
+		root.Right = insertNode(root.Right, pl, cmp)
+	} else {
+		// Price already exists, shouldn't happen in this design
+		return root
+	}
+
+	root.Height = 1 + max(height(root.Left), height(root.Right))
+	balance := getBalance(root)
+
+	// Left Left
+	if balance > 1 && cmp(pl.Price, root.Left.PL.Price) {
+		return rotateRight(root)
+	}
+	// Right Right
+	if balance < -1 && cmp(root.Right.PL.Price, pl.Price) {
+		return rotateLeft(root)
+	}
+	// Left Right
+	if balance > 1 && cmp(root.Left.PL.Price, pl.Price) {
+		root.Left = rotateLeft(root.Left)
+		return rotateRight(root)
+	}
+	// Right Left
+	if balance < -1 && cmp(pl.Price, root.Right.PL.Price) {
+		root.Right = rotateRight(root.Right)
+		return rotateLeft(root)
+	}
+
+	return root
+}
+
+// Find min/max node depending on side
+func minNode(n *PriceLevelNode) *PriceLevelNode {
+	current := n
+	for current.Left != nil {
+		current = current.Left
+	}
+	return current
+}
+
+func maxNode(n *PriceLevelNode) *PriceLevelNode {
+	current := n
+	for current.Right != nil {
+		current = current.Right
+	}
+	return current
+}
+
+// Remove node by price
+func removeNode(root *PriceLevelNode, price int64, cmp func(a, b int64) bool) *PriceLevelNode {
+	if root == nil {
+		return nil
+	}
+
+	if cmp(price, root.PL.Price) {
+		root.Left = removeNode(root.Left, price, cmp)
+	} else if cmp(root.PL.Price, price) {
+		root.Right = removeNode(root.Right, price, cmp)
+	} else {
+		// node to delete
+		if root.Left == nil || root.Right == nil {
+			var temp *PriceLevelNode
+			if root.Left != nil {
+				temp = root.Left
+			} else {
+				temp = root.Right
+			}
+			if temp == nil {
+				return nil
+			} else {
+				root = temp
+			}
+		} else {
+			// get inorder successor
+			temp := minNode(root.Right)
+			root.PL = temp.PL
+			root.Right = removeNode(root.Right, temp.PL.Price, cmp)
+		}
+	}
+
+	if root == nil {
+		return nil
+	}
+
+	root.Height = 1 + max(height(root.Left), height(root.Right))
+	balance := getBalance(root)
+
+	// Left Left
+	if balance > 1 && getBalance(root.Left) >= 0 {
+		return rotateRight(root)
+	}
+	// Left Right
+	if balance > 1 && getBalance(root.Left) < 0 {
+		root.Left = rotateLeft(root.Left)
+		return rotateRight(root)
+	}
+	// Right Right
+	if balance < -1 && getBalance(root.Right) <= 0 {
+		return rotateLeft(root)
+	}
+	// Right Left
+	if balance < -1 && getBalance(root.Right) > 0 {
+		root.Right = rotateRight(root.Right)
+		return rotateLeft(root)
+	}
+	return root
+}
+
+// ================= Price Level Tree Wrapper =================
+
+type PriceLevelTree struct {
+	root *PriceLevelNode
+	cmp  func(a, b int64) bool
+}
+
+func NewPriceLevelTree(cmp func(a, b int64) bool) *PriceLevelTree {
+	return &PriceLevelTree{cmp: cmp}
+}
+
+func (t *PriceLevelTree) Insert(price int64) *PriceLevel {
+	pl := &PriceLevel{Price: price, Orders: list.New()}
+	t.root = insertNode(t.root, pl, t.cmp)
+	return pl
+}
+
+func (t *PriceLevelTree) Remove(price int64) {
+	t.root = removeNode(t.root, price, t.cmp)
+}
+
+func (t *PriceLevelTree) Best() *PriceLevel {
+	if t.root == nil {
+		return nil
+	}
+	if t.cmp == nil {
+		return nil
+	}
+	if t.cmp(1, 0) {
+		return minNode(t.root).PL
+	}
+	return maxNode(t.root).PL
+}
+
+// ================= OrderBook =================
+
+type OrderBook struct {
+	Bids       *PriceLevelTree
+	Asks       *PriceLevelTree
+	OrderIndex map[uint64]*Order
+}
+
+func NewOrderBook() *OrderBook {
+	return &OrderBook{
+		Bids:       NewPriceLevelTree(func(a, b int64) bool { return a > b }),
+		Asks:       NewPriceLevelTree(func(a, b int64) bool { return a < b }),
+		OrderIndex: make(map[uint64]*Order),
+	}
+}
+
+func (ob *OrderBook) AddOrder(order *Order) {
+	ob.OrderIndex[order.ID] = order
+	if order.Side == Bid {
+		ob.MatchBid(order)
+		if order.Quantity > 0 {
+			pl := ob.Bids.Insert(order.Price)
+			order.PriceLevel = pl
+			order.Node = pl.Orders.PushBack(order)
+			pl.Total += order.Quantity
+		}
+	} else {
+		ob.MatchAsk(order)
+		if order.Quantity > 0 {
+			pl := ob.Asks.Insert(order.Price)
+			order.PriceLevel = pl
+			order.Node = pl.Orders.PushBack(order)
+			pl.Total += order.Quantity
+		}
+	}
+}
+
+func (ob *OrderBook) MatchBid(order *Order) {
+	for {
+		best := ob.Asks.Best()
+		if best == nil || best.Price > order.Price || order.Quantity == 0 {
+			break
+		}
+		for e := best.Orders.Front(); e != nil && order.Quantity > 0; {
+			o := e.Value.(*Order)
+			tradeQty := min(order.Quantity, o.Quantity)
+			order.Quantity -= tradeQty
+			o.Quantity -= tradeQty
+			best.Total -= tradeQty
+			next := e.Next()
+			if o.Quantity == 0 {
+				best.Orders.Remove(e)
+				delete(ob.OrderIndex, o.ID)
+			}
+			e = next
+		}
+		if best.Orders.Len() == 0 {
+			ob.Asks.Remove(best.Price)
+		}
+	}
+}
+
+func (ob *OrderBook) MatchAsk(order *Order) {
+	for {
+		best := ob.Bids.Best()
+		if best == nil || best.Price < order.Price || order.Quantity == 0 {
+			break
+		}
+		for e := best.Orders.Front(); e != nil && order.Quantity > 0; {
+			o := e.Value.(*Order)
+			tradeQty := min(order.Quantity, o.Quantity)
+			order.Quantity -= tradeQty
+			o.Quantity -= tradeQty
+			best.Total -= tradeQty
+			next := e.Next()
+			if o.Quantity == 0 {
+				best.Orders.Remove(e)
+				delete(ob.OrderIndex, o.ID)
+			}
+			e = next
+		}
+		if best.Orders.Len() == 0 {
+			ob.Bids.Remove(best.Price)
+		}
+	}
+}
+
+func (ob *OrderBook) Cancel(orderID uint64) bool {
+	order, ok := ob.OrderIndex[orderID]
+	if !ok {
 		return false
 	}
-	m.Store(asset, bal-amt)
+	pl := order.PriceLevel
+	pl.Orders.Remove(order.Node)
+	if pl.Orders.Len() == 0 {
+		if order.Side == Bid {
+			ob.Bids.Remove(order.Price)
+		} else {
+			ob.Asks.Remove(order.Price)
+		}
+	}
+	delete(ob.OrderIndex, orderID)
 	return true
 }
 
-// ---------- Matching Engine ----------
-
-type MatchingEngine struct {
-	symbol      string
-	book        *OrderBook
-	orderCh     chan *Order
-	tradeCh     chan *Trade
-	persistCh   chan interface{}
-	stop        chan struct{}
-	wallets     *Wallets
-	nextOrderID *uint64
-}
-
-func NewMatchingEngine(symbol string, wallets *Wallets, nextID *uint64, persistCh chan interface{}) *MatchingEngine {
-	me := &MatchingEngine{
-		symbol:      symbol,
-		book:        NewOrderBook(symbol),
-		orderCh:     make(chan *Order, 10000),
-		tradeCh:     make(chan *Trade, 10000),
-		persistCh:   persistCh,
-		stop:        make(chan struct{}),
-		wallets:     wallets,
-		nextOrderID: nextID,
-	}
-	go me.loop()
-	go me.tradePublisher()
-	return me
-}
-
-func (me *MatchingEngine) Submit(o *Order) {
-	me.orderCh <- o
-}
-
-func (me *MatchingEngine) loop() {
-	for {
-		select {
-		case o := <-me.orderCh:
-			me.processOrder(o)
-		case <-me.stop:
-			return
-		}
-	}
-}
-
-func min(a, b float64) float64 {
+func min(a, b int64) int64 {
 	if a < b {
 		return a
 	}
 	return b
 }
 
-func (me *MatchingEngine) processOrder(o *Order) {
-	me.book.lock.Lock()
-	defer me.book.lock.Unlock()
-	if o.Side == Buy {
-		// try match with sells
-		for me.book.sells.Len() > 0 {
-			best := me.book.sells.items[0].order
-			if best.Price > o.Price {
-				break
-			}
-			// match
-			tradeQty := min(o.Qty, best.Qty)
-			trade := &Trade{BuyOrderID: o.ID, SellOrderID: best.ID, Price: best.Price, Qty: tradeQty, Symbol: o.Symbol, Timestamp: time.Now()}
-			me.tradeCh <- trade
-			// reduce quantities
-			o.Qty -= tradeQty
-			best.Qty -= tradeQty
-			if best.Qty <= 0 {
-				heap.Pop(me.book.sells)
-			}
-			if o.Qty <= 0 {
-				break
-			}
-		}
-		if o.Qty > 0 {
-			heap.Push(me.book.buys, &OrderItem{order: o})
-		}
-	} else {
-		// Sell side
-		for me.book.buys.Len() > 0 {
-			best := me.book.buys.items[0].order
-			if best.Price < o.Price {
-				break
-			}
-			tradeQty := min(o.Qty, best.Qty)
-			trade := &Trade{BuyOrderID: best.ID, SellOrderID: o.ID, Price: best.Price, Qty: tradeQty, Symbol: o.Symbol, Timestamp: time.Now()}
-			me.tradeCh <- trade
-			o.Qty -= tradeQty
-			best.Qty -= tradeQty
-			if best.Qty <= 0 {
-				heap.Pop(me.book.buys)
-			}
-			if o.Qty <= 0 {
-				break
-			}
-		}
-		if o.Qty > 0 {
-			heap.Push(me.book.sells, &OrderItem{order: o})
-		}
-	}
-}
-
-func (me *MatchingEngine) tradePublisher() {
-	for t := range me.tradeCh {
-		// publish event to wallets and persistence asynchronously
-		me.persistCh <- t
-		// apply to wallets (simple immediate settlement for simulation)
-		// In real systems, settlement writes would be async and idempotent
-		// Here we just print
-		fmt.Printf("TRADE %s: %0.8f %s @ %0.2f (buyOrder=%d sellOrder=%d)\n", t.Symbol, t.Qty, "BASE", t.Price, t.BuyOrderID, t.SellOrderID)
-	}
-}
-
-// ---------- Gateway & Rate Limiting ----------
-
-type Gateway struct {
-	engines      map[string]*MatchingEngine
-	wallets      *Wallets
-	persistCh    chan interface{}
-	rateWindow   time.Duration
-	maxPerWindow int
-	userCounts   sync.Map // user -> []time.Time or int counters
-	nextID       *uint64
-}
-
-func NewGateway(symbols []string) *Gateway {
-	wallets := &Wallets{}
-	persistCh := make(chan interface{}, 100000)
-	var nextID uint64 = 1
-	gw := &Gateway{engines: map[string]*MatchingEngine{}, wallets: wallets, persistCh: persistCh, rateWindow: time.Second, maxPerWindow: 100, nextID: &nextID}
-	for _, s := range symbols {
-		gw.engines[s] = NewMatchingEngine(s, wallets, &nextID, persistCh)
-	}
-	// start persistence worker
-	go persistenceWorker(persistCh)
-	return gw
-}
-
-func (gw *Gateway) SubmitOrder(user, symbol string, side Side, price, qty float64) error {
-	// basic rate limit
-	cnt := gw.incUserCounter(user)
-	if cnt > gw.maxPerWindow {
-		return fmt.Errorf("rate limit exceeded for user %s: %d in window", user, cnt)
-	}
-	// basic wallet check
-	if side == Sell {
-		if !gw.wallets.Sub(user, "BASE", qty) {
-			return fmt.Errorf("insufficient BASE balance for user %s", user)
-		}
-	} else {
-		// Buy: ensure user has quote funds price*qty
-		cost := price * qty
-		if !gw.wallets.Sub(user, "QUOTE", cost) {
-			return fmt.Errorf("insufficient QUOTE balance for user %s", user)
-		}
-	}
-	id := atomic.AddUint64(gw.nextID, 1)
-	o := &Order{ID: id, User: user, Symbol: symbol, Side: side, Price: price, Qty: qty, Timestamp: time.Now()}
-	eng, ok := gw.engines[symbol]
-	if !ok {
-		return fmt.Errorf("unknown symbol %s", symbol)
-	}
-	eng.Submit(o)
-	return nil
-}
-
-func (gw *Gateway) incUserCounter(user string) int {
-	now := time.Now()
-	v, _ := gw.userCounts.LoadOrStore(user, &[]time.Time{})
-	arr := v.(*[]time.Time)
-	// naive sliding window
-	*arr = append(*arr, now)
-	// drop old
-	cut := now.Add(-gw.rateWindow)
-	s := *arr
-	i := sort.Search(len(s), func(i int) bool { return s[i].After(cut) || s[i].Equal(cut) })
-	s = s[i:]
-	*arr = s
-	return len(s)
-}
-
-// ---------- Persistence Worker ----------
-
-func persistenceWorker(ch chan interface{}) {
-	for ev := range ch {
-		switch v := ev.(type) {
-		case *Trade:
-			// simulate async DB write
-			fmt.Printf("PERSIST trade: %v\n", v)
-		default:
-			fmt.Printf("PERSIST unknown: %v\n", v)
-		}
-		// simulate delay
-		time.Sleep(5 * time.Millisecond)
-	}
-}
-
-// ---------- Simulation & Utilities ----------
-
-func seedBalances(w *Wallets, users []string) {
-	for _, u := range users {
-		w.Add(u, "BASE", 100)
-		w.Add(u, "QUOTE", 100000)
-	}
-}
-
-func randomUser(users []string) string {
-	return users[rand.Intn(len(users))]
-}
+// ================= Benchmark =================
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-	symbols := []string{"BTCUSDT", "ETHUSDT"}
-	gw := NewGateway(symbols)
-	seedBalances(gw.wallets, []string{"alice", "bob", "charlie", "dave"})
+	ob := NewOrderBook()
+	orderCh := make(chan *Order, 100_000)
+	done := make(chan struct{})
+	var totalOrders uint64 = 1_000_000
+	var idCounter uint64
+	var processed uint64
 
-	// simple workload generator
-	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
-		users := []string{"alice", "bob", "charlie", "dave"}
-		for i := 0; i < 1000; i++ {
-			user := randomUser(users)
-			sym := symbols[rand.Intn(len(symbols))]
-			side := Side(rand.Intn(2))
-			price := 50000.0 + float64(rand.Intn(1000))*(1-2*rand.Float64())
-			qty := 0.001 + rand.Float64()*0.1
-			err := gw.SubmitOrder(user, sym, side, price, qty)
-			if err != nil {
-				// in production we'd return error to user; here we just print
-				fmt.Println("order rejected:", err)
-			}
-			// small jitter
-			time.Sleep(time.Millisecond * time.Duration(1+rand.Intn(5)))
+		for order := range orderCh {
+			ob.AddOrder(order)
+			atomic.AddUint64(&processed, 1)
 		}
-		// stop after batch
-		cancel()
+		done <- struct{}{}
 	}()
 
-	<-ctx.Done()
-	fmt.Println("Simulation finished. Waiting for persistence to flush...")
-	// give some time to flush
-	time.Sleep(2 * time.Second)
+	start := time.Now()
+	for i := 0; i < 10; i++ {
+		go func() {
+			r := rand.New(rand.NewSource(time.Now().UnixNano()))
+			for j := 0; j < int(totalOrders/10); j++ {
+				id := atomic.AddUint64(&idCounter, 1)
+				price := r.Int63n(1000) + 90
+				qty := r.Int63n(10) + 1
+				side := Bid
+				if r.Intn(2) == 0 {
+					side = Ask
+				}
+				orderCh <- &Order{ID: id, Price: price, Quantity: qty, Side: side}
+			}
+		}()
+	}
+
+	for atomic.LoadUint64(&processed) < totalOrders {
+		time.Sleep(10 * time.Millisecond)
+	}
+	close(orderCh)
+	<-done
+
+	duration := time.Since(start)
+	opsPerSec := float64(totalOrders) / duration.Seconds()
+	fmt.Printf("Processed %d orders in %v (~%.2f ops/sec)\n",
+		totalOrders, duration, opsPerSec)
 }
