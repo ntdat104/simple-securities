@@ -1,11 +1,17 @@
 package main
 
 import (
+	"bytes"
+	"compress/gzip"
 	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 	"sync"
+
+	commonPb "simple-securities/gen/common/v1"
+
+	"google.golang.org/protobuf/proto"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/websocket"
@@ -203,8 +209,14 @@ func redisListener() {
 	log.Println("Listening Redis → WS...")
 
 	for msg := range ch {
+		broadcastProtobuf(msg.Channel, &commonPb.Balance{
+			Asset:     "BTC",
+			Available: "YES",
+			Locked:    "TRUE",
+		})
 		broadcast(msg.Channel, msg.Payload)
-		// broadcastMsgPack(msg.Channel, msg.Payload)
+		broadcastMsgPack(msg.Channel, msg.Payload)
+		broadcastGzipMsgPack(msg.Channel, msg.Payload)
 	}
 }
 
@@ -215,6 +227,29 @@ func broadcast(stream string, payload string) {
 	for conn, subs := range clients {
 		if subs[stream] {
 			if err := conn.WriteMessage(websocket.BinaryMessage, []byte(payload)); err != nil { // websocket.TextMessage || websocket.BinaryMessage
+				log.Println("WS write error:", err)
+				conn.Close()
+				delete(clients, conn)
+			}
+		}
+	}
+}
+
+func broadcastProtobuf(stream string, msg proto.Message) {
+	// 1) Marshal to protobuf binary
+	bin, err := proto.Marshal(msg)
+	if err != nil {
+		log.Println("Protobuf marshal error:", err)
+		return
+	}
+
+	// 2) Broadcast to subscribed clients
+	clientsMu.Lock()
+	defer clientsMu.Unlock()
+
+	for conn, subs := range clients {
+		if subs[stream] {
+			if err := conn.WriteMessage(websocket.BinaryMessage, bin); err != nil {
 				log.Println("WS write error:", err)
 				conn.Close()
 				delete(clients, conn)
@@ -250,4 +285,50 @@ func broadcastMsgPack(stream string, payload string) {
 			}
 		}
 	}
+}
+
+func broadcastGzipMsgPack(stream string, payload string) {
+	data, err := toGzipMsgPack(payload)
+	if err != nil {
+		log.Println("encode error:", err)
+		return
+	}
+
+	clientsMu.Lock()
+	defer clientsMu.Unlock()
+
+	for conn, subs := range clients {
+		if subs[stream] {
+			if err := conn.WriteMessage(websocket.BinaryMessage, data); err != nil {
+				log.Println("WS write error:", err)
+				conn.Close()
+				delete(clients, conn)
+			}
+		}
+	}
+}
+
+func toGzipMsgPack(payload string) ([]byte, error) {
+	// 1) JSON → map
+	var data any
+	if err := json.Unmarshal([]byte(payload), &data); err != nil {
+		return nil, err
+	}
+
+	// 2) map → msgpack
+	bin, err := msgpack.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+
+	// 3) msgpack → gzip(msgpack)
+	var buf bytes.Buffer
+	zw := gzip.NewWriter(&buf)
+	_, err = zw.Write(bin)
+	if err != nil {
+		return nil, err
+	}
+	zw.Close()
+
+	return buf.Bytes(), nil
 }
