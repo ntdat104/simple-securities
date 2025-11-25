@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GZIP Decoder</title>
+</head>
+<body>
+<h1>GZIP / MsgPack Decoder</h1>
+
+<textarea id="input" rows="10" cols="80" placeholder="Paste GZIP (base64) here"></textarea><br>
+<button id="decodeBtn">Decode</button>
+
+<h2>Output:</h2>
+<pre id="output"></pre>
+
+<!-- JS libraries for gzip and msgpack -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@msgpack/msgpack/dist/msgpack.min.js"></script>
+
+<script>
+document.getElementById('decodeBtn').addEventListener('click', () => {
+    const input = document.getElementById('input').value.trim();
+    const output = document.getElementById('output');
+
+    try {
+        // 1) Convert Base64 to Uint8Array
+        const binary = Uint8Array.from(atob(input), c => c.charCodeAt(0));
+
+        // 2) Gunzip
+        const decompressed = pako.ungzip(binary);
+
+        // 3) Try to decode as UTF-8 JSON string first
+        let text;
+        try {
+            text = new TextDecoder("utf-8").decode(decompressed);
+            try {
+                // Parse JSON nicely
+                const obj = JSON.parse(text);
+                output.textContent = JSON.stringify(obj, null, 2);
+            } catch {
+                // Not JSON, just show as string
+                output.textContent = text;
+            }
+        } catch {
+            // 4) If not UTF-8, try MsgPack
+            const obj = msgpack.decode(decompressed);
+            output.textContent = JSON.stringify(obj, null, 2);
+        }
+
+    } catch (err) {
+        output.textContent = "Error decoding: " + err;
+    }
+});
+</script>
+</body>
+</html>

@@ -216,6 +216,7 @@ func redisListener() {
 		})
 		broadcast(msg.Channel, msg.Payload)
 		broadcastMsgPack(msg.Channel, msg.Payload)
+		broadcastGzip(msg.Channel, msg.Payload)
 		broadcastGzipMsgPack(msg.Channel, msg.Payload)
 	}
 }
@@ -279,6 +280,30 @@ func broadcastMsgPack(stream string, payload string) {
 	for conn, subs := range clients {
 		if subs[stream] {
 			if err := conn.WriteMessage(websocket.BinaryMessage, bin); err != nil {
+				log.Println("WS write error:", err)
+				conn.Close()
+				delete(clients, conn)
+			}
+		}
+	}
+}
+
+func broadcastGzip(stream string, payload string) {
+	var buf bytes.Buffer
+	zw := gzip.NewWriter(&buf)
+	_, err := zw.Write([]byte(payload))
+	if err != nil {
+		log.Println("Invalid gzip payload:", err)
+		return
+	}
+	zw.Close()
+
+	clientsMu.Lock()
+	defer clientsMu.Unlock()
+
+	for conn, subs := range clients {
+		if subs[stream] {
+			if err := conn.WriteMessage(websocket.BinaryMessage, buf.Bytes()); err != nil {
 				log.Println("WS write error:", err)
 				conn.Close()
 				delete(clients, conn)
