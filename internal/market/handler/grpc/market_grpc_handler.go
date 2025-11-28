@@ -7,6 +7,7 @@ import (
 
 	marketpb "simple-securities/gen/market/v1"
 	"simple-securities/internal/market/application/service"
+	"simple-securities/pkg/errors"
 )
 
 // MarketGrpcSvc defines the collection of services required by the gRPC handler.
@@ -20,7 +21,7 @@ type MarketGrpcSvc struct {
 	RecentTradesSvc          service.RecentTradesSvc
 	HistoricalTradeLookupSvc service.HistoricalTradeLookupSvc
 	AggTradesListSvc         service.AggTradesListSvc
-	KlinesSvc                service.KlinesSvc
+	KlinesSvc                *service.KlinesSvc
 	UiKlinesSvc              service.UiKlinesSvc
 	AvgPriceSvc              service.AvgPriceSvc
 	Ticker24hrSvc            service.Ticker24hrSvc
@@ -40,7 +41,7 @@ type MarketGrpcHandler struct {
 	recentTradesSvc          service.RecentTradesSvc
 	historicalTradeLookupSvc service.HistoricalTradeLookupSvc
 	aggTradesListSvc         service.AggTradesListSvc
-	klinesSvc                service.KlinesSvc
+	klinesSvc                *service.KlinesSvc
 	uiKlinesSvc              service.UiKlinesSvc
 	avgPriceSvc              service.AvgPriceSvc
 	ticker24hrSvc            service.Ticker24hrSvc
@@ -358,18 +359,32 @@ func (h *MarketGrpcHandler) GetAggTrades(ctx context.Context, req *marketpb.GetA
 // --- Klines / Candlestick ---
 
 // GetKlines implements marketpb.MarketServiceServer
-func (h *MarketGrpcHandler) GetKlines(ctx context.Context, req *marketpb.GetKlinesRequest) (*marketpb.GetKlinesResponse, error) {
-	limitPtr := toPtrInt(req.Limit)
-	var startTimePtr *uint64
-	if req.StartTime != 0 {
-		startTimePtr = &req.StartTime
-	}
-	var endTimePtr *uint64
-	if req.EndTime != 0 {
-		endTimePtr = &req.EndTime
+func (h *MarketGrpcHandler) GetKlines(
+	ctx context.Context,
+	req *marketpb.GetKlinesRequest,
+) (*marketpb.GetKlinesResponse, error) {
+	if err := req.Validate(); err != nil {
+		return nil, errors.NewErrWrap(err, errors.ErrorTypeValidation).GrpcError()
 	}
 
-	results, err := h.klinesSvc.Execute(ctx, req.Symbol, req.Interval, limitPtr, startTimePtr, endTimePtr)
+	if req.GetLimit() == 0 {
+		defaultVal := int32(500)
+		req.Limit = &defaultVal // Set default limit if not provided
+	}
+
+	args := h.klinesSvc.
+		Symbol(req.GetSymbol()).
+		Interval(req.GetInterval()).
+		Limit(req.GetLimit())
+
+	if req.GetStartTime() != 0 {
+		args = args.StartTime(req.GetStartTime())
+	}
+	if req.GetEndTime() != 0 {
+		args = args.EndTime(req.GetEndTime())
+	}
+
+	results, err := args.Execute(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -4,28 +4,9 @@ package errors
 import (
 	stderrors "errors"
 	"fmt"
-)
 
-// ErrorType defines the error type
-type ErrorType string
-
-const (
-	// ErrorTypeValidation represents validation errors
-	ErrorTypeValidation ErrorType = "VALIDATION"
-	// ErrorTypeNotFound represents resource not found errors
-	ErrorTypeNotFound ErrorType = "NOT_FOUND"
-	// ErrorTypePersistence represents persistence layer errors
-	ErrorTypePersistence ErrorType = "PERSISTENCE"
-	// ErrorTypeSystem represents internal system errors
-	ErrorTypeSystem ErrorType = "SYSTEM"
-	// ErrorTypeBusiness represents business logic errors
-	ErrorTypeBusiness ErrorType = "BUSINESS"
-	// ErrorTypeUnauthorized represents authentication/authorization errors
-	ErrorTypeUnauthorized ErrorType = "UNAUTHORIZED"
-	// ErrorTypeForbidden represents permission errors
-	ErrorTypeForbidden ErrorType = "FORBIDDEN"
-	// ErrorTypeConflict represents resource conflict errors
-	ErrorTypeConflict ErrorType = "CONFLICT"
+	spb "google.golang.org/genproto/googleapis/rpc/status"
+	"google.golang.org/grpc/status"
 )
 
 // AppError defines the application error structure
@@ -35,6 +16,14 @@ type AppError struct {
 	Cause   error
 	Details map[string]any
 	Code    int
+}
+
+// GrpcError converts the AppError to a gRPC error
+func (e *AppError) GrpcError() error {
+	return status.ErrorProto(&spb.Status{
+		Code:    int32(e.Code),
+		Message: e.Error(),
+	})
 }
 
 // Error implements the error interface
@@ -65,6 +54,7 @@ func (e *AppError) WithCode(code int) *AppError {
 // NewValidationError creates a validation error
 func NewValidationError(message string, cause error) *AppError {
 	return &AppError{
+		Code:    ErrorCodes[ErrorTypeValidation],
 		Type:    ErrorTypeValidation,
 		Message: message,
 		Cause:   cause,
@@ -74,6 +64,7 @@ func NewValidationError(message string, cause error) *AppError {
 // NewNotFoundError creates a resource not found error
 func NewNotFoundError(message string, cause error) *AppError {
 	return &AppError{
+		Code:    ErrorCodes[ErrorTypeNotFound],
 		Type:    ErrorTypeNotFound,
 		Message: message,
 		Cause:   cause,
@@ -83,6 +74,7 @@ func NewNotFoundError(message string, cause error) *AppError {
 // NewPersistenceError creates a persistence error
 func NewPersistenceError(message string, cause error) *AppError {
 	return &AppError{
+		Code:    ErrorCodes[ErrorTypePersistence],
 		Type:    ErrorTypePersistence,
 		Message: message,
 		Cause:   cause,
@@ -92,6 +84,7 @@ func NewPersistenceError(message string, cause error) *AppError {
 // NewSystemError creates a system error
 func NewSystemError(message string, cause error) *AppError {
 	return &AppError{
+		Code:    ErrorCodes[ErrorTypeSystem],
 		Type:    ErrorTypeSystem,
 		Message: message,
 		Cause:   cause,
@@ -101,6 +94,7 @@ func NewSystemError(message string, cause error) *AppError {
 // NewBusinessError creates a business logic error
 func NewBusinessError(message string, cause error) *AppError {
 	return &AppError{
+		Code:    ErrorCodes[ErrorTypeBusiness],
 		Type:    ErrorTypeBusiness,
 		Message: message,
 		Cause:   cause,
@@ -155,6 +149,7 @@ func IsBusinessError(err error) bool {
 // Wrap wraps a standard error as an application error
 func Wrap(err error, errType ErrorType, message string) *AppError {
 	return &AppError{
+		Code:    ErrorCodes[errType],
 		Type:    errType,
 		Message: message,
 		Cause:   err,
@@ -164,6 +159,7 @@ func Wrap(err error, errType ErrorType, message string) *AppError {
 // Wrapf wraps an error with a formatted message
 func Wrapf(err error, errType ErrorType, format string, args ...any) *AppError {
 	return &AppError{
+		Code:    ErrorCodes[errType],
 		Type:    errType,
 		Message: fmt.Sprintf(format, args...),
 		Cause:   err,
@@ -173,6 +169,7 @@ func Wrapf(err error, errType ErrorType, format string, args ...any) *AppError {
 // New creates a new application error
 func New(errType ErrorType, message string) *AppError {
 	return &AppError{
+		Code:    ErrorCodes[errType],
 		Type:    errType,
 		Message: message,
 	}
@@ -181,28 +178,9 @@ func New(errType ErrorType, message string) *AppError {
 // Newf creates a new application error with a formatted message
 func Newf(errType ErrorType, format string, args ...any) *AppError {
 	return &AppError{
+		Code:    ErrorCodes[errType],
 		Type:    errType,
 		Message: fmt.Sprintf(format, args...),
-	}
-}
-
-// StatusCode returns the appropriate HTTP status code for the error type
-func (e *AppError) StatusCode() int {
-	switch e.Type {
-	case ErrorTypeValidation:
-		return 400 // Bad Request
-	case ErrorTypeNotFound:
-		return 404 // Not Found
-	case ErrorTypeUnauthorized:
-		return 401 // Unauthorized
-	case ErrorTypeForbidden:
-		return 403 // Forbidden
-	case ErrorTypeConflict:
-		return 409 // Conflict
-	case ErrorTypePersistence, ErrorTypeSystem:
-		return 500 // Internal Server Error
-	default:
-		return 500 // Internal Server Error
 	}
 }
 
@@ -213,4 +191,42 @@ func (e *AppError) Is(target error) bool {
 		return false
 	}
 	return e.Type == t.Type
+}
+
+// NewErr creates a new application error based on predefined codes and messages
+func NewErr(errType ErrorType) *AppError {
+	return &AppError{
+		Code:    ErrorCodes[errType],
+		Type:    errType,
+		Message: ErrorMessages[errType],
+	}
+}
+
+// NewErrf creates a new application error with formatted message based on predefined codes and messages
+func NewErrf(errType ErrorType, format string, args ...any) *AppError {
+	return &AppError{
+		Code:    ErrorCodes[errType],
+		Type:    errType,
+		Message: fmt.Sprintf(format, args...),
+	}
+}
+
+// NewErrWrap creates a new application error that wraps an existing error
+func NewErrWrap(err error, errType ErrorType) *AppError {
+	return &AppError{
+		Code:    ErrorCodes[errType],
+		Type:    errType,
+		Message: ErrorMessages[errType],
+		Cause:   err,
+	}
+}
+
+// NewErrWrapf creates a new application error that wraps an existing error with a formatted message
+func NewErrWrapf(err error, errType ErrorType, format string, args ...any) *AppError {
+	return &AppError{
+		Code:    ErrorCodes[errType],
+		Type:    errType,
+		Message: fmt.Sprintf(format, args...),
+		Cause:   err,
+	}
 }

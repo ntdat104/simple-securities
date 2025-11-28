@@ -45,7 +45,7 @@ func LoggingInterceptor(
 			zap.Time("end_time", end),
 			zap.Duration("duration", duration),
 			zap.Any("request", req),
-			zap.Any("response", resp),
+			// zap.Any("response", resp),
 		)
 	}
 

@@ -12,44 +12,62 @@ import (
 	"golang.org/x/sync/singleflight"
 )
 
-type KlinesSvc interface {
-	Execute(ctx context.Context, symbol string, interval string, limit *int, startTime *uint64, endTime *uint64, opts ...client.RequestOption) ([]*response.KlinesResponse, error)
-}
-
-type klinesSvc struct {
+type KlinesSvc struct {
 	c  *client.Client
 	sf singleflight.Group
+
+	symbol    string
+	interval  string
+	limit     *int32
+	startTime *uint64
+	endTime   *uint64
 }
 
-func NewKlinesSvc(c *client.Client) KlinesSvc {
-	return &klinesSvc{
+func NewKlinesSvc(c *client.Client) *KlinesSvc {
+	return &KlinesSvc{
 		c: c,
 	}
 }
 
-func (s *klinesSvc) Execute(
-	ctx context.Context,
-	symbol string,
-	interval string,
-	limit *int,
-	startTime *uint64,
-	endTime *uint64,
-	opts ...client.RequestOption,
-) (res []*response.KlinesResponse, err error) {
+func (s *KlinesSvc) Symbol(symbol string) *KlinesSvc {
+	s.symbol = symbol
+	return s
+}
 
+func (s *KlinesSvc) Interval(interval string) *KlinesSvc {
+	s.interval = interval
+	return s
+}
+
+func (s *KlinesSvc) Limit(limit int32) *KlinesSvc {
+	s.limit = &limit
+	return s
+}
+
+func (s *KlinesSvc) StartTime(startTime uint64) *KlinesSvc {
+	s.startTime = &startTime
+	return s
+}
+
+func (s *KlinesSvc) EndTime(endTime uint64) *KlinesSvc {
+	s.endTime = &endTime
+	return s
+}
+
+func (s *KlinesSvc) Execute(ctx context.Context, opts ...client.RequestOption) (res []*response.KlinesResponse, err error) {
 	// 1. Create a map to hold parameters for key generation
 	keyMap := make(map[string]any)
-	keyMap["Symbol"] = symbol
-	keyMap["Interval"] = interval
+	keyMap["Symbol"] = s.symbol
+	keyMap["Interval"] = s.interval
 
-	if limit != nil {
-		keyMap["Limit"] = *limit
+	if s.limit != nil {
+		keyMap["Limit"] = *s.limit
 	}
-	if startTime != nil {
-		keyMap["StartTime"] = *startTime
+	if s.startTime != nil {
+		keyMap["StartTime"] = *s.startTime
 	}
-	if endTime != nil {
-		keyMap["EndTime"] = *endTime
+	if s.endTime != nil {
+		keyMap["EndTime"] = *s.endTime
 	}
 
 	// 2. Marshal the map to JSON bytes
@@ -68,17 +86,17 @@ func (s *klinesSvc) Execute(
 			SecType:  client.SecTypeNone,
 		}
 
-		r.SetParam("symbol", symbol)
-		r.SetParam("interval", interval)
+		r.SetParam("symbol", s.symbol)
+		r.SetParam("interval", s.interval)
 
-		if limit != nil {
-			r.SetParam("limit", *limit)
+		if s.limit != nil {
+			r.SetParam("limit", *s.limit)
 		}
-		if startTime != nil {
-			r.SetParam("startTime", *startTime)
+		if s.startTime != nil {
+			r.SetParam("startTime", *s.startTime)
 		}
-		if endTime != nil {
-			r.SetParam("endTime", *endTime)
+		if s.endTime != nil {
+			r.SetParam("endTime", *s.endTime)
 		}
 
 		data, apiErr := s.c.CallAPI(ctx, r, opts...)

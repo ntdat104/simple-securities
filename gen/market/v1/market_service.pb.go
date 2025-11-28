@@ -7,6 +7,7 @@
 package v1
 
 import (
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -1334,9 +1335,9 @@ type GetKlinesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Symbol        string                 `protobuf:"bytes,1,opt,name=symbol,proto3" json:"symbol,omitempty"`
 	Interval      string                 `protobuf:"bytes,2,opt,name=interval,proto3" json:"interval,omitempty"`
-	Limit         int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
-	StartTime     uint64                 `protobuf:"varint,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime       uint64                 `protobuf:"varint,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	Limit         *int32                 `protobuf:"varint,3,opt,name=limit,proto3,oneof" json:"limit,omitempty"`
+	StartTime     *uint64                `protobuf:"varint,4,opt,name=start_time,json=startTime,proto3,oneof" json:"start_time,omitempty"`
+	EndTime       *uint64                `protobuf:"varint,5,opt,name=end_time,json=endTime,proto3,oneof" json:"end_time,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1386,22 +1387,22 @@ func (x *GetKlinesRequest) GetInterval() string {
 }
 
 func (x *GetKlinesRequest) GetLimit() int32 {
-	if x != nil {
-		return x.Limit
+	if x != nil && x.Limit != nil {
+		return *x.Limit
 	}
 	return 0
 }
 
 func (x *GetKlinesRequest) GetStartTime() uint64 {
-	if x != nil {
-		return x.StartTime
+	if x != nil && x.StartTime != nil {
+		return *x.StartTime
 	}
 	return 0
 }
 
 func (x *GetKlinesRequest) GetEndTime() uint64 {
-	if x != nil {
-		return x.EndTime
+	if x != nil && x.EndTime != nil {
+		return *x.EndTime
 	}
 	return 0
 }
@@ -2616,7 +2617,7 @@ var File_market_v1_market_service_proto protoreflect.FileDescriptor
 
 const file_market_v1_market_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1emarket/v1/market_service.proto\x12\tmarket.v1\x1a\x1cgoogle/api/annotations.proto\"\r\n" +
+	"\x1emarket/v1/market_service.proto\x12\tmarket.v1\x1a\x17validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\"\r\n" +
 	"\vPingRequest\"\x0e\n" +
 	"\fPingResponse\"\x16\n" +
 	"\x14GetServerTimeRequest\"8\n" +
@@ -2722,14 +2723,18 @@ const file_market_v1_market_service_proto_rawDesc = "" +
 	"\rlast_trade_id\x18\x05 \x01(\x03R\vlastTradeId\x12\x12\n" +
 	"\x04time\x18\x06 \x01(\x03R\x04time\x12$\n" +
 	"\x0eis_buyer_maker\x18\a \x01(\bR\fisBuyerMaker\x12\"\n" +
-	"\ris_best_match\x18\b \x01(\bR\visBestMatch\"\x96\x01\n" +
-	"\x10GetKlinesRequest\x12\x16\n" +
-	"\x06symbol\x18\x01 \x01(\tR\x06symbol\x12\x1a\n" +
-	"\binterval\x18\x02 \x01(\tR\binterval\x12\x14\n" +
-	"\x05limit\x18\x03 \x01(\x05R\x05limit\x12\x1d\n" +
+	"\ris_best_match\x18\b \x01(\bR\visBestMatch\"\x9e\x02\n" +
+	"\x10GetKlinesRequest\x12\x1f\n" +
+	"\x06symbol\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x06symbol\x12F\n" +
+	"\binterval\x18\x02 \x01(\tB*\xfaB'r%2#^(1m|3m|5m|15m|30m|1h|2h|4h|8h|1d)$R\binterval\x12%\n" +
+	"\x05limit\x18\x03 \x01(\x05B\n" +
+	"\xfaB\a\x1a\x05\x18\xdc\v(\x00H\x00R\x05limit\x88\x01\x01\x12+\n" +
 	"\n" +
-	"start_time\x18\x04 \x01(\x04R\tstartTime\x12\x19\n" +
-	"\bend_time\x18\x05 \x01(\x04R\aendTime\"=\n" +
+	"start_time\x18\x04 \x01(\x04B\a\xfaB\x042\x02(\x00H\x01R\tstartTime\x88\x01\x01\x12'\n" +
+	"\bend_time\x18\x05 \x01(\x04B\a\xfaB\x042\x02(\x00H\x02R\aendTime\x88\x01\x01B\b\n" +
+	"\x06_limitB\r\n" +
+	"\v_start_timeB\v\n" +
+	"\t_end_time\"=\n" +
 	"\x11GetKlinesResponse\x12(\n" +
 	"\x06klines\x18\x01 \x03(\v2\x10.market.v1.KlineR\x06klines\"\x81\x03\n" +
 	"\x05Kline\x12\x1b\n" +
@@ -2961,6 +2966,7 @@ func file_market_v1_market_service_proto_init() {
 		return
 	}
 	file_market_v1_market_service_proto_msgTypes[4].OneofWrappers = []any{}
+	file_market_v1_market_service_proto_msgTypes[21].OneofWrappers = []any{}
 	file_market_v1_market_service_proto_msgTypes[29].OneofWrappers = []any{}
 	file_market_v1_market_service_proto_msgTypes[32].OneofWrappers = []any{}
 	file_market_v1_market_service_proto_msgTypes[35].OneofWrappers = []any{}
