@@ -9,7 +9,6 @@ import (
 	crypto "simple-securities/gen/crypto/v1"
 	"simple-securities/internal/crypto/application/service"
 	grpcHandler "simple-securities/internal/crypto/handler/grpc"
-	"simple-securities/internal/crypto/middleware"
 	"simple-securities/pkg/conv"
 	"simple-securities/pkg/db/sqlite"
 	"simple-securities/pkg/kafka"
@@ -89,7 +88,7 @@ func main() {
 				MinTime:             time.Duration(config.GlobalConfig.GrpcServer.MinTime),
 				PermitWithoutStream: config.GlobalConfig.GrpcServer.PermitWithoutStream,
 			},
-			UnaryInterceptor: middleware.LoggingInterceptor,
+			UnaryInterceptor: logger.LoggingInterceptor,
 		},
 	)
 	if err != nil {

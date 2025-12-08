@@ -1,0 +1,712 @@
+syntax = "proto3";
+
+package account.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "/gen/account/v1";
+
+service AccountService {
+  // --- New Order ---
+  // @grpc-gateway: POST /api/v1/account/order/test
+  rpc TestNewOrder (TestNewOrderRequest) returns (TestNewOrderResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/account/order/test"
+      body: "*"
+    };
+  }
+
+  // @grpc-gateway: POST /api/v1/account/order
+  rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/account/order"
+      body: "*"
+    };
+  }
+
+  // --- Cancel Order ---
+  // @grpc-gateway: DELETE /api/v1/account/order
+  rpc CancelOrder (CancelOrderRequest) returns (CancelOrderResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/account/order"
+    };
+  }
+
+  // @grpc-gateway: DELETE /api/v1/account/openOrders
+  rpc CancelOpenOrders (CancelOpenOrdersRequest) returns (CancelOpenOrdersResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/account/openOrders"
+    };
+  }
+
+  // --- Query Order ---
+  // @grpc-gateway: GET /api/v1/account/order
+  rpc GetOrder (GetOrderRequest) returns (GetOrderResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/account/order"
+    };
+  }
+
+  // --- Cancel/Replace Order ---
+  // @grpc-gateway: POST /api/v1/account/order/cancelReplace
+  rpc CancelReplaceOrder (CancelReplaceOrderRequest) returns (CancelReplaceOrderResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/account/order/cancelReplace"
+      body: "*"
+    };
+  }
+
+  // --- Open Orders ---
+  // @grpc-gateway: GET /api/v1/account/openOrders
+  rpc GetOpenOrders (GetOpenOrdersRequest) returns (GetOpenOrdersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/account/openOrders"
+    };
+  }
+
+  // --- All Orders ---
+  // @grpc-gateway: GET /api/v1/account/allOrders
+  rpc GetAllOrders (GetAllOrdersRequest) returns (GetAllOrdersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/account/allOrders"
+    };
+  }
+
+  // --- OCO Orders ---
+  // @grpc-gateway: POST /api/v1/account/order/oco
+  rpc NewOCO (NewOCORequest) returns (NewOCOResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/account/order/oco"
+      body: "*"
+    };
+  }
+
+  // @grpc-gateway: DELETE /api/v1/account/orderList
+  rpc CancelOCO (CancelOCORequest) returns (CancelOCOResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/account/orderList"
+    };
+  }
+
+  // @grpc-gateway: GET /api/v1/account/orderList
+  rpc QueryOCO (QueryOCORequest) returns (QueryOCOResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/account/orderList"
+    };
+  }
+
+  // @grpc-gateway: GET /api/v1/account/allOrderList
+  rpc QueryAllOCO (QueryAllOCORequest) returns (QueryAllOCOResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/account/allOrderList"
+    };
+  }
+
+  // @grpc-gateway: GET /api/v1/account/openOrderList
+  rpc QueryOpenOCO (QueryOpenOCORequest) returns (QueryOpenOCOResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/account/openOrderList"
+    };
+  }
+
+  // --- Account Information ---
+  // @grpc-gateway: GET /api/v1/account/account
+  rpc GetAccount (GetAccountRequest) returns (GetAccountResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/account/account"
+    };
+  }
+
+  // --- Account Trades ---
+  // @grpc-gateway: GET /api/v1/account/myTrades
+  rpc GetMyTrades (GetMyTradesRequest) returns (GetMyTradesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/account/myTrades"
+    };
+  }
+
+  // --- Rate Limit ---
+  // @grpc-gateway: GET /api/v1/account/rateLimit/order
+  rpc GetQueryCurrentOrderCountUsage (GetQueryCurrentOrderCountUsageRequest) returns (GetQueryCurrentOrderCountUsageResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/account/rateLimit/order"
+    };
+  }
+
+  // --- Prevented Matches ---
+  // @grpc-gateway: GET /api/v1/account/myPreventedMatches
+  rpc GetQueryPreventedMatches (GetQueryPreventedMatchesRequest) returns (GetQueryPreventedMatchesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/account/myPreventedMatches"
+    };
+  }
+}
+
+// ========== Messages ==========
+
+// --- New Order ---
+
+// Binance Test New Order endpoint (POST /api/v3/order/test)
+message TestNewOrderRequest {
+  string symbol = 1;
+  string side = 2;
+  string order_type = 3;
+  optional string time_in_force = 4;
+  optional double quantity = 5;
+  optional double quote_order_qty = 6;
+  optional double price = 7;
+  optional string new_client_order_id = 8;
+  optional int32 strategy_id = 9;
+  optional int32 strategy_type = 10;
+  optional double stop_price = 11;
+  optional int32 trailing_delta = 12;
+  optional double iceberg_qty = 13;
+  optional string new_order_resp_type = 14;
+  optional string self_trade_prevention = 15;
+}
+
+message TestNewOrderResponse {
+  // Test endpoint usually returns an empty JSON object {} on success.
+}
+
+// Binance New Order endpoint (POST /api/v3/order)
+message CreateOrderRequest {
+  string symbol = 1;
+  string side = 2;
+  string order_type = 3;
+  optional string time_in_force = 4;
+  optional double quantity = 5;
+  optional double quote_order_qty = 6;
+  optional double price = 7;
+  optional string new_client_order_id = 8;
+  optional int32 strategy_id = 9;
+  optional int32 strategy_type = 10;
+  optional double stop_price = 11;
+  optional int32 trailing_delta = 12;
+  optional double iceberg_qty = 13;
+  optional string new_order_resp_type = 14;
+  optional string self_trade_prevention_mode = 15;
+}
+
+// Multiple response types are possible (ACK, RESULT, FULL) for CreateOrderService.Do,
+// so a single response message that is the union/superset of fields is appropriate for gRPC.
+message CreateOrderResponse {
+  string symbol = 1;
+  int64 order_id = 2;
+  int64 order_list_id = 3;
+  string client_order_id = 4;
+  uint64 transact_time = 5;
+  optional string price = 6;
+  optional string orig_qty = 7;
+  optional string executed_qty = 8;
+  optional string cummulative_quote_qty = 9;
+  optional string status = 10;
+  optional string time_in_force = 11;
+  optional string type = 12;
+  optional string side = 13;
+  optional uint64 working_time = 14;
+  optional string self_trade_prevention_mode = 15;
+  optional string iceberg_qty = 16;
+  optional int64 prevented_match_id = 17;
+  optional string prevented_quantity = 18;
+  optional string stop_price = 19;
+  optional int64 strategy_id = 20;
+  optional int64 strategy_type = 21;
+  optional string trailing_delta = 22;
+  optional int64 trailing_time = 23;
+  repeated Fill fills = 24;
+}
+
+message Fill {
+  string price = 1;
+  string qty = 2;
+  string commission = 3;
+  string commission_asset = 4;
+  int64 trade_id = 5;
+}
+
+
+// --- Cancel Order ---
+
+// Binance Cancel Order endpoint (DELETE /api/v3/order)
+message CancelOrderRequest {
+  string symbol = 1;
+  optional int64 order_id = 2;
+  optional string orig_client_order_id = 3;
+  optional string new_client_order_id = 4;
+  optional string cancel_restrictions = 5;
+}
+
+message CancelOrderResponse {
+  string symbol = 1;
+  string orig_client_order_id = 2;
+  int64 order_id = 3;
+  int64 order_list_id = 4;
+  string client_order_id = 5;
+  string price = 6;
+  string orig_qty = 7;
+  string executed_qty = 8;
+  string cummulative_quote_qty = 9;
+  string status = 10;
+  string time_in_force = 11;
+  string type = 12;
+  string side = 13;
+  string self_trade_prevention = 14;
+  optional string iceberg_qty = 15;
+  optional int64 prevented_match_id = 16;
+  optional string prevented_quantity = 17;
+  optional string stop_price = 18;
+  optional int64 strategy_id = 19;
+  optional int64 strategy_type = 20;
+  optional string trailing_delta = 21;
+  optional int64 trailing_time = 22;
+}
+
+// Binance Cancel all open orders on a symbol (DELETE /api/v3/openOrders)
+message CancelOpenOrdersRequest {
+  string symbol = 1;
+}
+
+message CancelOpenOrdersResponse {
+  repeated CancelOrderResponse cancelled_orders = 1;
+}
+
+
+// --- Query Order ---
+
+// Binance Query Order (USER_DATA) (GET /api/v3/order)
+message GetOrderRequest {
+  string symbol = 1;
+  optional int64 order_id = 2;
+  optional string orig_client_order_id = 3;
+}
+
+message GetOrderResponse {
+  string symbol = 1;
+  int64 order_id = 2;
+  int64 order_list_id = 3;
+  string client_order_id = 4;
+  string price = 5;
+  string orig_qty = 6;
+  string executed_qty = 7;
+  string cummulative_quote_qty = 8;
+  string status = 9;
+  string time_in_force = 10;
+  string type = 11;
+  string side = 12;
+  string stop_price = 13;
+  optional string iceberg_qty = 14;
+  uint64 time = 15;
+  uint64 update_time = 16;
+  bool is_working = 17;
+  uint64 working_time = 18;
+  string orig_quote_order_qty = 19;
+  string self_trade_prevention_mode = 20;
+  optional int64 prevented_match_id = 21;
+  optional string prevented_quantity = 22;
+  optional int64 strategy_id = 23;
+  optional int64 strategy_type = 24;
+  optional string trailing_delta = 25;
+  optional int64 trailing_time = 26;
+}
+
+
+// --- Cancel/Replace Order ---
+
+// Cancel an Existing Order and Send a New Order (TRADE)
+message CancelReplaceOrderRequest {
+  string symbol = 1;
+  string side = 2;
+  string order_type = 3;
+  string cancel_replace_mode = 4;
+  optional string time_in_force = 5;
+  optional double quantity = 6;
+  optional double quote_order_qty = 7;
+  optional double price = 8;
+  optional string cancel_new_client_order_id = 9;
+  optional string cancel_orig_client_order_id = 10;
+  optional int64 cancel_order_id = 11;
+  optional string new_client_order_id = 12;
+  optional int32 strategy_id = 13;
+  optional int32 strategy_type = 14;
+  optional double stop_price = 15;
+  optional int64 trailing_delta = 16;
+  optional double iceberg_qty = 17;
+  optional string new_order_resp_type = 18;
+  optional string self_trade_prevention_mode = 19;
+  optional string cancel_restrictions = 20;
+}
+
+message CancelReplaceOrderResponse {
+  optional int64 code = 1;
+  optional string msg = 2;
+  optional string cancel_result = 3;
+  optional string new_order_result = 4;
+  optional CancelReplaceOrderCancelResponse cancel_response = 5;
+  optional CancelReplaceOrderNewOrderResponse new_order_response = 6;
+  // The 'Data' field seems redundant or for a specific error case/format, omitting for simplicity.
+}
+
+message CancelReplaceOrderCancelResponse {
+  optional int32 code = 1;
+  optional string msg = 2;
+  optional string symbol = 3;
+  optional string orig_client_order_id = 4;
+  optional int64 order_id = 5;
+  optional int64 order_list_id = 6;
+  optional string client_order_id = 7;
+  optional string price = 8;
+  optional string orig_qty = 9;
+  optional string executed_qty = 10;
+  optional string cummulative_quote_qty = 11;
+  optional string status = 12;
+  optional string time_in_force = 13;
+  optional string type = 14;
+  optional string side = 15;
+  optional string self_trade_prevention_mode = 16;
+}
+
+message CancelReplaceOrderNewOrderResponse {
+  optional int64 code = 1;
+  optional string msg = 2;
+  optional string symbol = 3;
+  optional int64 order_id = 4;
+  optional int64 order_list_id = 5;
+  optional string client_order_id = 6;
+  optional uint64 transact_time = 7;
+  optional string price = 8;
+  optional string orig_qty = 9;
+  optional string executed_qty = 10;
+  optional string cummulative_quote_qty = 11;
+  optional string status = 12;
+  optional string time_in_force = 13;
+  optional string type = 14;
+  optional string side = 15;
+  repeated Fill fills = 16;
+  optional string self_trade_prevention_mode = 17;
+}
+
+// --- Open Orders ---
+
+// Binance Get current open orders (GET /api/v3/openOrders)
+message GetOpenOrdersRequest {
+  optional string symbol = 1;
+}
+
+message NewOpenOrdersResponse {
+  string symbol = 1;
+  int64 order_id = 2;
+  int64 order_list_id = 3;
+  string client_order_id = 4;
+  string price = 5;
+  string orig_qty = 6;
+  string executed_qty = 7;
+  string cummulative_quote_qty = 8;
+  string status = 9;
+  string time_in_force = 10;
+  string type = 11;
+  string side = 12;
+  string stop_price = 13;
+  optional string iceberg_qty = 14;
+  uint64 time = 15;
+  uint64 update_time = 16;
+  bool is_working = 17;
+  uint64 working_time = 18;
+  string orig_quote_order_qty = 19;
+  string self_trade_prevention_mode = 20;
+  optional int64 prevented_match_id = 21;
+  optional string prevented_quantity = 22;
+  optional int64 strategy_id = 23;
+  optional int64 strategy_type = 24;
+  optional string trailing_delta = 25;
+  optional int64 trailing_time = 26;
+}
+
+message GetOpenOrdersResponse {
+  repeated NewOpenOrdersResponse open_orders = 1;
+}
+
+
+// --- All Orders ---
+
+// Binance Get all account orders; active, canceled, or filled (GET /api/v3/allOrders)
+message GetAllOrdersRequest {
+  string symbol = 1;
+  optional int64 order_id = 2;
+  optional uint64 start_time = 3;
+  optional uint64 end_time = 4;
+  optional int32 limit = 5;
+}
+
+message NewAllOrdersResponse {
+  string symbol = 1;
+  string list_client_order_id = 2;
+  int64 order_id = 3;
+  int64 order_list_id = 4;
+  string client_order_id = 5;
+  string price = 6;
+  string orig_qty = 7;
+  string executed_qty = 8;
+  string cummulative_quote_qty = 9;
+  string status = 10;
+  string time_in_force = 11;
+  string type = 12;
+  string side = 13;
+  string stop_price = 14;
+  optional string iceberg_qty = 15;
+  uint64 time = 16;
+  uint64 update_time = 17;
+  bool is_working = 18;
+  string orig_quote_order_qty = 19;
+  uint64 working_time = 20;
+  string self_trade_prevention_mode = 21;
+  optional int64 prevented_match_id = 22;
+  optional string prevented_quantity = 23;
+  optional int64 strategy_id = 24;
+  optional int64 strategy_type = 25;
+  optional string trailing_delta = 26;
+  optional int64 trailing_time = 27;
+}
+
+message GetAllOrdersResponse {
+  repeated NewAllOrdersResponse orders = 1;
+}
+
+
+// --- OCO Orders ---
+
+// Binance New OCO (TRADE) (POST /api/v3/order/oco)
+message NewOCORequest {
+  string symbol = 1;
+  optional string list_client_order_id = 2;
+  string side = 3;
+  double quantity = 4;
+  optional string limit_client_order_id = 5;
+  optional int32 limit_strategy_id = 6;
+  optional int32 limit_strategy_type = 7;
+  double price = 8; // Limit Price
+  optional double limit_iceberg_qty = 9;
+  optional int32 trailing_delta = 10;
+  optional string stop_client_order_id = 11;
+  double stop_price = 12;
+  optional int32 stop_strategy_id = 13;
+  optional int32 stop_strategy_type = 14;
+  optional double stop_limit_price = 15;
+  optional double stop_iceberg_qty = 16;
+  optional string stop_limit_time_in_force = 17;
+  optional string new_order_resp_type = 18;
+  optional string self_trade_prevention_mode = 19;
+}
+
+message NewOCOResponse {
+  int64 order_list_id = 1;
+  string contingency_type = 2;
+  string list_status_type = 3;
+  string list_order_status = 4;
+  string list_client_order_id = 5;
+  uint64 transaction_time = 6;
+  string symbol = 7;
+  repeated OCOOrder orders = 8;
+  repeated OrderReport order_reports = 9;
+}
+
+message OCOOrder {
+  string symbol = 1;
+  int64 order_id = 2;
+  string client_order_id = 3;
+}
+
+message OrderReport {
+  string symbol = 1;
+  int64 order_id = 2;
+  int64 order_list_id = 3;
+  string client_order_id = 4;
+  uint64 transact_time = 5;
+  double price = 6;
+  double orig_qty = 7;
+  double executed_qty = 8;
+  double cummulative_quote_qty = 9;
+  string status = 10;
+  string time_in_force = 11;
+  string type = 12;
+  string side = 13;
+  string stop_price = 14;
+  uint64 working_time = 15;
+  string self_trade_prevention_mode = 16;
+  optional string iceberg_qty = 17;
+  optional int64 prevented_match_id = 18;
+  optional string prevented_quantity = 19;
+  optional int64 strategy_id = 20;
+  optional int64 strategy_type = 21;
+  optional string trailing_delta = 22;
+  optional int64 trailing_time = 23;
+}
+
+// Binance Cancel OCO (TRADE) (DELETE /api/v3/orderList)
+message CancelOCORequest {
+  string symbol = 1;
+  optional int32 order_list_id = 2;
+  optional string list_client_order_id = 3;
+  optional string new_client_order_id = 4;
+}
+
+// CancelOCO uses the same response structure as NewOCO
+message CancelOCOResponse {
+  int64 order_list_id = 1;
+  string contingency_type = 2;
+  string list_status_type = 3;
+  string list_order_status = 4;
+  string list_client_order_id = 5;
+  uint64 transaction_time = 6;
+  string symbol = 7;
+  repeated OCOOrder orders = 8;
+  repeated OrderReport order_reports = 9;
+}
+
+// Binance Query OCO (USER_DATA) (GET /api/v3/orderList)
+message QueryOCORequest {
+  optional int64 order_list_id = 1;
+  optional string orig_client_order_id = 2;
+}
+
+message QueryOCOResponse {
+  int64 order_list_id = 1;
+  string contingency_type = 2;
+  string list_status_type = 3;
+  string list_order_status = 4;
+  string list_client_order_id = 5;
+  uint64 transaction_time = 6;
+  string symbol = 7;
+  repeated OCOOrder orders = 8;
+}
+
+// Binance Query all OCO (USER_DATA) (GET /api/v3/allOrderList)
+message QueryAllOCORequest {
+  optional int64 from_id = 1;
+  optional uint64 start_time = 2;
+  optional uint64 end_time = 3;
+  optional int32 limit = 4;
+}
+
+message QueryAllOCOResponse {
+  repeated QueryOCOResponse oco_orders = 1;
+}
+
+// Binance Query open OCO (USER_DATA) (GET /api/v3/openOrderList)
+message QueryOpenOCORequest {}
+
+// QueryOpenOCO uses the same response structure as QueryOCO
+message QueryOpenOCOResponse {
+  int64 order_list_id = 1;
+  string contingency_type = 2;
+  string list_status_type = 3;
+  string list_order_status = 4;
+  string list_client_order_id = 5;
+  uint64 transaction_time = 6;
+  string symbol = 7;
+  repeated OCOOrder orders = 8;
+}
+
+
+// --- Account Information ---
+
+// Binance Account Information (USER_DATA) (GET /api/v3/account)
+message GetAccountRequest {}
+
+message GetAccountResponse {
+  int64 maker_commission = 1;
+  int64 taker_commission = 2;
+  int64 buyer_commission = 3;
+  int64 seller_commission = 4;
+  bool can_trade = 5;
+  bool can_withdraw = 6;
+  bool can_deposit = 7;
+  uint64 update_time = 8;
+  string account_type = 9;
+  repeated Balance balances = 10;
+  repeated string permissions = 11;
+}
+
+message Balance {
+  string asset = 1;
+  string free = 2;
+  string locked = 3;
+}
+
+
+// --- Account Trades ---
+
+// Binance Get trades for a specific account and symbol (USER_DATA) (GET /api/v3/myTrades)
+message GetMyTradesRequest {
+  string symbol = 1;
+  optional int64 order_id = 2;
+  optional uint64 start_time = 3;
+  optional uint64 end_time = 4;
+  optional int64 from_id = 5;
+  optional int32 limit = 6;
+}
+
+message AccountTradeListResponse {
+  int64 id = 1;
+  string symbol = 2;
+  int64 order_id = 3;
+  int64 order_list_id = 4;
+  string price = 5;
+  string quantity = 6;
+  string quote_quantity = 7;
+  string commission = 8;
+  string commission_asset = 9;
+  uint64 time = 10;
+  bool is_buyer = 11;
+  bool is_maker = 12;
+  bool is_best_match = 13;
+}
+
+message GetMyTradesResponse {
+  repeated AccountTradeListResponse trades = 1;
+}
+
+
+// --- Rate Limit ---
+
+// Query Current Order Count Usage (TRADE)
+message GetQueryCurrentOrderCountUsageRequest {}
+
+message QueryCurrentOrderCountUsageResponse {
+  string rate_limit_type = 1;
+  string interval = 2;
+  int32 interval_num = 3;
+  int32 limit = 4;
+  int32 count = 5;
+}
+
+message GetQueryCurrentOrderCountUsageResponse {
+  repeated QueryCurrentOrderCountUsageResponse usage = 1;
+}
+
+// --- Prevented Matches ---
+
+// Query Prevented Matches (USER_DATA)
+message GetQueryPreventedMatchesRequest {
+  string symbol = 1;
+  optional int64 prevent_match_id = 2;
+  optional int64 order_id = 3;
+  optional int64 from_prevented_match_id = 4;
+  optional int32 limit = 5;
+}
+
+message GetQueryPreventedMatchesResponse {
+  repeated PreventedMatch prevented_matches = 1;
+}
+
+message PreventedMatch {
+  string symbol = 1;
+  int64 prevented_match_id = 2;
+  int64 taker_order_id = 3;
+  int64 maker_order_id = 4;
+  int64 trade_group_id = 5;
+  string self_trade_prevention_mode = 6;
+  string price = 7;
+  string maker_prevented_quantity = 8;
+  uint64 transact_time = 9;
+}

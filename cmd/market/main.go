@@ -8,7 +8,6 @@ import (
 	marketpb "simple-securities/gen/market/v1"
 	"simple-securities/internal/market/application/service"
 	grpcHandler "simple-securities/internal/market/handler/grpc"
-	"simple-securities/internal/market/middleware"
 	"simple-securities/pkg/client"
 	"simple-securities/pkg/conv"
 	"simple-securities/pkg/logger"
@@ -79,7 +78,7 @@ func main() {
 				MinTime:             time.Duration(config.GlobalConfig.GrpcServer.MinTime),
 				PermitWithoutStream: config.GlobalConfig.GrpcServer.PermitWithoutStream,
 			},
-			UnaryInterceptor: middleware.LoggingInterceptor,
+			UnaryInterceptor: logger.LoggingInterceptor,
 		},
 	)
 	if err != nil {

@@ -1,9 +1,8 @@
-package middleware
+package logger
 
 import (
 	"context"
 	"simple-securities/config"
-	"simple-securities/pkg/logger"
 	"time"
 
 	"go.uber.org/zap"
@@ -24,7 +23,7 @@ func LoggingInterceptor(
 	duration := end.Sub(start)
 
 	if err != nil {
-		logger.Logger.Error("gRPC request",
+		Logger.Error("gRPC request",
 			zap.String("env", string(config.GlobalConfig.Env)),
 			zap.String("app_name", config.GlobalConfig.App.Name),
 			zap.String("method", info.FullMethod),
@@ -36,7 +35,7 @@ func LoggingInterceptor(
 			zap.Error(err),
 		)
 	} else {
-		logger.Logger.Info("gRPC request",
+		Logger.Info("gRPC request",
 			zap.String("env", string(config.GlobalConfig.Env)),
 			zap.String("app_name", config.GlobalConfig.App.Name),
 			zap.String("method", info.FullMethod),

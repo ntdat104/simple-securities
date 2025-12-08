@@ -10,7 +10,6 @@ import (
 	"simple-securities/internal/notification/application/service"
 	grpcHandler "simple-securities/internal/notification/handler/grpc"
 	"simple-securities/internal/notification/infras/repo"
-	"simple-securities/internal/notification/middleware"
 	"simple-securities/pkg/conv"
 	"simple-securities/pkg/db/cache"
 	"simple-securities/pkg/db/sqlite"
@@ -117,7 +116,7 @@ func main() {
 				MinTime:             time.Duration(config.GlobalConfig.GrpcServer.MinTime),
 				PermitWithoutStream: config.GlobalConfig.GrpcServer.PermitWithoutStream,
 			},
-			UnaryInterceptor: middleware.LoggingInterceptor,
+			UnaryInterceptor: logger.LoggingInterceptor,
 		},
 	)
 	if err != nil {
