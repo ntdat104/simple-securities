@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"fmt"
 	"math/rand"
+	"simple-securities/pkg/uuid"
 	"time"
 )
 
@@ -37,6 +38,7 @@ const (
 
 type Order struct {
 	ID         uint64
+	Uuid       string
 	Price      int64
 	Quantity   int64
 	Side       Side
@@ -495,6 +497,7 @@ func main() {
 
 		ob.AddOrder(&Order{
 			ID:        id,
+			Uuid:      uuid.NewGoogleUUID(),
 			Price:     price,
 			Quantity:  qty,
 			Side:      side,
