@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
+	"simple-securities/pkg/datetime"
 
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
@@ -20,8 +20,8 @@ func NewProducer(brokers []string, logger *zap.Logger) *Producer {
 		Addr:         kafka.TCP(brokers...),
 		Balancer:     &kafka.LeastBytes{},
 		RequiredAcks: kafka.RequireOne, // wait for leader
-		Async:        false, // wait for ack
-		BatchTimeout: 0, // send immediately || time.Second * 2
+		Async:        false,            // wait for ack
+		BatchTimeout: 0,                // send immediately || time.Second * 2
 	}
 
 	return &Producer{
@@ -49,7 +49,7 @@ func (p *Producer) SendMessage(
 	msg := kafka.Message{
 		Topic: topic,
 		Value: eventBytes,
-		Time:  time.Now(),
+		Time:  datetime.Now(),
 	}
 
 	// Add key if provided

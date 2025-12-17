@@ -5,8 +5,8 @@ import (
 	"errors"
 	"simple-securities/internal/notification/domain/model"
 	"simple-securities/internal/notification/domain/repo"
+	"simple-securities/pkg/datetime"
 	"sync"
-	"time"
 )
 
 type NotificationInmemRepo struct {
@@ -30,7 +30,7 @@ func (r *NotificationInmemRepo) Create(ctx context.Context, noti *model.Notifica
 	n := model.NewNotification(noti.UserID, noti.Type, noti.Title, noti.Body)
 	n.ID = r.auto
 	r.auto++
-	n.CreatedAt = time.Now()
+	n.CreatedAt = datetime.Now()
 	n.UpdatedAt = n.CreatedAt
 
 	r.data[n.ID] = n
@@ -57,7 +57,7 @@ func (r *NotificationInmemRepo) Update(ctx context.Context, n *model.Notificatio
 	if _, ok := r.data[n.ID]; !ok {
 		return errors.New("not found")
 	}
-	n.UpdatedAt = time.Now()
+	n.UpdatedAt = datetime.Now()
 	r.data[n.ID] = n
 	return nil
 }

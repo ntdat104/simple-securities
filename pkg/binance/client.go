@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"simple-securities/pkg/binance/handlers"
+	"simple-securities/pkg/datetime"
 	"time"
 
 	"github.com/bitly/go-simplejson"
@@ -46,7 +47,7 @@ const (
 )
 
 func currentTimestamp() int64 {
-	return FormatTimestamp(time.Now())
+	return FormatTimestamp(datetime.Now())
 }
 
 // FormatTimestamp formats a time into Unix timestamp in milliseconds, as requested by Binance.

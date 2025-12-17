@@ -7,9 +7,9 @@ import (
 	"simple-securities/internal/user/application/mapper"
 	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
+	"simple-securities/pkg/datetime"
 	"simple-securities/pkg/errors"
 	"simple-securities/pkg/jwt"
-	"time"
 )
 
 type RefreshTokenSvc interface {
@@ -72,7 +72,7 @@ func (s *refreshTokenSvc) Execute(ctx context.Context, refreshToken string) (*dt
 	}
 
 	userExist.RefreshToken = newRefreshToken
-	userExist.UpdatedAt = time.Now()
+	userExist.UpdatedAt = datetime.Now()
 	userExist.UpdatedBy = userExist.ID
 	_, err = s.userRepo.Save(ctx, userExist)
 	if err != nil {

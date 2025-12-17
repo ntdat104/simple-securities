@@ -14,6 +14,7 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 
 	"simple-securities/config"
+	"simple-securities/pkg/datetime"
 )
 
 // Global logger instances, maintained for compatibility with existing code
@@ -293,7 +294,8 @@ func (l *AppLogger) buildCores() []zapcore.Core {
 
 		// Create a core that doesn't write directly to file, we'll use the hook for actual file output
 		fc := l.options.FileConfig
-		dateStr := time.Now().Format("2006-01-02")
+		now := datetime.Now()
+		dateStr := datetime.ConvertTimeToString(now, datetime.YYYY_MM_DD)
 		fileNameWithDate := fmt.Sprintf("%s.log", dateStr)
 
 		lum := &lumberjack.Logger{

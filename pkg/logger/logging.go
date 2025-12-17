@@ -3,7 +3,7 @@ package logger
 import (
 	"context"
 	"simple-securities/config"
-	"time"
+	"simple-securities/pkg/datetime"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -15,11 +15,11 @@ func LoggingInterceptor(
 	info *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler,
 ) (resp interface{}, err error) {
-	start := time.Now()
+	start := datetime.Now()
 
 	resp, err = handler(ctx, req)
 
-	end := time.Now()
+	end := datetime.Now()
 	duration := end.Sub(start)
 
 	if err != nil {

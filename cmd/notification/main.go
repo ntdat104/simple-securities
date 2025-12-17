@@ -11,6 +11,7 @@ import (
 	grpcHandler "simple-securities/internal/notification/handler/grpc"
 	"simple-securities/internal/notification/infras/repo"
 	"simple-securities/pkg/conv"
+	"simple-securities/pkg/datetime"
 	"simple-securities/pkg/db/cache"
 	"simple-securities/pkg/db/sqlite"
 	"simple-securities/pkg/kafka"
@@ -48,7 +49,7 @@ func main() {
 	// -----------------------------
 	go func() {
 		for {
-			now := time.Now()
+			now := datetime.Now()
 			event := kafka.Event{
 				Meta: kafka.Meta{
 					ServiceName: "notification-service",

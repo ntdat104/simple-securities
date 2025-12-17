@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"simple-securities/internal/crypto/application/dto"
-	"time"
+	"simple-securities/pkg/datetime"
 )
 
 type GetServerTimeSvc interface {
@@ -18,7 +18,7 @@ func NewGetServerTimeSvc() GetServerTimeSvc {
 
 func (s *getServerTimeSvc) Handle(ctx context.Context) (*dto.ServerTimeDto, error) {
 	result := &dto.ServerTimeDto{
-		ServerTime: time.Now().Unix(),
+		ServerTime: datetime.Now().Unix(),
 	}
 	return result, nil
 }

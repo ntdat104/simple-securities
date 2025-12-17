@@ -10,8 +10,8 @@ import (
 	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
 	"simple-securities/pkg/bcrypt"
+	"simple-securities/pkg/datetime"
 	"simple-securities/pkg/errors"
-	"time"
 )
 
 type LoginSvc interface {
@@ -69,7 +69,7 @@ func (s *loginSvc) Execute(ctx context.Context, req *dto.LoginReq) (*dto.LoginRe
 		return nil, errors.Newf(errors.ErrorTypeBusiness, "Failed to generate refresh token: %v", err)
 	}
 
-	now := time.Now()
+	now := datetime.Now()
 	userExist.LastLoginAt = &now
 	userExist.RefreshToken = refreshToken
 	userSaved, err := s.userRepo.Save(ctx, userExist)

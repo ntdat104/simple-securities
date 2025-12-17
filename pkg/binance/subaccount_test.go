@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"simple-securities/pkg/datetime"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -83,7 +83,7 @@ func (s *subAccountTestSuite) TestInternalUniversalTransferHistory() {
 	fromEmail := "sub1@gmail.com"
 	toEmail := "sub2@gmail.com"
 	clientTranId := "testID"
-	endTime := time.Now().UnixNano() / 1000 / 1000
+	endTime := datetime.Now().UnixNano() / 1000 / 1000
 	startTime := endTime - 3600*1000
 	page := 1
 	limit := 10

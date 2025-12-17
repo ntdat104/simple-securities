@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"simple-securities/pkg/datetime"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -14,7 +15,7 @@ func GenerateJwtToken(
 	jwtSecret string,
 	expire uint32,
 ) (string, int64, error) {
-	now := time.Now()
+	now := datetime.Now()
 	expireTime := now.Add(time.Duration(expire) * time.Second)
 	expireUnix := expireTime.Unix()
 

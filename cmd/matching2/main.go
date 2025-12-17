@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"fmt"
 	"math/rand"
+	"simple-securities/pkg/datetime"
 	"sync/atomic"
 	"time"
 )
@@ -43,7 +44,7 @@ func NewSkipList(cmp func(a, b int64) bool) *SkipList {
 	return &SkipList{
 		head: &SkipListNode{Level: make([]*SkipListNode, 32)},
 		cmp:  cmp,
-		rnd:  rand.New(rand.NewSource(time.Now().UnixNano())),
+		rnd:  rand.New(rand.NewSource(datetime.Now().UnixNano())),
 	}
 }
 
@@ -270,11 +271,11 @@ func main() {
 		done <- struct{}{}
 	}()
 
-	start := time.Now()
+	start := datetime.Now()
 	// 10 concurrent streams
 	for i := 0; i < 10; i++ {
 		go func() {
-			r := rand.New(rand.NewSource(time.Now().UnixNano()))
+			r := rand.New(rand.NewSource(datetime.Now().UnixNano()))
 			for j := 0; j < int(totalOrders/10); j++ {
 				id := atomic.AddUint64(&idCounter, 1)
 				price := r.Int63n(1000) + 90

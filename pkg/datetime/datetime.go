@@ -20,18 +20,18 @@ const (
 )
 
 // GetCurrentLocalTime returns the current local time.
-func GetCurrentLocalTime() time.Time {
+func Now() time.Time {
 	return time.Now()
 }
 
-// GetCurrentMiliseconds returns the current milliseconds.
-func GetCurrentMiliseconds() int64 {
-	return ConvertLocalTimeToMilliseconds(GetCurrentLocalTime())
+// GetMiliseconds returns the current milliseconds.
+func GetMiliseconds(inputTime time.Time) int64 {
+	return ConvertLocalTimeToMilliseconds(inputTime)
 }
 
-// ConvertCurrentLocalTimeToString converts the current local time to string with the specific format.
-func ConvertCurrentLocalTimeToString(format string) string {
-	return GetCurrentLocalTime().Format(format)
+// ConvertTimeToString converts the current local time to string with the specific format.
+func ConvertTimeToString(inputTime time.Time, format string) string {
+	return inputTime.Format(format)
 }
 
 // ConvertMillisecondsToString converts the milliseconds to the string with the specific format.
@@ -70,54 +70,54 @@ func ConvertLocalTimeToString(localTime time.Time, format string) string {
 }
 
 // GetYear returns the current year.
-func GetYear() int {
-	return GetCurrentLocalTime().Year()
+func GetYear(inputTime time.Time) int {
+	return inputTime.Year()
 }
 
 // GetDayOfYear returns the day of the year.
-func GetDayOfYear() int {
-	return GetCurrentLocalTime().YearDay()
+func GetDayOfYear(inputTime time.Time) int {
+	return inputTime.YearDay()
 }
 
 // GetDayOfMonth returns the day of month.
-func GetDayOfMonth() int {
-	return GetCurrentLocalTime().Day()
+func GetDayOfMonth(inputTime time.Time) int {
+	return inputTime.Day()
 }
 
 // GetMonthOfYear returns the month of year. Value from 1 to 12.
-func GetMonthOfYear() int {
-	return int(GetCurrentLocalTime().Month())
+func GetMonthOfYear(inputTime time.Time) int {
+	return int(inputTime.Month())
 
 }
 
 // GetStartLocalTimeOfYear returns the start local time of year.
-func GetStartLocalTimeOfYear() time.Time {
-	return time.Date(GetYear(), 1, 1, 0, 0, 0, 0, time.Local)
+func GetStartLocalTimeOfYear(inputTime time.Time) time.Time {
+	return time.Date(GetYear(inputTime), 1, 1, 0, 0, 0, 0, time.Local)
 }
 
 // GetEndLocalTimeOfYear returns the end local time of year.
-func GetEndLocalTimeOfYear() time.Time {
-	return time.Date(GetYear(), 12, 31, 23, 59, 59, 999999999, time.Local)
+func GetEndLocalTimeOfYear(inputTime time.Time) time.Time {
+	return time.Date(GetYear(inputTime), 12, 31, 23, 59, 59, 999999999, time.Local)
 }
 
 // GetStartLocalTimeOfMonth returns the start local time of month.
-func GetStartLocalTimeOfMonth() time.Time {
-	return time.Date(GetYear(), GetCurrentLocalTime().Month(), 1, 0, 0, 0, 0, time.Local)
+func GetStartLocalTimeOfMonth(inputTime time.Time) time.Time {
+	return time.Date(GetYear(inputTime), inputTime.Month(), 1, 0, 0, 0, 0, time.Local)
 }
 
 // GetEndLocalTimeOfMonth returns the end local time of month.
-func GetEndLocalTimeOfMonth() time.Time {
-	return time.Date(GetYear(), GetCurrentLocalTime().Month(), 1, 23, 59, 59, 999999999, time.Local).AddDate(0, 1, -1)
+func GetEndLocalTimeOfMonth(inputTime time.Time) time.Time {
+	return time.Date(GetYear(inputTime), inputTime.Month(), 1, 23, 59, 59, 999999999, time.Local).AddDate(0, 1, -1)
 }
 
 // GetStartLocalTimeOfDay return the start local time of day.
-func GetStartLocalTimeOfDay() time.Time {
-	return time.Date(GetYear(), GetCurrentLocalTime().Month(), GetCurrentLocalTime().Day(), 0, 0, 0, 0, time.Local)
+func GetStartLocalTimeOfDay(inputTime time.Time) time.Time {
+	return time.Date(GetYear(inputTime), inputTime.Month(), inputTime.Day(), 0, 0, 0, 0, time.Local)
 }
 
 // GetEndLocalTimeOfDay return the end local time of day.
-func GetEndLocalTimeOfDay() time.Time {
-	return time.Date(GetYear(), GetCurrentLocalTime().Month(), GetCurrentLocalTime().Day(), 23, 59, 59, 999999999, time.Local)
+func GetEndLocalTimeOfDay(inputTime time.Time) time.Time {
+	return time.Date(GetYear(inputTime), inputTime.Month(), inputTime.Day(), 23, 59, 59, 999999999, time.Local)
 }
 
 // GetStartLocalTimeOfTime return the start local time of specific local time.

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"simple-securities/pkg/datetime"
 	"simple-securities/pkg/uuid"
 	"time"
 )
@@ -27,7 +28,7 @@ func (n Notification) TableName() string {
 }
 
 func NewNotification(userID uint64, nType, title, body string) *Notification {
-	now := time.Now()
+	now := datetime.Now()
 	return &Notification{
 		Uuid:      uuid.NewGoogleUUID(),
 		UserID:    userID,

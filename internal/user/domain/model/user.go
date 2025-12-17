@@ -3,6 +3,7 @@ package model
 import (
 	"reflect"
 	"simple-securities/internal/user/application/enum"
+	"simple-securities/pkg/datetime"
 	"simple-securities/pkg/uuid"
 	"strings"
 	"time"
@@ -49,7 +50,7 @@ func NewUser(email, hashedPassword string) (*User, error) {
 		return nil, ErrUserPasswordMissing
 	}
 
-	now := time.Now()
+	now := datetime.Now()
 	return &User{
 		Uuid:           uuid.NewGoogleUUID(),
 		Email:          email,

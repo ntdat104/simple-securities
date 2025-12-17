@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"simple-securities/pkg/datetime"
 	"time"
 )
 
@@ -38,7 +39,7 @@ type Client struct {
 type doFunc func(req *http.Request) (*http.Response, error)
 
 func currentTimestamp() int64 {
-	return FormatTimestamp(time.Now())
+	return FormatTimestamp(datetime.Now())
 }
 
 // FormatTimestamp formats a time into Unix timestamp in milliseconds, as requested by Binance.

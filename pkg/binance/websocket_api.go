@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"simple-securities/pkg/datetime"
 	"sort"
 	"strconv"
 	"strings"
@@ -177,7 +178,7 @@ func websocketAPISignature(apiKey string, apiSecret string, parameters map[strin
 		}
 	}
 
-	parameters["timestamp"] = strconv.FormatInt(time.Now().Unix()*1000, 10)
+	parameters["timestamp"] = strconv.FormatInt(datetime.Now().Unix()*1000, 10)
 	parameters["apiKey"] = apiKey
 
 	// Sort parameters by key
@@ -213,7 +214,7 @@ func getUUID() string {
 }
 
 func randomHex(n int) string {
-	rand.New(rand.NewSource(time.Now().UnixNano()))
+	rand.New(rand.NewSource(datetime.Now().UnixNano()))
 	hexChars := "0123456789abcdef"
 	bytes := make([]byte, n)
 	for i := 0; i < n; i++ {

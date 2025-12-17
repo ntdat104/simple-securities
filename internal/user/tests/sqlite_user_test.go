@@ -4,11 +4,11 @@ import (
 	"context"
 	"log"
 	"testing"
-	"time"
 
 	"simple-securities/internal/user/application/enum"
 	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/infras/repo"
+	"simple-securities/pkg/datetime"
 	"simple-securities/pkg/db/sqlite"
 
 	"github.com/stretchr/testify/assert"
@@ -40,7 +40,7 @@ func TestUserRepo_CRUD(t *testing.T) {
 	userRepo, cleanup := setupTestRepo(t)
 	defer cleanup()
 
-	now := time.Now()
+	now := datetime.Now()
 
 	// 1️⃣ Create user
 	newUser, err := model.NewUser("test_user@example.com", "abc123")
@@ -93,8 +93,8 @@ func TestUserRepo_CRUD(t *testing.T) {
 
 	inserted[0].Email = "updated_bulk1@example.com"
 	inserted[1].Email = "updated_bulk2@example.com"
-	inserted[0].UpdatedAt = time.Now()
-	inserted[1].UpdatedAt = time.Now()
+	inserted[0].UpdatedAt = datetime.Now()
+	inserted[1].UpdatedAt = datetime.Now()
 
 	updatedBulk, err := userRepo.SaveAll(ctx, inserted)
 	assert.NoError(t, err)

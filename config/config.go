@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"os"
+	"simple-securities/pkg/datetime"
 	"strconv"
 	"strings"
 	"sync"
@@ -113,7 +114,7 @@ func Load(configPath string, configFile string) (*Config, error) {
 			// Update global config with new values - with mutex protection
 			configMutex.Lock()
 			*GlobalConfig = newConf
-			lastConfigChangeTime = time.Now()
+			lastConfigChangeTime = datetime.Now()
 			configMutex.Unlock()
 		}
 	})
