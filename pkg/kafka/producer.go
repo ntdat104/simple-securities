@@ -39,6 +39,7 @@ func (p *Producer) SendMessage(
 	topic string,
 	key string,
 	partition int, // set -1 to let Kafka decide
+	headers map[string]string,
 	event Event,
 ) error {
 	eventBytes, err := json.Marshal(event)
@@ -46,10 +47,20 @@ func (p *Producer) SendMessage(
 		return fmt.Errorf("failed to marshal event: %w", err)
 	}
 
+	// 2. Convert map to kafka.Header slice
+	kafkaHeaders := make([]kafka.Header, 0, len(headers))
+	for k, v := range headers {
+		kafkaHeaders = append(kafkaHeaders, kafka.Header{
+			Key:   k,
+			Value: []byte(v),
+		})
+	}
+
 	msg := kafka.Message{
-		Topic: topic,
-		Value: eventBytes,
-		Time:  datetime.Now(),
+		Headers: kafkaHeaders,
+		Topic:   topic,
+		Value:   eventBytes,
+		Time:    datetime.Now(),
 	}
 
 	// Add key if provided
@@ -66,11 +77,12 @@ func (p *Producer) SendMessage(
 		return fmt.Errorf("failed to write message: %w", err)
 	}
 
-	p.logger.Info("📤 kafka sends",
+	p.logger.Info("🔔 Kafka sends",
 		zap.String("topic", topic),
 		zap.String("key", key),
 		zap.Int("partition", msg.Partition),
-		zap.ByteString("event", eventBytes),
+		zap.Any("header", headers),
+		zap.Any("event", event),
 	)
 
 	return nil

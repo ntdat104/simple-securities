@@ -8,7 +8,15 @@ import (
 	"go.uber.org/zap"
 )
 
+type Config struct {
+	ServiceName string
+	Version     string
+	Port        string
+	Env         string
+}
+
 type Manager struct {
+	config    Config
 	producer  *Producer
 	consumers map[string]*Consumer
 	logger    *zap.Logger
@@ -21,8 +29,9 @@ type Manager struct {
 	controlMu       sync.RWMutex
 }
 
-func NewManager(brokers []string, logger *zap.Logger) *Manager {
+func NewManager(cfg Config, brokers []string, logger *zap.Logger) *Manager {
 	return &Manager{
+		config:          cfg,
 		producer:        NewProducer(brokers, logger),
 		consumers:       make(map[string]*Consumer),
 		logger:          logger,
@@ -43,15 +52,57 @@ func NewManagerWithConfig(brokers []string, logger *zap.Logger, producerEnabled,
 	}
 }
 
-func (m *Manager) SendMessage(ctx context.Context, topic string, key string, partition int, event Event) error {
-	m.controlMu.RLock()
-	defer m.controlMu.RUnlock()
+func (m *Manager) NewSendMessage() *SendMessage {
+	return &SendMessage{
+		m:         m,
+		partition: -1,
+	}
+}
 
-	if !m.producerEnabled {
+func (s *SendMessage) Topic(topic string) *SendMessage {
+	s.topic = topic
+	return s
+}
+
+func (s *SendMessage) Key(key string) *SendMessage {
+	s.key = key
+	return s
+}
+
+func (s *SendMessage) Partition(partition int) *SendMessage {
+	s.partition = partition
+	return s
+}
+
+func (s *SendMessage) Headers(headers map[string]string) *SendMessage {
+	s.headers = headers
+	return s
+}
+
+func (s *SendMessage) Event(event Event) *SendMessage {
+	s.event = event
+	return s
+}
+
+func (s *SendMessage) Do(ctx context.Context) error {
+	s.m.controlMu.RLock()
+	defer s.m.controlMu.RUnlock()
+
+	if !s.m.producerEnabled {
 		return fmt.Errorf("kafka producer is disabled")
 	}
 
-	return m.producer.SendMessage(ctx, topic, key, partition, event) // partition -1 = let Kafka decide
+	headers := map[string]string{
+		"service_name": s.m.config.ServiceName,
+		"version":      s.m.config.Version,
+		"port":         s.m.config.Port,
+		"env":          s.m.config.Env,
+	}
+	for k, v := range s.headers {
+		headers[k] = v
+	}
+
+	return s.m.producer.SendMessage(ctx, s.topic, s.key, s.partition, headers, s.event)
 }
 
 func (m *Manager) AddConsumer(topic, groupID string, handler EventHandler) error {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -10,6 +11,7 @@ import (
 	"simple-securities/internal/notification/application/service"
 	grpcHandler "simple-securities/internal/notification/handler/grpc"
 	"simple-securities/internal/notification/infras/repo"
+	"simple-securities/pkg/binance"
 	"simple-securities/pkg/conv"
 	"simple-securities/pkg/datetime"
 	"simple-securities/pkg/db/cache"
@@ -37,41 +39,72 @@ func main() {
 		zap.String("port", conv.ConvertUInt32ToString(config.GlobalConfig.GrpcServer.Port)),
 		zap.String("env", string(config.GlobalConfig.Env)))
 
-	// Kafka brokers
-	brokers := []string{"localhost:9092"}
+	// Kafka
+	kafkaCfg := kafka.Config{
+		ServiceName: config.GlobalConfig.App.Name,
+		Version:     config.GlobalConfig.App.Version,
+		Port:        conv.ConvertUInt32ToString(config.GlobalConfig.GrpcServer.Port),
+		Env:         string(config.GlobalConfig.Env),
+	}
+	kafkaBrokers := []string{"localhost:9092", "localhost:9093", "localhost:9094"}
 
 	// Create Kafka Manager
-	mgr := kafka.NewManager(brokers, logger.Logger)
+	mgr := kafka.NewManager(kafkaCfg, kafkaBrokers, logger.Logger)
 	defer mgr.Close()
+
+	binanceClient := binance.NewClient("", "", "https://api.binance.com")
 
 	// -----------------------------
 	// Producer loop
 	// -----------------------------
 	go func() {
 		for {
+			ticker, err := binanceClient.NewTickerService().
+				Symbol("BTCUSDT").Do(context.Background())
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
 			now := datetime.Now()
 			event := kafka.Event{
 				Meta: kafka.Meta{
-					ServiceName: "notification-service",
+					ServiceName: config.GlobalConfig.App.Name,
 					RequestID:   uuid.NewGoogleUUID(),
 					Code:        200,
 					Message:     "Success",
 					Timestamp:   now.Unix(),
-					Datetime:    now.Format("2006-01-02 15:04:05"),
+					Datetime:    datetime.ConvertTimeToString(now, datetime.YYYY_MM_DD_HH_MM_SS),
 				},
-				Data: map[string]any{
-					"time":    now.String(),
-					"success": true,
-				},
+				Data: ticker,
 			}
 
 			// Send to metrics
-			if err := mgr.SendMessage(context.Background(), "metrics", "metrics-key", -1, event); err != nil {
+			if err := mgr.NewSendMessage().
+				Topic("metrics").
+				Key("metrics-key").
+				Partition(1).
+				Headers(map[string]string{
+					"request_id": event.Meta.RequestID,
+					"timestamp":  conv.ConvertInt64ToString(event.Meta.Timestamp),
+					"datetime":   event.Meta.Datetime,
+				}).
+				Event(event).
+				Do(context.Background()); err != nil {
 				logger.Logger.Error("failed to send metrics event", zap.Error(err))
 			}
 
-			// // Send to audit
-			if err := mgr.SendMessage(context.Background(), "audit", "audit-key", -1, event); err != nil {
+			// Send to audit
+			if err := mgr.NewSendMessage().
+				Topic("audit").
+				Key("audit-key").
+				Headers(map[string]string{
+					"request_id": event.Meta.RequestID,
+					"timestamp":  conv.ConvertInt64ToString(event.Meta.Timestamp),
+					"datetime":   event.Meta.Datetime,
+				}).
+				Event(event).
+				Do(context.Background()); err != nil {
 				logger.Logger.Error("failed to send audit event", zap.Error(err))
 			}
 

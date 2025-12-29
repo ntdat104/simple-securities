@@ -39,11 +39,17 @@ func main() {
 	}
 	defer db.Close(ctx)
 
-	// Kafka brokers
-	brokers := []string{"localhost:9092", "localhost:9093", "localhost:9094"}
+	// Kafka
+	kafkaCfg := kafka.Config{
+		ServiceName: config.GlobalConfig.App.Name,
+		Version:     config.GlobalConfig.App.Version,
+		Port:        conv.ConvertUInt32ToString(config.GlobalConfig.GrpcServer.Port),
+		Env:         string(config.GlobalConfig.Env),
+	}
+	kafkaBrokers := []string{"localhost:9092", "localhost:9093", "localhost:9094"}
 
 	// Create Kafka Manager
-	mgr := kafka.NewManager(brokers, logger.Logger)
+	mgr := kafka.NewManager(kafkaCfg, kafkaBrokers, logger.Logger)
 	defer mgr.Close()
 
 	// Register consumers

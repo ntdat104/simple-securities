@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/segmentio/kafka-go"
@@ -21,7 +22,7 @@ func NewConsumer(brokers []string, topic, groupID string, handler EventHandler, 
 		Brokers:  brokers,
 		Topic:    topic,
 		GroupID:  groupID,
-		MinBytes: 1, // 10KB || 10e3
+		MinBytes: 1,    // 10KB || 10e3
 		MaxBytes: 10e6, // 10MB
 	})
 
@@ -50,12 +51,24 @@ func (c *Consumer) Start(ctx context.Context) error {
 				continue
 			}
 
-			c.logger.Debug("📥 kafka recieves",
+			headers := map[string]string{}
+			for _, h := range m.Headers {
+				headers[h.Key] = string(h.Value)
+			}
+
+			var event Event
+			if err := json.Unmarshal(m.Value, &event); err != nil {
+				c.logger.Error("failed to unmarshal event", zap.Error(err))
+				continue
+			}
+
+			c.logger.Debug("🔔 Kafka recieves",
+				zap.Any("header", headers),
 				zap.String("topic", m.Topic),
 				zap.Int("partition", m.Partition),
 				zap.Int64("offset", m.Offset),
 				zap.ByteString("key", m.Key),
-				zap.String("event", string(m.Value)),
+				zap.Any("event", event),
 			)
 
 			if err := c.handler(ctx, m.Key, m.Value); err != nil {
