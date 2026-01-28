@@ -7,7 +7,6 @@ import (
 
 	marketpb "simple-securities/gen/market/v1"
 	"simple-securities/internal/market/application/service"
-	"simple-securities/pkg/errors"
 )
 
 // MarketGrpcSvc defines the collection of services required by the gRPC handler.
@@ -363,9 +362,9 @@ func (h *MarketGrpcHandler) GetKlines(
 	ctx context.Context,
 	req *marketpb.GetKlinesRequest,
 ) (*marketpb.GetKlinesResponse, error) {
-	if err := req.Validate(); err != nil {
-		return nil, errors.NewErrWrap(err, errors.ErrorTypeValidation).GrpcError()
-	}
+	// if err := req.Validate(); err != nil {
+	// 	return nil, errors.NewErrWrap(err, errors.ErrorTypeValidation).GrpcError()
+	// }
 
 	if req.GetLimit() == 0 {
 		defaultVal := int32(500)

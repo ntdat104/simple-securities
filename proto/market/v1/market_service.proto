@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package market.v1;
 
-import "validate/validate.proto";
+// import "validate/validate.proto";
 import "google/api/annotations.proto";
 
 option go_package = "/gen/market/v1";
@@ -249,12 +249,19 @@ message AggTrade {
 }
 
 // Klines
+// message GetKlinesRequest {
+//   string symbol = 1 [(validate.rules).string = {min_len: 1}];
+//   string interval = 2 [(validate.rules).string = {pattern: "^(1m|3m|5m|15m|30m|1h|2h|4h|8h|1d)$"}];
+//   optional int32 limit = 3 [(validate.rules).int32 = {gte: 0, lte: 1500}];
+//   optional uint64 start_time = 4 [(validate.rules).uint64 = {gte: 0}];
+//   optional uint64 end_time = 5 [(validate.rules).uint64 = {gte: 0}];
+// }
 message GetKlinesRequest {
-  string symbol = 1 [(validate.rules).string = {min_len: 1}];
-  string interval = 2 [(validate.rules).string = {pattern: "^(1m|3m|5m|15m|30m|1h|2h|4h|8h|1d)$"}];
-  optional int32 limit = 3 [(validate.rules).int32 = {gte: 0, lte: 1500}];
-  optional uint64 start_time = 4 [(validate.rules).uint64 = {gte: 0}];
-  optional uint64 end_time = 5 [(validate.rules).uint64 = {gte: 0}];
+  string symbol = 1;
+  string interval = 2;
+  optional int32 limit = 3;
+  optional uint64 start_time = 4;
+  optional uint64 end_time = 5;
 }
 message GetKlinesResponse {
   repeated Kline klines = 1;
