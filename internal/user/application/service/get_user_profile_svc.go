@@ -36,7 +36,17 @@ func (s *getUserProfileSvc) Execute(ctx context.Context, accessToken string) (*d
 		return nil, errors.New(errors.ErrorTypeUnauthorized, "Token claims missing user id.")
 	}
 
-	userExist, err := s.userRepo.FindById(ctx, userId)
+	email := claims.Email
+	if email == "" {
+		return nil, errors.New(errors.ErrorTypeUnauthorized, "Token claims missing email.")
+	}
+
+	userUuid := claims.UserUUID
+	if userUuid == "" {
+		return nil, errors.New(errors.ErrorTypeUnauthorized, "Token claims missing user uuid.")
+	}
+
+	userExist, err := s.userRepo.FindByIdAndEmailAndUuid(ctx, userId, email, userUuid)
 	if err != nil {
 		return nil, errors.Newf(errors.ErrorTypeSystem, "Failed to get user by ID: %v", err)
 	}

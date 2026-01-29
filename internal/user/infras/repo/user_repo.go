@@ -28,6 +28,11 @@ func NewUserRepo(db *sqlx.DB) repo.IUserRepo {
 	}
 }
 
+func (r *UserRepo) FindByIdAndEmailAndUuid(ctx context.Context, id uint64, email string, uuid string) (*model.User, error) {
+	query := fmt.Sprintf("SELECT %s FROM %s WHERE id = $1 AND email = $2 AND uuid = $3 LIMIT 1", r.queryFields, r.tableName)
+	return r.FindOne(ctx, query, id, email, uuid)
+}
+
 func (r *UserRepo) FindById(ctx context.Context, id uint64) (*model.User, error) {
 	query := fmt.Sprintf("SELECT %s FROM %s WHERE id = $1 LIMIT 1", r.queryFields, r.tableName)
 	return r.FindOne(ctx, query, id)
