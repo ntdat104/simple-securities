@@ -2,9 +2,13 @@ package service
 
 import (
 	"context"
+
+	noti "simple-securities/gen/notification/v1"
+
 	"simple-securities/config"
 	"simple-securities/internal/user/application/dto"
 	"simple-securities/internal/user/application/mapper"
+	"simple-securities/internal/user/client/grpc"
 	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
 	"simple-securities/pkg/errors"
@@ -16,12 +20,14 @@ type GetUserProfileSvc interface {
 }
 
 type getUserProfileSvc struct {
-	userRepo repo.IUserRepo
+	notiClient *grpc.NotificationGrpcClient
+	userRepo   repo.IUserRepo
 }
 
-func NewGetUserProfileSvc(userRepo repo.IUserRepo) GetUserProfileSvc {
+func NewGetUserProfileSvc(notiClient *grpc.NotificationGrpcClient, userRepo repo.IUserRepo) GetUserProfileSvc {
 	return &getUserProfileSvc{
-		userRepo: userRepo,
+		notiClient: notiClient,
+		userRepo:   userRepo,
 	}
 }
 
@@ -53,6 +59,12 @@ func (s *getUserProfileSvc) Execute(ctx context.Context, accessToken string) (*d
 	if userExist == nil {
 		return nil, model.ErrUserNotFound
 	}
+
+	s.notiClient.Send(ctx, &noti.SendRequest{
+		UserId: userId,
+		Title:  "Get User Profile Notification",
+		Body:   "You have successfully get user profile.",
+	})
 
 	return mapper.ToUserDto(userExist), nil
 }

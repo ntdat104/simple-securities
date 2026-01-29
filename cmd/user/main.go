@@ -8,6 +8,7 @@ import (
 	"simple-securities/config"
 	user "simple-securities/gen/user/v1"
 	"simple-securities/internal/user/application/service"
+	grpcClient "simple-securities/internal/user/client/grpc"
 	grpcHandler "simple-securities/internal/user/handler/grpc"
 	"simple-securities/internal/user/infras/repo"
 	"simple-securities/pkg/conv"
@@ -56,11 +57,16 @@ func main() {
 		"migrations/sqlite/000002_init_userdb.up.sql",
 	})
 
+	notiClient, err := grpcClient.NewNotificationGrpcClient("localhost:50052")
+	if err != nil {
+		log.Fatalf("failed to create notification grpc client: %v", err)
+	}
+
 	userRepo := repo.NewUserRepo(db.DB)
 	registerSvc := service.NewRegisterSvc(userRepo)
-	loginSvc := service.NewLoginSvc(userRepo)
+	loginSvc := service.NewLoginSvc(notiClient, userRepo)
 	refreshTokenSvc := service.NewRefreshTokenSvc(userRepo)
-	getUserProfileSvc := service.NewGetUserProfileSvc(userRepo)
+	getUserProfileSvc := service.NewGetUserProfileSvc(notiClient, userRepo)
 	userHandler := grpcHandler.NewUserGrpcHandler(
 		grpcHandler.UserGrpcSvc{
 			LoginSvc:          loginSvc,

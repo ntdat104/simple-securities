@@ -3,6 +3,11 @@ app:
   name: notification-service
   debug: true
   version: v1.0.0
+jwt:
+  token_type: Bearer
+  secret_key: RTRALU4MXVn6QJrSHAPyYdpkRxyyxP9g1UALxsnIJiiLb1pfY34oOk1tOjiwwFN8
+  access_token_expiry: 3600
+  refresh_token_expiry: 86400
 grpc_server:
   port: 50052
   max_connection_idle: 100

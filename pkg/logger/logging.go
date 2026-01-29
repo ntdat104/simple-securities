@@ -39,12 +39,13 @@ func LoggingInterceptor(
 	claims := extractClaims(authHeader)
 
 	ctx = context.WithValue(ctx, "request-id", requestID)
-	ctx = context.WithValue(ctx, "user_id", claims.UserID)
-	ctx = context.WithValue(ctx, "user_uuid", claims.UserUUID)
-	ctx = context.WithValue(ctx, "user_email", claims.Email)
-	ctx = context.WithValue(ctx, "api_key", apiKey)
-	ctx = context.WithValue(ctx, "api_secret", apiSecret)
+	ctx = context.WithValue(ctx, "user-id", claims.UserID)
+	ctx = context.WithValue(ctx, "user-uuid", claims.UserUUID)
+	ctx = context.WithValue(ctx, "user-email", claims.Email)
+	ctx = context.WithValue(ctx, "api-key", apiKey)
+	ctx = context.WithValue(ctx, "api-secret", apiSecret)
 	ctx = context.WithValue(ctx, "signature", signature)
+	ctx = context.WithValue(ctx, "authorization", authHeader)
 
 	start := datetime.Now()
 	resp, err = handler(ctx, req)

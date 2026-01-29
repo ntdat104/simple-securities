@@ -3,12 +3,18 @@ package service
 import (
 	"context"
 	"log"
+
+	noti "simple-securities/gen/notification/v1"
+
 	"simple-securities/config"
+
 	"simple-securities/internal/user/application/dto"
 	"simple-securities/internal/user/application/mapper"
 	"simple-securities/internal/user/application/util"
+	"simple-securities/internal/user/client/grpc"
 	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
+
 	"simple-securities/pkg/bcrypt"
 	"simple-securities/pkg/datetime"
 	"simple-securities/pkg/errors"
@@ -19,12 +25,14 @@ type LoginSvc interface {
 }
 
 type loginSvc struct {
-	userRepo repo.IUserRepo
+	notiClient *grpc.NotificationGrpcClient
+	userRepo   repo.IUserRepo
 }
 
-func NewLoginSvc(userRepo repo.IUserRepo) LoginSvc {
+func NewLoginSvc(notiClient *grpc.NotificationGrpcClient, userRepo repo.IUserRepo) LoginSvc {
 	return &loginSvc{
-		userRepo: userRepo,
+		notiClient: notiClient,
+		userRepo:   userRepo,
 	}
 }
 
@@ -78,6 +86,12 @@ func (s *loginSvc) Execute(ctx context.Context, req *dto.LoginReq) (*dto.LoginRe
 	}
 
 	log.Printf("user %+v", userSaved)
+
+	s.notiClient.Send(ctx, &noti.SendRequest{
+		UserId: userSaved.ID,
+		Title:  "Login Notification",
+		Body:   "You have successfully logged in.",
+	})
 
 	return &dto.LoginResp{
 		User:         mapper.ToUserDto(userSaved),
