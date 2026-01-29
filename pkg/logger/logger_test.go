@@ -10,6 +10,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	"simple-securities/common/constants"
 	"simple-securities/config"
 )
 
@@ -152,17 +153,17 @@ func TestLogContext(t *testing.T) {
 	fieldMap := make(map[string]string)
 	for _, field := range fields {
 		switch field.Key {
-		case "request_id", "user_id", "trace_id", "span_id", "operation", "component":
+		case constants.RequestId, constants.UserId, constants.TraceId, constants.SpanId, constants.Operation, constants.Component:
 			fieldMap[field.Key] = field.String
 		}
 	}
 
-	assert.Equal(t, "req-123", fieldMap["request_id"])
-	assert.Equal(t, "user-456", fieldMap["user_id"])
-	assert.Equal(t, "trace-789", fieldMap["trace_id"])
-	assert.Equal(t, "span-012", fieldMap["span_id"])
-	assert.Equal(t, "test-op", fieldMap["operation"])
-	assert.Equal(t, "test-comp", fieldMap["component"])
+	assert.Equal(t, "req-123", fieldMap[constants.RequestId])
+	assert.Equal(t, "user-456", fieldMap[constants.UserId])
+	assert.Equal(t, "trace-789", fieldMap[constants.TraceId])
+	assert.Equal(t, "span-012", fieldMap[constants.SpanId])
+	assert.Equal(t, "test-op", fieldMap[constants.Operation])
+	assert.Equal(t, "test-comp", fieldMap[constants.Component])
 }
 
 func TestLogContextMethods(t *testing.T) {
@@ -202,8 +203,8 @@ func TestLogContextMethods(t *testing.T) {
 		WithRequestID("req-test").
 		WithComponent("test-component")
 
-	logger.DebugContext(ctx, "debug message", zap.String("key", "value"))
-	logger.InfoContext(ctx, "info message", zap.Int("code", 200))
+	logger.DebugContext(ctx, "debug message", zap.String(constants.Key, "value"))
+	logger.InfoContext(ctx, "info message", zap.Int(constants.Code, 200))
 	logger.WarnContext(ctx, "warn message")
 	logger.ErrorContext(ctx, "error message", zap.Error(assert.AnError))
 

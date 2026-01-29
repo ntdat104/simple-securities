@@ -2,20 +2,10 @@ package logger
 
 import (
 	"context"
+	"simple-securities/common/constants"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-)
-
-const (
-	KeyRequestID     = "request-id"
-	KeyUserID        = "user-id"
-	KeyUserUUID      = "user-uuid"
-	KeyUserEmail     = "user-email"
-	KeyApiKey        = "api-key"
-	KeyApiSecret     = "api-secret"
-	KeySignature     = "signature"
-	KeyAuthorization = "authorization"
 )
 
 func ForwardMetadataInterceptor(
@@ -30,14 +20,14 @@ func ForwardMetadataInterceptor(
 
 	pairs := []string{}
 	keysToForward := []string{
-		KeyRequestID,
-		KeyUserID,
-		KeyUserUUID,
-		KeyUserEmail,
-		KeyApiKey,
-		KeyApiSecret,
-		KeySignature,
-		KeyAuthorization,
+		constants.RequestId,
+		constants.UserId,
+		constants.UserUuid,
+		constants.UserEmail,
+		constants.ApiKey,
+		constants.ApiSecret,
+		constants.Signature,
+		constants.Authorization,
 	}
 
 	for _, key := range keysToForward {

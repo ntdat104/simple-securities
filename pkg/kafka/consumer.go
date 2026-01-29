@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"simple-securities/common/constants"
 
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
@@ -35,8 +36,8 @@ func NewConsumer(brokers []string, topic, groupID string, handler EventHandler, 
 
 func (c *Consumer) Start(ctx context.Context) error {
 	c.logger.Info("🧩 connect kafka consumer",
-		zap.String("topic", c.reader.Config().Topic),
-		zap.String("group_id", c.reader.Config().GroupID),
+		zap.String(constants.Topic, c.reader.Config().Topic),
+		zap.String(constants.GroupId, c.reader.Config().GroupID),
 	)
 
 	for {
@@ -63,12 +64,12 @@ func (c *Consumer) Start(ctx context.Context) error {
 			}
 
 			c.logger.Debug("🔔 Kafka recieves",
-				zap.Any("header", headers),
-				zap.String("topic", m.Topic),
-				zap.Int("partition", m.Partition),
-				zap.Int64("offset", m.Offset),
-				zap.ByteString("key", m.Key),
-				zap.Any("event", event),
+				zap.Any(constants.Header, headers),
+				zap.String(constants.Topic, m.Topic),
+				zap.Int(constants.Partition, m.Partition),
+				zap.Int64(constants.Offset, m.Offset),
+				zap.ByteString(constants.Key, m.Key),
+				zap.Any(constants.Event, event),
 			)
 
 			if err := c.handler(ctx, m.Key, m.Value); err != nil {

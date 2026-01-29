@@ -37,18 +37,20 @@ func GetLastConfigChangeTime() time.Time {
 }
 
 type Config struct {
-	Env           Env               `yaml:"env" mapstructure:"env"`
-	App           *AppConfig        `yaml:"app" mapstructure:"app"`
-	Jwt           *JwtConfig        `yaml:"jwt" mapstructure:"jwt"`
-	GrpcServer    *GrpcServerConfig `yaml:"grpc_server" mapstructure:"grpc_server"`
-	HTTPServer    *HttpServerConfig `yaml:"http_server" mapstructure:"http_server"`
-	MetricsServer *MetricsConfig    `yaml:"metrics_server" mapstructure:"metrics_server"`
-	Log           *LogConfig        `yaml:"log" mapstructure:"log"`
-	MySQL         *MySQLConfig      `yaml:"mysql" mapstructure:"mysql"`
-	Redis         *RedisConfig      `yaml:"redis" mapstructure:"redis"`
-	Postgre       *PostgreSQLConfig `yaml:"postgres" mapstructure:"postgres"`
-	MongoDB       *MongoDBConfig    `yaml:"mongodb" mapstructure:"mongodb"`
-	MigrationDir  string            `yaml:"migration_dir" mapstructure:"migration_dir"`
+	Env             Env                    `yaml:"env" mapstructure:"env"`
+	App             *AppConfig             `yaml:"app" mapstructure:"app"`
+	Jwt             *JwtConfig             `yaml:"jwt" mapstructure:"jwt"`
+	GrpcServer      *GrpcServerConfig      `yaml:"grpc_server" mapstructure:"grpc_server"`
+	HTTPServer      *HttpServerConfig      `yaml:"http_server" mapstructure:"http_server"`
+	MetricsServer   *MetricsConfig         `yaml:"metrics_server" mapstructure:"metrics_server"`
+	InternalService *InternalServiceConfig `yaml:"internal_service" mapstructure:"internal_service"`
+	ExternalService *ExternalServiceConfig `yaml:"external_service" mapstructure:"external_service"`
+	Log             *LogConfig             `yaml:"log" mapstructure:"log"`
+	MySQL           *MySQLConfig           `yaml:"mysql" mapstructure:"mysql"`
+	Redis           *RedisConfig           `yaml:"redis" mapstructure:"redis"`
+	Postgre         *PostgreSQLConfig      `yaml:"postgres" mapstructure:"postgres"`
+	MongoDB         *MongoDBConfig         `yaml:"mongodb" mapstructure:"mongodb"`
+	MigrationDir    string                 `yaml:"migration_dir" mapstructure:"migration_dir"`
 }
 
 type AppConfig struct {

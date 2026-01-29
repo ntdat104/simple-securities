@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"simple-securities/common/constants"
 	"simple-securities/config"
 	crypto "simple-securities/gen/crypto/v1"
 	"simple-securities/internal/crypto/application/service"
@@ -28,10 +29,10 @@ func main() {
 
 	logger.Init()
 	logger.Logger.Info("🚀 Application starting",
-		zap.String("service", config.GlobalConfig.App.Name),
-		zap.String("version", config.GlobalConfig.App.Version),
-		zap.String("port", conv.ConvertUInt32ToString(config.GlobalConfig.GrpcServer.Port)),
-		zap.String("env", string(config.GlobalConfig.Env)))
+		zap.String(constants.Service, config.GlobalConfig.App.Name),
+		zap.String(constants.Version, config.GlobalConfig.App.Version),
+		zap.String(constants.Port, conv.ConvertUInt32ToString(config.GlobalConfig.GrpcServer.Port)),
+		zap.String(constants.Env, string(config.GlobalConfig.Env)))
 
 	db, err := sqlite.NewSQLiteClient()
 	if err != nil {
@@ -55,8 +56,8 @@ func main() {
 	// Register consumers
 	if err := mgr.AddConsumer("metrics", "group-metrics", func(ctx context.Context, key, value []byte) error {
 		logger.Logger.Warn("🧹 consumer metrics",
-			zap.String("key", string(key)),
-			// zap.String("value", string(value)),
+			zap.String(constants.Key, string(key)),
+			// zap.String(constants.Value, string(value)),
 		)
 		return nil
 	}); err != nil {
@@ -65,8 +66,8 @@ func main() {
 
 	if err := mgr.AddConsumer("audit", "group-audit", func(ctx context.Context, key, value []byte) error {
 		logger.Logger.Warn("🧹 consumer audit",
-			zap.String("key", string(key)),
-			// zap.String("value", string(value)),
+			zap.String(constants.Key, string(key)),
+			// zap.String(constants.Value, string(value)),
 		)
 		return nil
 	}); err != nil {

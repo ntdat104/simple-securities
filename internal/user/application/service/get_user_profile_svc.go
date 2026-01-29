@@ -3,12 +3,12 @@ package service
 import (
 	"context"
 
+	"simple-securities/common/client/grpc"
 	noti "simple-securities/gen/notification/v1"
 
 	"simple-securities/config"
 	"simple-securities/internal/user/application/dto"
 	"simple-securities/internal/user/application/mapper"
-	"simple-securities/internal/user/client/grpc"
 	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
 	"simple-securities/pkg/errors"

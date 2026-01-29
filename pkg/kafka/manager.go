@@ -3,6 +3,7 @@ package kafka
 import (
 	"context"
 	"fmt"
+	"simple-securities/common/constants"
 	"sync"
 
 	"go.uber.org/zap"
@@ -156,7 +157,7 @@ func (m *Manager) StartAllConsumers(ctx context.Context) {
 	for topic, consumer := range m.consumers {
 		go func(t string, c *Consumer) {
 			if err := c.Start(ctx); err != nil {
-				m.logger.Error("consumer stopped with error", zap.String("topic", t), zap.Error(err))
+				m.logger.Error("consumer stopped with error", zap.String(constants.Topic, t), zap.Error(err))
 			}
 		}(topic, consumer)
 	}
@@ -169,7 +170,7 @@ func (m *Manager) Close() error {
 	// Close all consumers
 	for topic, consumer := range m.consumers {
 		if err := consumer.Close(); err != nil {
-			m.logger.Error("failed to close consumer", zap.String("topic", topic), zap.Error(err))
+			m.logger.Error("failed to close consumer", zap.String(constants.Topic, topic), zap.Error(err))
 		}
 	}
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"simple-securities/common/client/grpc"
 	noti "simple-securities/gen/notification/v1"
 
 	"simple-securities/config"
@@ -11,7 +12,6 @@ import (
 	"simple-securities/internal/user/application/dto"
 	"simple-securities/internal/user/application/mapper"
 	"simple-securities/internal/user/application/util"
-	"simple-securities/internal/user/client/grpc"
 	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
 

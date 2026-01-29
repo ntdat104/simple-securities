@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"simple-securities/common/constants"
 	"simple-securities/pkg/datetime"
 
 	"github.com/segmentio/kafka-go"
@@ -78,11 +79,11 @@ func (p *Producer) SendMessage(
 	}
 
 	p.logger.Info("🔔 Kafka sends",
-		zap.String("topic", topic),
-		zap.String("key", key),
-		zap.Int("partition", msg.Partition),
-		zap.Any("header", headers),
-		zap.Any("event", event),
+		zap.String(constants.Topic, topic),
+		zap.String(constants.Key, key),
+		zap.Int(constants.Partition, msg.Partition),
+		zap.Any(constants.Header, headers),
+		zap.Any(constants.Event, event),
 	)
 
 	return nil

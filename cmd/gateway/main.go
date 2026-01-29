@@ -23,7 +23,7 @@ const (
 
 func main() {
 	// 1. Kết nối tới gRPC Server
-	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("❌ Lỗi: Không thể kết nối tới server %s: %v", address, err)
 	}

@@ -24,6 +24,12 @@ http_server:
   max_page_size: 100
   read_timeout: 60s
   write_timeout: 60s
+internal_service:
+  notification_service: localhost:50052
+  crypto_service: localhost:50053
+  market_service: localhost:50055
+external_service:
+  ip_info_service: https://ipinfo.io
 metrics_server:
   addr: :9090
   enabled: true

@@ -3,6 +3,7 @@ package logger
 
 import (
 	"errors"
+	"simple-securities/common/constants"
 	"time"
 
 	"go.uber.org/zap"
@@ -24,24 +25,24 @@ func LoggerUsageExamples() {
 
 	// Example 1: Basic structured logging with explicit fields
 	Logger.Info("User logged in",
-		zap.String("user_id", "user123"),
-		zap.String("ip_address", "192.168.1.1"),
-		zap.String("user_agent", "Mozilla/5.0"),
+		zap.String(constants.UserId, "user123"),
+		zap.String(constants.IpAddress, "192.168.1.1"),
+		zap.String(constants.UserAgent, "Mozilla/5.0"),
 	)
 
 	// Example 2: Error logging with structured context
 	Logger.Error("Database connection failed",
-		zap.String("db_host", "db.example.com"),
-		zap.Int("port", 5432),
-		zap.Duration("timeout", 30*time.Second),
+		zap.String(constants.DbHost, "db.example.com"),
+		zap.Int(constants.Port, 5432),
+		zap.Duration(constants.Timeout, 30*time.Second),
 		zap.Error(errDatabaseConnection),
 	)
 
 	// Example 3: Warn level with context fields
 	Logger.Warn("Rate limit exceeded",
-		zap.String("client_id", "client456"),
-		zap.Int("limit", 100),
-		zap.Int("current_rate", 120),
+		zap.String(constants.ClientId, "client456"),
+		zap.Int(constants.Limit, 100),
+		zap.Int(constants.CurrentRate, 120),
 	)
 
 	// ===== SUGARED LOGGER =====

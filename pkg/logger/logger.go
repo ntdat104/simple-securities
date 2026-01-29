@@ -13,6 +13,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 
+	"simple-securities/common/constants"
 	"simple-securities/config"
 	"simple-securities/pkg/datetime"
 )
@@ -81,27 +82,27 @@ func (c *LogContext) ToFields() []zap.Field {
 	fields := make([]zap.Field, 0)
 
 	if c.RequestID != "" {
-		fields = append(fields, zap.String("request_id", c.RequestID))
+		fields = append(fields, zap.String(constants.RequestId, c.RequestID))
 	}
 
 	if c.UserID != "" {
-		fields = append(fields, zap.String("user_id", c.UserID))
+		fields = append(fields, zap.String(constants.UserId, c.UserID))
 	}
 
 	if c.TraceID != "" {
-		fields = append(fields, zap.String("trace_id", c.TraceID))
+		fields = append(fields, zap.String(constants.TraceId, c.TraceID))
 	}
 
 	if c.SpanID != "" {
-		fields = append(fields, zap.String("span_id", c.SpanID))
+		fields = append(fields, zap.String(constants.SpanId, c.SpanID))
 	}
 
 	if c.Operation != "" {
-		fields = append(fields, zap.String("operation", c.Operation))
+		fields = append(fields, zap.String(constants.Operation, c.Operation))
 	}
 
 	if c.Component != "" {
-		fields = append(fields, zap.String("component", c.Component))
+		fields = append(fields, zap.String(constants.Component, c.Component))
 	}
 
 	return fields

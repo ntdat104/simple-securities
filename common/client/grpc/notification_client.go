@@ -17,7 +17,7 @@ type NotificationGrpcClient struct {
 }
 
 func NewNotificationGrpcClient(target string) (*NotificationGrpcClient, error) {
-	conn, err := grpc.Dial(
+	conn, err := grpc.NewClient(
 		target,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(logger.ForwardMetadataInterceptor),

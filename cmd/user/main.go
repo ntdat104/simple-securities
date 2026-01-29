@@ -5,10 +5,11 @@ import (
 	"log"
 	"time"
 
+	grpcClient "simple-securities/common/client/grpc"
+	"simple-securities/common/constants"
 	"simple-securities/config"
 	user "simple-securities/gen/user/v1"
 	"simple-securities/internal/user/application/service"
-	grpcClient "simple-securities/internal/user/client/grpc"
 	grpcHandler "simple-securities/internal/user/handler/grpc"
 	"simple-securities/internal/user/infras/repo"
 	"simple-securities/pkg/conv"
@@ -29,10 +30,10 @@ func main() {
 
 	logger.Init()
 	logger.Logger.Info("🚀 application starting",
-		zap.String("service", config.GlobalConfig.App.Name),
-		zap.String("version", config.GlobalConfig.App.Version),
-		zap.String("port", conv.ConvertUInt32ToString(config.GlobalConfig.GrpcServer.Port)),
-		zap.String("env", string(config.GlobalConfig.Env)))
+		zap.String(constants.Service, config.GlobalConfig.App.Name),
+		zap.String(constants.Version, config.GlobalConfig.App.Version),
+		zap.String(constants.Port, conv.ConvertUInt32ToString(config.GlobalConfig.GrpcServer.Port)),
+		zap.String(constants.Env, string(config.GlobalConfig.Env)))
 
 	// db, err := mysql.NewMySQLClient(mysql.MySQLConfig{
 	// 	User:         config.GlobalConfig.MySQL.User,
@@ -57,10 +58,11 @@ func main() {
 		"migrations/sqlite/000002_init_userdb.up.sql",
 	})
 
-	notiClient, err := grpcClient.NewNotificationGrpcClient("localhost:50052")
+	notiClient, err := grpcClient.NewNotificationGrpcClient(config.GlobalConfig.InternalService.NotificationService)
 	if err != nil {
 		log.Fatalf("failed to create notification grpc client: %v", err)
 	}
+	defer notiClient.Close()
 
 	userRepo := repo.NewUserRepo(db.DB)
 	registerSvc := service.NewRegisterSvc(userRepo)

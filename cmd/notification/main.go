@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"simple-securities/common/constants"
 	"simple-securities/config"
 	noti "simple-securities/gen/notification/v1"
 	"simple-securities/internal/notification/application/service"
@@ -34,10 +35,10 @@ func main() {
 
 	logger.Init()
 	logger.Logger.Info("🚀 application starting",
-		zap.String("service", config.GlobalConfig.App.Name),
-		zap.String("version", config.GlobalConfig.App.Version),
-		zap.String("port", conv.ConvertUInt32ToString(config.GlobalConfig.GrpcServer.Port)),
-		zap.String("env", string(config.GlobalConfig.Env)))
+		zap.String(constants.Service, config.GlobalConfig.App.Name),
+		zap.String(constants.Version, config.GlobalConfig.App.Version),
+		zap.String(constants.Port, conv.ConvertUInt32ToString(config.GlobalConfig.GrpcServer.Port)),
+		zap.String(constants.Env, string(config.GlobalConfig.Env)))
 
 	// Kafka
 	kafkaCfg := kafka.Config{
@@ -85,9 +86,9 @@ func main() {
 				Key("metrics-key").
 				Partition(1).
 				Headers(map[string]string{
-					"request_id": event.Meta.RequestID,
-					"timestamp":  conv.ConvertInt64ToString(event.Meta.Timestamp),
-					"datetime":   event.Meta.Datetime,
+					constants.RequestId: event.Meta.RequestID,
+					constants.Timestamp: conv.ConvertInt64ToString(event.Meta.Timestamp),
+					constants.Datetime:  event.Meta.Datetime,
 				}).
 				Event(event).
 				Do(context.Background()); err != nil {
@@ -99,9 +100,9 @@ func main() {
 				Topic("audit").
 				Key("audit-key").
 				Headers(map[string]string{
-					"request_id": event.Meta.RequestID,
-					"timestamp":  conv.ConvertInt64ToString(event.Meta.Timestamp),
-					"datetime":   event.Meta.Datetime,
+					constants.RequestId: event.Meta.RequestID,
+					constants.Timestamp: conv.ConvertInt64ToString(event.Meta.Timestamp),
+					constants.Datetime:  event.Meta.Datetime,
 				}).
 				Event(event).
 				Do(context.Background()); err != nil {

@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"simple-securities/common/constants"
 	"simple-securities/config"
 	marketpb "simple-securities/gen/market/v1"
 	"simple-securities/internal/market/application/service"
@@ -24,10 +25,10 @@ func main() {
 
 	logger.Init()
 	logger.Logger.Info("🚀 Application starting",
-		zap.String("service", config.GlobalConfig.App.Name),
-		zap.String("version", config.GlobalConfig.App.Version),
-		zap.String("port", conv.ConvertUInt32ToString(config.GlobalConfig.GrpcServer.Port)),
-		zap.String("env", string(config.GlobalConfig.Env)))
+		zap.String(constants.Service, config.GlobalConfig.App.Name),
+		zap.String(constants.Version, config.GlobalConfig.App.Version),
+		zap.String(constants.Port, conv.ConvertUInt32ToString(config.GlobalConfig.GrpcServer.Port)),
+		zap.String(constants.Env, string(config.GlobalConfig.Env)))
 
 	c := client.NewPublicClient(config.GlobalConfig.App.Name)
 
