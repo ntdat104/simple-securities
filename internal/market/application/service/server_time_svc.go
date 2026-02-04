@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"simple-securities/internal/market/application/dto/response"
 	"simple-securities/pkg/client"
+	"simple-securities/pkg/logger"
 
 	"golang.org/x/sync/singleflight"
 )
@@ -26,6 +27,7 @@ func NewServerTimeSvc(c *client.Client) ServerTimeSvc {
 }
 
 func (s *serverTimeSvc) Execute(ctx context.Context, opts ...client.RequestOption) (res *response.ServerTimeResponse, err error) {
+	logger.Info(ctx, "test logger with log context")
 	val, err, _ := s.sf.Do("serverTime", func() (any, error) {
 		r := &client.Request{
 			Method:   http.MethodGet,

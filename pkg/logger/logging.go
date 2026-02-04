@@ -72,10 +72,10 @@ func LoggingInterceptor(
 
 	if err != nil {
 		fields = append(fields, zap.Error(err), zap.String(constants.Status, constants.Failed))
-		Logger.Error("gRPC request failed", fields...)
+		Logger.Error("❌ gRPC request failed", fields...)
 	} else {
 		fields = append(fields, zap.Any("response", resp), zap.String(constants.Status, constants.Success))
-		Logger.Info("gRPC request success", fields...)
+		Logger.Info("✅ gRPC request success", fields...)
 	}
 
 	return resp, err

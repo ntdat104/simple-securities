@@ -2,6 +2,7 @@
 package logger
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -559,4 +560,120 @@ func getProjectRootPath() string {
 	_, b, _, _ := runtime.Caller(0)
 
 	return filepath.Join(filepath.Dir(b), "./")
+}
+
+// Tạo một instance logger có skip 1 level để bỏ qua hàm helper này
+func loggerWithSkip() *zap.Logger {
+	return Logger.WithOptions(zap.AddCallerSkip(1))
+}
+
+// --- Context-Aware Standard Logger (Sử dụng zap.Field) ---
+
+func Debug(ctx context.Context, msg string, fields ...zap.Field) {
+	allFields := append(extractFields(ctx), fields...)
+	loggerWithSkip().Debug(msg, allFields...)
+}
+
+func Info(ctx context.Context, msg string, fields ...zap.Field) {
+	allFields := append(extractFields(ctx), fields...)
+	loggerWithSkip().Info(msg, allFields...)
+}
+
+func Warn(ctx context.Context, msg string, fields ...zap.Field) {
+	allFields := append(extractFields(ctx), fields...)
+	loggerWithSkip().Warn(msg, allFields...)
+}
+
+func Error(ctx context.Context, msg string, fields ...zap.Field) {
+	allFields := append(extractFields(ctx), fields...)
+	loggerWithSkip().Error(msg, allFields...)
+}
+
+func DPanic(ctx context.Context, msg string, fields ...zap.Field) {
+	allFields := append(extractFields(ctx), fields...)
+	loggerWithSkip().DPanic(msg, allFields...)
+}
+
+func Panic(ctx context.Context, msg string, fields ...zap.Field) {
+	allFields := append(extractFields(ctx), fields...)
+	loggerWithSkip().Panic(msg, allFields...)
+}
+
+func Fatal(ctx context.Context, msg string, fields ...zap.Field) {
+	allFields := append(extractFields(ctx), fields...)
+	loggerWithSkip().Fatal(msg, allFields...)
+}
+
+// --- Context-Aware Sugared Logger (Sử dụng format string) ---
+
+func Debugf(ctx context.Context, template string, args ...interface{}) {
+	SugaredLogger.WithOptions(zap.AddCallerSkip(1)).With(extractArgs(ctx)...).Debugf(template, args...)
+}
+
+func Infof(ctx context.Context, template string, args ...interface{}) {
+	SugaredLogger.WithOptions(zap.AddCallerSkip(1)).With(extractArgs(ctx)...).Infof(template, args...)
+}
+
+func Warnf(ctx context.Context, template string, args ...interface{}) {
+	SugaredLogger.WithOptions(zap.AddCallerSkip(1)).With(extractArgs(ctx)...).Warnf(template, args...)
+}
+
+func Errorf(ctx context.Context, template string, args ...interface{}) {
+	SugaredLogger.WithOptions(zap.AddCallerSkip(1)).With(extractArgs(ctx)...).Errorf(template, args...)
+}
+
+func Fatalf(ctx context.Context, template string, args ...interface{}) {
+	SugaredLogger.WithOptions(zap.AddCallerSkip(1)).With(extractArgs(ctx)...).Fatalf(template, args...)
+}
+
+// --- Helper functions nội bộ ---
+
+// extractFields dùng cho Zap Logger (structured)
+func extractFields(ctx context.Context) []zap.Field {
+	fields := make([]zap.Field, 0)
+	if ctx == nil {
+		return fields
+	}
+
+	if rid, ok := ctx.Value(constants.RequestId).(string); ok {
+		fields = append(fields, zap.String(constants.RequestId, rid))
+	}
+
+	if uid, ok := ctx.Value(constants.UserId).(uint64); ok {
+		fields = append(fields, zap.Uint64(constants.UserId, uid))
+	}
+
+	if uuid, ok := ctx.Value(constants.UserUuid).(string); ok {
+		fields = append(fields, zap.String(constants.UserUuid, uuid))
+	}
+
+	if email, ok := ctx.Value(constants.UserEmail).(string); ok {
+		fields = append(fields, zap.String(constants.UserEmail, email))
+	}
+	return fields
+}
+
+// extractArgs dùng cho Sugared Logger (key-value pairs)
+func extractArgs(ctx context.Context) []interface{} {
+	args := make([]interface{}, 0)
+	if ctx == nil {
+		return args
+	}
+
+	if rid, ok := ctx.Value(constants.RequestId).(string); ok {
+		args = append(args, constants.RequestId, rid)
+	}
+
+	if uid, ok := ctx.Value(constants.UserId).(uint64); ok {
+		args = append(args, constants.UserId, uid)
+	}
+
+	if uuid, ok := ctx.Value(constants.UserUuid).(string); ok {
+		args = append(args, constants.UserUuid, uuid)
+	}
+
+	if email, ok := ctx.Value(constants.UserEmail).(string); ok {
+		args = append(args, constants.UserEmail, email)
+	}
+	return args
 }
