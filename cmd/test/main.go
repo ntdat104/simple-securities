@@ -44,7 +44,7 @@ import (
 )
 
 func main() {
-	runStrings()
+	getVariables()
 }
 
 // fmt_package
@@ -158,8 +158,20 @@ func runStrings() {
 	s := " Hello, GoLang! "
 
 	fmt.Println("==== 1. Comparison ====")
-	fmt.Println(strings.Compare("a", "b"))     // -1
-	fmt.Println(strings.EqualFold("Go", "go")) // true
+	fmt.Println(strings.Compare("a", "b"))           // -1
+	fmt.Println(strings.Compare("apple", "Apple"))   // Output: 1 ('a' has a higher Unicode value than 'A')
+	fmt.Println(strings.Compare("Apple", "Apricot")) // Output: -1 ('p' comes before 'r')
+	fmt.Println(strings.Compare("hello", "hello"))   // Output: 0
+
+	fmt.Println(strings.EqualFold("Go", "go"))                   // Case-insensitive comparison: returns true
+	fmt.Println(strings.EqualFold("AnkitaSaini", "ankitasaINI")) // Case-insensitive comparison with different cases: returns true
+	fmt.Println("Go" == "go")                                    // Output: false. Standard comparison with == would return false for the above examples
+	/*
+	 * Efficiency: Using strings.EqualFold(s1, s2) is more efficient than
+	 * strings.ToLower(s1) == strings.ToLower(s2) because it avoids unnecessary
+	 * memory allocation for intermediate lowercase strings and can stop comparing as
+	 * soon as a non-matching character is found.
+	 */
 
 	fmt.Println("\n==== 2. Contains & Searching ====")
 	fmt.Println(strings.Contains(s, "Go"))                 // true
@@ -248,16 +260,16 @@ func runStrings() {
 // values
 func getValues() {
 	// Strings, which can be added together with `+`.
-	fmt.Println("go" + "lang")
+	fmt.Println("go" + "lang") // golang
 
 	// Integers and floats.
-	fmt.Println("1+1 =", 1+1)
-	fmt.Println("7.0/3.0 =", 7.0/3.0)
+	fmt.Println("1+1 =", 1+1)         // 1+1 = 2
+	fmt.Println("7.0/3.0 =", 7.0/3.0) // 7.0/3.0 = 2.33333333333
 
 	// Booleans, with boolean operators as you'd expect.
-	fmt.Println(true && false)
-	fmt.Println(true || false)
-	fmt.Println(!true)
+	fmt.Println(true && false) // false
+	fmt.Println(true || false) // true
+	fmt.Println(!true)         // false
 }
 
 // variables
@@ -354,39 +366,26 @@ func getFor() {
 
 // if-else
 func getIfElse() {
-	// The most basic type, with a single condition.
-	i := 1
-	for i <= 3 {
-		fmt.Println(i)
-		i = i + 1
+	if 7%2 == 0 {
+		fmt.Println("7 is even")
+	} else {
+		fmt.Println("7 is odd")
 	}
 
-	// A classic initial/condition/after `for` loop.
-	for j := 0; j < 3; j++ {
-		fmt.Println(j)
+	if 8%4 == 0 {
+		fmt.Println("8 is divisible by 4")
 	}
 
-	// Another way of accomplishing the basic "do this
-	// N times" iteration is `range` over an integer.
-	for i := range 3 {
-		fmt.Println("range", i)
+	if 8%2 == 0 || 7%2 == 0 {
+		fmt.Println("either 8 or 7 are even")
 	}
 
-	// `for` without a condition will loop repeatedly
-	// until you `break` out of the loop or `return` from
-	// the enclosing function.
-	for {
-		fmt.Println("loop")
-		break
-	}
-
-	// You can also `continue` to the next iteration of
-	// the loop.
-	for n := range 6 {
-		if n%2 == 0 {
-			continue
-		}
-		fmt.Println(n)
+	if num := 9; num < 0 {
+		fmt.Println(num, "is negative")
+	} else if num < 10 {
+		fmt.Println(num, "has 1 digit")
+	} else {
+		fmt.Println(num, "has multiple digits")
 	}
 }
 
