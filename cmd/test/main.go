@@ -44,7 +44,23 @@ import (
 )
 
 func main() {
+	nums := []int{1, 2, 3, 4}
+	loop := 3
+	log.Printf("%#v", solve(nums, loop))
 	getVariables()
+}
+
+func solve(nums []int, loop int) []int {
+	n := len(nums)
+	final := make([]int, loop*n)
+
+	for i := 0; i < n; i++ {
+		for j := 0; j < loop; j++ {
+			final[i+(j*n)] = nums[i]
+		}
+	}
+
+	return final
 }
 
 // fmt_package
