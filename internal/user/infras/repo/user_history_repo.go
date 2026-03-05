@@ -12,8 +12,8 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type UserRepo struct {
-	*pkgRepo.BaseRepo[model.User]
+type UserHistoryRepo struct {
+	*pkgRepo.BaseRepo[model.UserHistory]
 	db           *sqlx.DB
 	queryFields  string
 	insertFields string
@@ -21,11 +21,11 @@ type UserRepo struct {
 	tableName    string
 }
 
-func NewUserRepo(db *sqlx.DB) repo.IUserRepo {
-	var m model.User
+func NewUserHistoryRepo(db *sqlx.DB) repo.IUserHistoryRepo {
+	var m model.UserHistory
 	meta := model.GetMeta(m)
-	return &UserRepo{
-		BaseRepo:     pkgRepo.NewBaseRepo[model.User](db),
+	return &UserHistoryRepo{
+		BaseRepo:     pkgRepo.NewBaseRepo[model.UserHistory](db),
 		db:           db,
 		tableName:    m.TableName(),
 		queryFields:  meta.QueryFields,
@@ -34,48 +34,48 @@ func NewUserRepo(db *sqlx.DB) repo.IUserRepo {
 	}
 }
 
-func (r *UserRepo) FindAllByPageAndSize(ctx context.Context, page int, size int) ([]*model.User, error) {
+func (r *UserHistoryRepo) FindAllByPageAndSize(ctx context.Context, page int, size int) ([]*model.UserHistory, error) {
 	query := fmt.Sprintf("SELECT %s FROM %s LIMIT ? OFFSET ?", r.queryFields, r.tableName)
 	return r.FindAll(ctx, query, size, page)
 }
 
-func (r *UserRepo) CountTotal(ctx context.Context) (int64, error) {
+func (r *UserHistoryRepo) CountTotal(ctx context.Context) (int64, error) {
 	query := fmt.Sprintf("SELECT COUNT(*) FROM %s", r.tableName)
 	return r.Count(ctx, query)
 }
 
-func (r *UserRepo) FindByIdAndEmailAndUuid(ctx context.Context, id uint64, email string, uuid string) (*model.User, error) {
+func (r *UserHistoryRepo) FindByIdAndEmailAndUuid(ctx context.Context, id uint64, email string, uuid string) (*model.UserHistory, error) {
 	query := fmt.Sprintf("SELECT %s FROM %s WHERE id = $1 AND email = $2 AND uuid = $3 LIMIT 1", r.queryFields, r.tableName)
 	return r.FindOne(ctx, query, id, email, uuid)
 }
 
-func (r *UserRepo) FindById(ctx context.Context, id uint64) (*model.User, error) {
+func (r *UserHistoryRepo) FindById(ctx context.Context, id uint64) (*model.UserHistory, error) {
 	query := fmt.Sprintf("SELECT %s FROM %s WHERE id = $1 LIMIT 1", r.queryFields, r.tableName)
 	return r.FindOne(ctx, query, id)
 }
 
-func (r *UserRepo) FindByUuid(ctx context.Context, uuid string) (*model.User, error) {
+func (r *UserHistoryRepo) FindByUuid(ctx context.Context, uuid string) (*model.UserHistory, error) {
 	query := fmt.Sprintf("SELECT %s FROM %s WHERE uuid = $1 LIMIT 1", r.queryFields, r.tableName)
 	return r.FindOne(ctx, query, uuid)
 }
 
-func (r *UserRepo) FindByUuidIn(ctx context.Context, uuids []string) ([]*model.User, error) {
+func (r *UserHistoryRepo) FindByUuidIn(ctx context.Context, uuids []string) ([]*model.UserHistory, error) {
 	return nil, nil
 }
 
-func (r *UserRepo) FindByEmail(ctx context.Context, email string) (*model.User, error) {
+func (r *UserHistoryRepo) FindByEmail(ctx context.Context, email string) (*model.UserHistory, error) {
 	query := fmt.Sprintf("SELECT %s FROM %s WHERE email = $1 LIMIT 1", r.queryFields, r.tableName)
 	return r.FindOne(ctx, query, email)
 }
 
-func (r *UserRepo) FindByIdIn(ctx context.Context, ids []uint64) ([]*model.User, error) {
+func (r *UserHistoryRepo) FindByIdIn(ctx context.Context, ids []uint64) ([]*model.UserHistory, error) {
 	query := fmt.Sprintf("SELECT %s FROM %s WHERE id IN (?)", r.queryFields, r.tableName)
 	return r.FindMany(ctx, query, ids)
 }
 
-// Save thực hiện INSERT hoặc UPDATE một User.
+// Save thực hiện INSERT hoặc UPDATE một UserHistory.
 // Nếu bạn muốn hỗ trợ Transaction, có thể truyền tx vào, nếu không hãy truyền nil.
-func (r *UserRepo) Save(ctx context.Context, tx *sqlx.Tx, user *model.User) (*model.User, error) {
+func (r *UserHistoryRepo) Save(ctx context.Context, tx *sqlx.Tx, user *model.UserHistory) (*model.UserHistory, error) {
 	var query string
 
 	if user.ID != 0 {
@@ -103,10 +103,10 @@ func (r *UserRepo) Save(ctx context.Context, tx *sqlx.Tx, user *model.User) (*mo
 	return user, nil
 }
 
-// SaveAll thực hiện lưu một danh sách User
-func (r *UserRepo) SaveAll(ctx context.Context, tx *sqlx.Tx, users []*model.User) ([]*model.User, error) {
+// SaveAll thực hiện lưu một danh sách UserHistory
+func (r *UserHistoryRepo) SaveAll(ctx context.Context, tx *sqlx.Tx, users []*model.UserHistory) ([]*model.UserHistory, error) {
 	if len(users) == 0 {
-		return []*model.User{}, nil
+		return []*model.UserHistory{}, nil
 	}
 
 	values := ":" + strings.ReplaceAll(r.insertFields, ", ", ", :")

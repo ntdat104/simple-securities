@@ -3,13 +3,17 @@ package service
 import (
 	"context"
 	"simple-securities/config"
+	"simple-securities/internal/user/application/constant"
 	"simple-securities/internal/user/application/dto"
 	"simple-securities/internal/user/application/mapper"
 	"simple-securities/internal/user/application/util"
 	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
 	"simple-securities/pkg/bcrypt"
+	"simple-securities/pkg/db/txmanager"
 	"simple-securities/pkg/errors"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type RegisterSvc interface {
@@ -17,27 +21,31 @@ type RegisterSvc interface {
 }
 
 type registerSvc struct {
-	userRepo repo.IUserRepo
+	tx              txmanager.TxManager
+	userRepo        repo.IUserRepo
+	userHistoryRepo repo.IUserHistoryRepo
 }
 
-func NewRegisterSvc(userRepo repo.IUserRepo) RegisterSvc {
+func NewRegisterSvc(tx txmanager.TxManager, userRepo repo.IUserRepo, userHistoryRepo repo.IUserHistoryRepo) RegisterSvc {
 	return &registerSvc{
-		userRepo: userRepo,
+		tx:              tx,
+		userRepo:        userRepo,
+		userHistoryRepo: userHistoryRepo,
 	}
 }
 
 func (s *registerSvc) Execute(ctx context.Context, req *dto.RegisterReq) (*dto.RegisterResp, error) {
 	if req.Email == "" {
-		return nil, model.ErrInvalidUserEmail
+		return nil, constant.ErrInvalidUserEmail
 	}
 
 	if req.Password == "" {
-		return nil, model.ErrUserPasswordMissing
+		return nil, constant.ErrUserPasswordMissing
 	}
 
 	userExist, _ := s.userRepo.FindByEmail(ctx, req.Email)
 	if userExist != nil {
-		return nil, model.ErrUserEmailTaken
+		return nil, constant.ErrUserEmailTaken
 	}
 
 	hashedPassword, err := bcrypt.HashPassword(req.Password)
@@ -50,7 +58,7 @@ func (s *registerSvc) Execute(ctx context.Context, req *dto.RegisterReq) (*dto.R
 		return nil, errors.Newf(errors.ErrorTypeValidation, "Fail to create new User: %v", err)
 	}
 
-	userSaved, err := s.userRepo.Save(ctx, newUser)
+	userSaved, err := s.userRepo.Save(ctx, nil, newUser)
 	if err != nil {
 		return nil, errors.Newf(errors.ErrorTypeSystem, "Internal system error during user save: %v", err)
 	}
@@ -72,7 +80,37 @@ func (s *registerSvc) Execute(ctx context.Context, req *dto.RegisterReq) (*dto.R
 	)
 
 	userSaved.RefreshToken = refreshToken
-	_, err = s.userRepo.Save(ctx, userSaved)
+
+	// txmanager.WithTxResult(ctx, s.tx.GetTx(), func(tx *sqlx.Tx) (*model.User, error) {
+	// 	val, err := s.userRepo.Save(ctx, tx, userSaved)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+
+	// 	input, err := model.NewUserHistory(userSaved.Email, string(hashedPassword))
+	// 	_, err = s.userHistoryRepo.Save(ctx, tx, input)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+
+	// 	return val, nil
+	// })
+
+	s.tx.WithTx(ctx, func(tx *sqlx.Tx) error {
+		_, err := s.userRepo.Save(ctx, tx, userSaved)
+		if err != nil {
+			return err
+		}
+
+		newUserHistory, err := model.NewUserHistory(userSaved.Email, string(hashedPassword))
+		_, err = s.userHistoryRepo.Save(ctx, tx, newUserHistory)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return nil, errors.Newf(errors.ErrorTypeBusiness, "Failed to generate access token: %v", err)
 	}

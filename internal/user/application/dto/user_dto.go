@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"simple-securities/internal/user/application/enum"
+	"simple-securities/internal/user/domain/enum"
 	"time"
 )
 

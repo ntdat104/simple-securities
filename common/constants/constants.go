@@ -22,6 +22,7 @@ const (
 	StartTime = "start-time"
 	EndTime   = "end-time"
 	Duration  = "duration"
+	Panic     = "panic"
 	Request   = "request"
 	Status    = "status"
 	Failed    = "failed"
@@ -46,4 +47,13 @@ const (
 	ClientId    = "client-id"
 	Limit       = "limit"
 	CurrentRate = "current-rate"
+
+	Error        = "error"
+	Query        = "query"
+	Arg          = "arg"
+	Count        = "count"
+	RowsAffected = "rows-affected"
+	LastId       = "last-id"
+
+	Mode = "mode"
 )

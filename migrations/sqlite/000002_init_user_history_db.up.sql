@@ -1,6 +1,6 @@
 BEGIN TRANSACTION;
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS user_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     uuid TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE,
@@ -14,16 +14,16 @@ CREATE TABLE IF NOT EXISTS users (
     updated_by INTEGER NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_users_uuid
-    ON users(uuid);
+CREATE INDEX IF NOT EXISTS idx_user_history_uuid
+    ON user_history(uuid);
 
-CREATE INDEX IF NOT EXISTS idx_users_created_at
-    ON users(created_at);
+CREATE INDEX IF NOT EXISTS idx_user_history_created_at
+    ON user_history(created_at);
 
-CREATE INDEX IF NOT EXISTS idx_users_last_login_at
-    ON users(last_login_at);
+CREATE INDEX IF NOT EXISTS idx_user_history_last_login_at
+    ON user_history(last_login_at);
 
-CREATE INDEX IF NOT EXISTS idx_users_status
-    ON users(status);
+CREATE INDEX IF NOT EXISTS idx_user_history_status
+    ON user_history(status);
 
 COMMIT;

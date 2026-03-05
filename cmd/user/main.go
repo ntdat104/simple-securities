@@ -14,6 +14,7 @@ import (
 	"simple-securities/internal/user/infras/repo"
 	"simple-securities/pkg/conv"
 	"simple-securities/pkg/db/sqlite"
+	"simple-securities/pkg/db/txmanager"
 	"simple-securities/pkg/logger"
 	"simple-securities/pkg/server"
 	"simple-securities/pkg/server/grpc"
@@ -56,7 +57,10 @@ func main() {
 	defer db.Close(ctx)
 	db.AutoMigrate([]string{
 		"migrations/sqlite/000002_init_userdb.up.sql",
+		"migrations/sqlite/000002_init_user_history_db.up.sql",
 	})
+
+	tx := txmanager.NewTxManager(db.DB)
 
 	notiClient, err := grpcClient.NewNotificationGrpcClient(config.GlobalConfig.InternalService.NotificationService)
 	if err != nil {
@@ -65,7 +69,8 @@ func main() {
 	defer notiClient.Close()
 
 	userRepo := repo.NewUserRepo(db.DB)
-	registerSvc := service.NewRegisterSvc(userRepo)
+	userHistoryRepo := repo.NewUserHistoryRepo(db.DB)
+	registerSvc := service.NewRegisterSvc(tx, userRepo, userHistoryRepo)
 	loginSvc := service.NewLoginSvc(notiClient, userRepo)
 	refreshTokenSvc := service.NewRefreshTokenSvc(userRepo)
 	getUserProfileSvc := service.NewGetUserProfileSvc(notiClient, userRepo)

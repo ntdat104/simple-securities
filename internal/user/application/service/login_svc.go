@@ -9,10 +9,10 @@ import (
 
 	"simple-securities/config"
 
+	"simple-securities/internal/user/application/constant"
 	"simple-securities/internal/user/application/dto"
 	"simple-securities/internal/user/application/mapper"
 	"simple-securities/internal/user/application/util"
-	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
 
 	"simple-securities/pkg/bcrypt"
@@ -38,16 +38,24 @@ func NewLoginSvc(notiClient *grpc.NotificationGrpcClient, userRepo repo.IUserRep
 
 func (s *loginSvc) Execute(ctx context.Context, req *dto.LoginReq) (*dto.LoginResp, error) {
 	if req.Email == "" {
-		return nil, model.ErrInvalidUserEmail
+		return nil, constant.ErrInvalidUserEmail
 	}
 
 	if req.Password == "" {
-		return nil, model.ErrUserPasswordMissing
+		return nil, constant.ErrUserPasswordMissing
+	}
+
+	val, _ := s.userRepo.CountTotal(ctx)
+	log.Println(val)
+
+	val3, _ := s.userRepo.FindAllByPageAndSize(ctx, 0, 1)
+	for _, val := range val3 {
+	    log.Printf("%#v", val)
 	}
 
 	userExist, _ := s.userRepo.FindByEmail(ctx, req.Email)
 	if userExist == nil {
-		return nil, model.ErrUserNotFound
+		return nil, constant.ErrUserNotFound
 	}
 
 	err := bcrypt.ComparePassword(userExist.HashedPassword, req.Password)
@@ -80,7 +88,7 @@ func (s *loginSvc) Execute(ctx context.Context, req *dto.LoginReq) (*dto.LoginRe
 	now := datetime.Now()
 	userExist.LastLoginAt = &now
 	userExist.RefreshToken = refreshToken
-	userSaved, err := s.userRepo.Save(ctx, userExist)
+	userSaved, err := s.userRepo.Save(ctx, nil, userExist)
 	if err != nil {
 		return nil, errors.Newf(errors.ErrorTypeBusiness, "Failed to save last login: %v", err)
 	}

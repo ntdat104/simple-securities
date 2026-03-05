@@ -1,15 +1,14 @@
 package model
 
 import (
-	"time"
-
 	"simple-securities/internal/user/application/constant"
 	"simple-securities/internal/user/domain/enum"
 	"simple-securities/pkg/datetime"
 	"simple-securities/pkg/uuid"
+	"time"
 )
 
-type User struct {
+type UserHistory struct {
 	ID             uint64          `db:"id"`
 	Uuid           string          `db:"uuid"`
 	Email          string          `db:"email"`
@@ -23,20 +22,20 @@ type User struct {
 	UpdatedBy      uint64          `db:"updated_by"`
 }
 
-func (u User) TableName() string {
-	return "users"
+func (u UserHistory) TableName() string {
+	return "user_history"
 }
 
-func NewUser(
+func NewUserHistory(
 	email string,
 	hashedPassword string,
-) (*User, error) {
+) (*UserHistory, error) {
 	if hashedPassword == "" {
 		return nil, constant.ErrUserPasswordMissing
 	}
 
 	now := datetime.Now()
-	return &User{
+	return &UserHistory{
 		Uuid:           uuid.NewGoogleUUID(),
 		Email:          email,
 		HashedPassword: hashedPassword,
@@ -47,19 +46,4 @@ func NewUser(
 		CreatedBy:      0,
 		UpdatedBy:      0,
 	}, nil
-}
-
-func (u *User) Activate() {
-	u.Status = enum.UserActive
-	u.UpdatedAt = time.Now()
-}
-
-func (u *User) UpdateRefreshToken(token string) {
-	u.RefreshToken = token
-	u.UpdatedAt = time.Now()
-}
-
-func (u *User) RecordLogin() {
-	now := time.Now()
-	u.LastLoginAt = &now
 }

@@ -5,7 +5,7 @@ import (
 	"log"
 	"testing"
 
-	"simple-securities/internal/user/application/enum"
+	"simple-securities/internal/user/domain/enum"
 	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/infras/repo"
 	"simple-securities/pkg/datetime"
@@ -45,7 +45,7 @@ func TestUserRepo_CRUD(t *testing.T) {
 	// 1️⃣ Create user
 	newUser, err := model.NewUser("test_user@example.com", "abc123")
 	assert.NoError(t, err)
-	saved, err := userRepo.Save(ctx, newUser)
+	saved, err := userRepo.Save(ctx, nil, newUser)
 	assert.NoError(t, err)
 	assert.NotZero(t, saved.ID)
 	assert.Equal(t, enum.UserProcessing, saved.Status)
@@ -72,7 +72,7 @@ func TestUserRepo_CRUD(t *testing.T) {
 	saved.UpdatedAt = now
 	saved.UpdatedBy = 0
 
-	updated, err := userRepo.Save(ctx, saved)
+	updated, err := userRepo.Save(ctx, nil, saved)
 	assert.NoError(t, err)
 	assert.Equal(t, enum.UserActive, updated.Status)
 
@@ -87,7 +87,7 @@ func TestUserRepo_CRUD(t *testing.T) {
 	user2, _ := model.NewUser("bulk2@example.com", "pw2")
 	users := []*model.User{user1, user2}
 
-	inserted, err := userRepo.SaveAll(ctx, users)
+	inserted, err := userRepo.SaveAll(ctx, nil, users)
 	assert.NoError(t, err)
 	assert.Len(t, inserted, 2)
 
@@ -96,7 +96,7 @@ func TestUserRepo_CRUD(t *testing.T) {
 	inserted[0].UpdatedAt = datetime.Now()
 	inserted[1].UpdatedAt = datetime.Now()
 
-	updatedBulk, err := userRepo.SaveAll(ctx, inserted)
+	updatedBulk, err := userRepo.SaveAll(ctx, nil, inserted)
 	assert.NoError(t, err)
 	assert.Equal(t, "updated_bulk1@example.com", updatedBulk[0].Email)
 	assert.Equal(t, "updated_bulk2@example.com", updatedBulk[1].Email)

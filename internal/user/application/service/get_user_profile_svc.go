@@ -7,9 +7,9 @@ import (
 	noti "simple-securities/gen/notification/v1"
 
 	"simple-securities/config"
+	"simple-securities/internal/user/application/constant"
 	"simple-securities/internal/user/application/dto"
 	"simple-securities/internal/user/application/mapper"
-	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
 	"simple-securities/pkg/errors"
 	"simple-securities/pkg/jwt"
@@ -57,7 +57,7 @@ func (s *getUserProfileSvc) Execute(ctx context.Context, accessToken string) (*d
 		return nil, errors.Newf(errors.ErrorTypeSystem, "Failed to get user by ID: %v", err)
 	}
 	if userExist == nil {
-		return nil, model.ErrUserNotFound
+		return nil, constant.ErrUserNotFound
 	}
 
 	s.notiClient.Send(ctx, &noti.SendRequest{

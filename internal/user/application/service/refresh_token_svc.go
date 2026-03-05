@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 	"simple-securities/config"
+	"simple-securities/internal/user/application/constant"
 	"simple-securities/internal/user/application/dto"
 	"simple-securities/internal/user/application/mapper"
-	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
 	"simple-securities/pkg/datetime"
 	"simple-securities/pkg/errors"
@@ -42,7 +42,7 @@ func (s *refreshTokenSvc) Execute(ctx context.Context, refreshToken string) (*dt
 		return nil, errors.Newf(errors.ErrorTypeSystem, "Failed to get user by ID: %v", err)
 	}
 	if userExist == nil {
-		return nil, model.ErrUserNotFound
+		return nil, constant.ErrUserNotFound
 	}
 
 	if userExist.RefreshToken != refreshToken {
@@ -74,7 +74,7 @@ func (s *refreshTokenSvc) Execute(ctx context.Context, refreshToken string) (*dt
 	userExist.RefreshToken = newRefreshToken
 	userExist.UpdatedAt = datetime.Now()
 	userExist.UpdatedBy = userExist.ID
-	_, err = s.userRepo.Save(ctx, userExist)
+	_, err = s.userRepo.Save(ctx, nil, userExist)
 	if err != nil {
 		return nil, errors.Newf(errors.ErrorTypeSystem, "Failed to update user refresh token: %v", err)
 	}
