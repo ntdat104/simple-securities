@@ -8,6 +8,7 @@ import (
 )
 
 type IUserRepo interface {
+	FindAllByCursor(ctx context.Context, cursor string, size int) ([]*model.User, string, error)
 	FindAllByPageAndSize(ctx context.Context, page int, size int) ([]*model.User, error)
 
 	FindById(ctx context.Context, id uint64) (*model.User, error)

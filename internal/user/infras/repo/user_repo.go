@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	pkgRepo "simple-securities/pkg/db/repo"
+	"simple-securities/pkg/pagination"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -32,6 +33,36 @@ func NewUserRepo(db *sqlx.DB) repo.IUserRepo {
 		insertFields: meta.InsertFields,
 		updateFields: meta.UpdateFields,
 	}
+}
+
+func (r *UserRepo) findAllCursor(ctx context.Context, query string, args ...any) ([]*model.User, string, error) {
+	val, err := r.FindAll(ctx, query, args...)
+	if err != nil {
+		return []*model.User{}, "", err
+	}
+	var cursor string
+	if len(val) > 0 {
+		last := val[len(val)-1]
+		cursor = pagination.NewCursor(last.ID, last.CreatedAt).Encode()
+	}
+	return val, cursor, nil
+}
+
+func (r *UserRepo) FindAllByCursor(ctx context.Context, cursor string, size int) ([]*model.User, string, error) {
+	var query string
+
+	if cursor == "" {
+		query = fmt.Sprintf(`SELECT %s FROM %s ORDER BY created_at DESC, id DESC LIMIT $1`, r.queryFields, r.tableName)
+		return r.findAllCursor(ctx, query, size)
+	}
+
+	c, err := pagination.DecodeCursor(cursor)
+	if err != nil {
+		return []*model.User{}, "", err
+	}
+
+	query = fmt.Sprintf(`SELECT %s FROM %s WHERE (created_at, id) < ($1, $2) ORDER BY created_at DESC, id DESC LIMIT $3`, r.queryFields, r.tableName)
+	return r.findAllCursor(ctx, query, c.CreatedAt, c.Id, size)
 }
 
 func (r *UserRepo) FindAllByPageAndSize(ctx context.Context, page int, size int) ([]*model.User, error) {

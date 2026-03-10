@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"simple-securities/common/client/grpc"
@@ -13,6 +14,7 @@ import (
 	"simple-securities/internal/user/application/dto"
 	"simple-securities/internal/user/application/mapper"
 	"simple-securities/internal/user/application/util"
+	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
 
 	"simple-securities/pkg/bcrypt"
@@ -50,7 +52,7 @@ func (s *loginSvc) Execute(ctx context.Context, req *dto.LoginReq) (*dto.LoginRe
 
 	val3, _ := s.userRepo.FindAllByPageAndSize(ctx, 0, 1)
 	for _, val := range val3 {
-	    log.Printf("%#v", val)
+		log.Printf("%+v", val)
 	}
 
 	userExist, _ := s.userRepo.FindByEmail(ctx, req.Email)
@@ -94,6 +96,24 @@ func (s *loginSvc) Execute(ctx context.Context, req *dto.LoginReq) (*dto.LoginRe
 	}
 
 	log.Printf("user %+v", userSaved)
+
+	users := []*model.User{}
+	for i := range 1000 {
+		newUser, _ := model.NewUser(fmt.Sprintf("abc-%d@gmail.com", i), "123123")
+		users = append(users, newUser)
+	}
+
+	s.userRepo.SaveAll(ctx, nil, users)
+
+	x, cursor, _ := s.userRepo.FindAllByCursor(ctx, "", 10)
+	for _, v := range x {
+		log.Printf("%+v ", v)
+	}
+
+	x, cursor, _ = s.userRepo.FindAllByCursor(ctx, cursor, 10)
+	for _, v := range x {
+		log.Printf("%+v ", v)
+	}
 
 	s.notiClient.Send(ctx, &noti.SendRequest{
 		UserId: userSaved.ID,

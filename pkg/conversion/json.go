@@ -1,4 +1,4 @@
-package jsn
+package conversion
 
 import (
 	"encoding/json"
