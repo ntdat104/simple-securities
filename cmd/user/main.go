@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"simple-securities/cmd/user/app"
-	grpcClient "simple-securities/common/client/grpc"
 	"simple-securities/common/constants"
 	"simple-securities/config"
 	user "simple-securities/gen/user/v1"
@@ -45,25 +44,7 @@ func main() {
 		"migrations/sqlite/000002_init_user_history_db.up.sql",
 	})
 
-	notiClient, err := grpcClient.NewNotificationGrpcClient(config.GlobalConfig.InternalService.NotificationService)
-	if err != nil {
-		log.Fatalf("failed to create notification grpc client: %v", err)
-	}
-	defer notiClient.Close()
-
-	marketClient, err := grpcClient.NewMarketGrpcClient(config.GlobalConfig.InternalService.MarketService)
-	if err != nil {
-		log.Fatalf("failed to create market grpc client: %v", err)
-	}
-	defer marketClient.Close()
-
-	cryptoClient, err := grpcClient.NewCryptoGrpcClient(config.GlobalConfig.InternalService.CryptoService)
-	if err != nil {
-		log.Fatalf("failed to create crypto grpc client: %v", err)
-	}
-	defer cryptoClient.Close()
-
-	// Kafka
+	// Kafka Setup
 	kafkaCfg := kafka.Config{
 		ServiceName: config.GlobalConfig.App.Name,
 		Version:     config.GlobalConfig.App.Version,
@@ -71,22 +52,21 @@ func main() {
 		Env:         string(config.GlobalConfig.Env),
 	}
 	kafkaBrokers := []string{"localhost:9092", "localhost:9093", "localhost:9094"}
-
-	// Create Kafka Manager
 	kafkaManager := kafka.NewManager(kafkaCfg, kafkaBrokers, logger.Logger)
 	defer kafkaManager.Close()
 
-	userSvc, err := app.InitializeUserHandler(
+	// Initialize App via Wire (Optimized)
+	// Tất cả gRPC Clients được khởi tạo và quản lý bên trong Wire
+	userSvc, cleanup, err := app.InitializeUserHandler(
 		db.DB,
 		logger.Logger,
 		kafkaManager,
-		notiClient,
-		marketClient,
-		cryptoClient,
+		config.GlobalConfig,
 	)
 	if err != nil {
 		log.Fatalf("failed to initialize user handler: %v", err)
 	}
+	defer cleanup() // TỰ ĐỘNG Close() tất cả gRPC clients (Notification, Market, Crypto,...)
 
 	userHandler := grpcHandler.NewUserGrpcHandler(userSvc)
 

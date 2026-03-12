@@ -5,6 +5,7 @@ package app
 
 import (
 	grpcClient "simple-securities/common/client/grpc"
+	"simple-securities/config"
 	"simple-securities/internal/user/di"
 	grpcHandler "simple-securities/internal/user/handler/grpc"
 	"simple-securities/pkg/db/txmanager"
@@ -19,16 +20,41 @@ func InitializeUserHandler(
 	db *sqlx.DB,
 	log *zap.Logger,
 	kafkaManager *kafka.Manager,
-	notiClient *grpcClient.NotificationGrpcClient,
-	marketClient *grpcClient.MarketGrpcClient,
-	cryptoClient *grpcClient.CryptoGrpcClient,
-) (grpcHandler.UserGrpcSvc, error) {
+	cfg *config.Config,
+) (grpcHandler.UserGrpcSvc, func(), error) {
 	wire.Build(
+		provideNotificationFunc,
+		provideMarketFunc,
+		provideCryptoFunc,
 		di.RepositorySet,
 		di.KafkaEventPublisherSet,
 		txmanager.NewTxManager,
 		di.ServiceSet,
 		di.GrpcHandlerSet,
 	)
-	return grpcHandler.UserGrpcSvc{}, nil
+	return grpcHandler.UserGrpcSvc{}, nil, nil
+}
+
+func provideNotificationFunc(cfg *config.Config) (*grpcClient.NotificationGrpcClient, func(), error) {
+	c, err := grpcClient.NewNotificationGrpcClient(cfg.InternalService.NotificationService)
+	if err != nil {
+		return nil, nil, err
+	}
+	return c, func() { c.Close() }, nil
+}
+
+func provideMarketFunc(cfg *config.Config) (*grpcClient.MarketGrpcClient, func(), error) {
+	c, err := grpcClient.NewMarketGrpcClient(cfg.InternalService.MarketService)
+	if err != nil {
+		return nil, nil, err
+	}
+	return c, func() { c.Close() }, nil
+}
+
+func provideCryptoFunc(cfg *config.Config) (*grpcClient.CryptoGrpcClient, func(), error) {
+	c, err := grpcClient.NewCryptoGrpcClient(cfg.InternalService.CryptoService)
+	if err != nil {
+		return nil, nil, err
+	}
+	return c, func() { c.Close() }, nil
 }

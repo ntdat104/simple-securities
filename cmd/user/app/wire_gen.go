@@ -9,9 +9,10 @@ package app
 import (
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
-	"simple-securities/common/client/grpc"
+	grpc2 "simple-securities/common/client/grpc"
+	"simple-securities/config"
 	"simple-securities/internal/user/application/service"
-	grpc2 "simple-securities/internal/user/handler/grpc"
+	"simple-securities/internal/user/handler/grpc"
 	"simple-securities/internal/user/infras/messaging"
 	"simple-securities/internal/user/infras/repo"
 	"simple-securities/pkg/db/txmanager"
@@ -20,20 +21,65 @@ import (
 
 // Injectors from wire.go:
 
-func InitializeUserHandler(db *sqlx.DB, log *zap.Logger, kafkaManager *kafka.Manager, notiClient *grpc.NotificationGrpcClient, marketClient *grpc.MarketGrpcClient, cryptoClient *grpc.CryptoGrpcClient) (grpc2.UserGrpcSvc, error) {
+func InitializeUserHandler(db *sqlx.DB, log *zap.Logger, kafkaManager *kafka.Manager, cfg *config.Config) (grpc.UserGrpcSvc, func(), error) {
 	txManager := txmanager.NewTxManager(db)
 	iUserRepo := repo.NewUserRepo(db)
 	iUserHistoryRepo := repo.NewUserHistoryRepo(db)
 	iEventPublisher := messaging.NewKafkaEventPublisher(kafkaManager, log)
 	registerSvc := service.NewRegisterSvc(txManager, iUserRepo, iUserHistoryRepo, iEventPublisher)
-	loginSvc := service.NewLoginSvc(iUserRepo, notiClient, marketClient, cryptoClient, iEventPublisher)
+	notificationGrpcClient, cleanup, err := provideNotificationFunc(cfg)
+	if err != nil {
+		return grpc.UserGrpcSvc{}, nil, err
+	}
+	marketGrpcClient, cleanup2, err := provideMarketFunc(cfg)
+	if err != nil {
+		cleanup()
+		return grpc.UserGrpcSvc{}, nil, err
+	}
+	cryptoGrpcClient, cleanup3, err := provideCryptoFunc(cfg)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return grpc.UserGrpcSvc{}, nil, err
+	}
+	loginSvc := service.NewLoginSvc(iUserRepo, notificationGrpcClient, marketGrpcClient, cryptoGrpcClient, iEventPublisher)
 	refreshTokenSvc := service.NewRefreshTokenSvc(iUserRepo)
-	getUserProfileSvc := service.NewGetUserProfileSvc(notiClient, iUserRepo, iEventPublisher)
-	userGrpcSvc := grpc2.UserGrpcSvc{
+	getUserProfileSvc := service.NewGetUserProfileSvc(notificationGrpcClient, iUserRepo, iEventPublisher)
+	userGrpcSvc := grpc.UserGrpcSvc{
 		RegisterSvc:       registerSvc,
 		LoginSvc:          loginSvc,
 		RefreshTokenSvc:   refreshTokenSvc,
 		GetUserProfileSvc: getUserProfileSvc,
 	}
-	return userGrpcSvc, nil
+	return userGrpcSvc, func() {
+		cleanup3()
+		cleanup2()
+		cleanup()
+	}, nil
+}
+
+// wire.go:
+
+func provideNotificationFunc(cfg *config.Config) (*grpc2.NotificationGrpcClient, func(), error) {
+	c, err := grpc2.NewNotificationGrpcClient(cfg.InternalService.NotificationService)
+	if err != nil {
+		return nil, nil, err
+	}
+	return c, func() { c.Close() }, nil
+}
+
+func provideMarketFunc(cfg *config.Config) (*grpc2.MarketGrpcClient, func(), error) {
+	c, err := grpc2.NewMarketGrpcClient(cfg.InternalService.MarketService)
+	if err != nil {
+		return nil, nil, err
+	}
+	return c, func() { c.Close() }, nil
+}
+
+func provideCryptoFunc(cfg *config.Config) (*grpc2.CryptoGrpcClient, func(), error) {
+	c, err := grpc2.NewCryptoGrpcClient(cfg.InternalService.CryptoService)
+	if err != nil {
+		return nil, nil, err
+	}
+	return c, func() { c.Close() }, nil
 }
