@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"simple-securities/common/client/grpc"
+	"simple-securities/common/constants"
 	noti "simple-securities/gen/notification/v1"
 
 	"simple-securities/config"
@@ -14,12 +16,16 @@ import (
 	"simple-securities/internal/user/application/dto"
 	"simple-securities/internal/user/application/mapper"
 	"simple-securities/internal/user/application/util"
+	"simple-securities/internal/user/domain/messaging"
 	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
 
 	"simple-securities/pkg/bcrypt"
 	"simple-securities/pkg/datetime"
 	"simple-securities/pkg/errors"
+	"simple-securities/pkg/logger"
+
+	"go.uber.org/zap"
 )
 
 type LoginSvc interface {
@@ -27,14 +33,26 @@ type LoginSvc interface {
 }
 
 type loginSvc struct {
-	notiClient *grpc.NotificationGrpcClient
-	userRepo   repo.IUserRepo
+	userRepo     repo.IUserRepo
+	notiClient   *grpc.NotificationGrpcClient
+	marketClient *grpc.MarketGrpcClient
+	cryptoClient *grpc.CryptoGrpcClient
+	publisher    messaging.IEventPublisher
 }
 
-func NewLoginSvc(notiClient *grpc.NotificationGrpcClient, userRepo repo.IUserRepo) LoginSvc {
+func NewLoginSvc(
+	userRepo repo.IUserRepo,
+	notiClient *grpc.NotificationGrpcClient,
+	marketClient *grpc.MarketGrpcClient,
+	cryptoClient *grpc.CryptoGrpcClient,
+	publisher messaging.IEventPublisher,
+) LoginSvc {
 	return &loginSvc{
-		notiClient: notiClient,
-		userRepo:   userRepo,
+		userRepo:     userRepo,
+		notiClient:   notiClient,
+		marketClient: marketClient,
+		cryptoClient: cryptoClient,
+		publisher:    publisher,
 	}
 }
 
@@ -120,6 +138,18 @@ func (s *loginSvc) Execute(ctx context.Context, req *dto.LoginReq) (*dto.LoginRe
 		Title:  "Login Notification",
 		Body:   "You have successfully logged in.",
 	})
+
+	if s.publisher != nil {
+		if pubErr := s.publisher.Publish(ctx, messaging.UserLoggedIn{
+			UserID:    userSaved.ID,
+			UserUUID:  userSaved.Uuid,
+			Email:     userSaved.Email,
+			Timestamp: time.Now().UnixMilli(),
+			RequestID: util.GetValueFromCtx(ctx, constants.RequestId),
+		}); pubErr != nil {
+			logger.Logger.Error("failed to publish UserLoggedIn event", zap.Error(pubErr))
+		}
+	}
 
 	return &dto.LoginResp{
 		User:         mapper.ToUserDto(userSaved),
