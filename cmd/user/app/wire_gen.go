@@ -15,13 +15,14 @@ import (
 	"simple-securities/internal/user/handler/grpc"
 	"simple-securities/internal/user/infras/messaging"
 	"simple-securities/internal/user/infras/repo"
+	"simple-securities/pkg/db/cache"
 	"simple-securities/pkg/db/txmanager"
 	"simple-securities/pkg/kafka"
 )
 
 // Injectors from wire.go:
 
-func InitializeUserHandler(db *sqlx.DB, log *zap.Logger, kafkaManager *kafka.Manager, cfg *config.Config) (grpc.UserGrpcSvc, func(), error) {
+func InitializeUserHandler(db *sqlx.DB, hybridCache *cache.HybridCache, log *zap.Logger, kafkaManager *kafka.Manager, cfg *config.Config) (grpc.UserGrpcSvc, func(), error) {
 	txManager := txmanager.NewTxManager(db)
 	iUserRepo := repo.NewUserRepo(db)
 	iUserHistoryRepo := repo.NewUserHistoryRepo(db)
@@ -44,7 +45,7 @@ func InitializeUserHandler(db *sqlx.DB, log *zap.Logger, kafkaManager *kafka.Man
 	}
 	loginSvc := service.NewLoginSvc(iUserRepo, notificationGrpcClient, marketGrpcClient, cryptoGrpcClient, iEventPublisher)
 	refreshTokenSvc := service.NewRefreshTokenSvc(iUserRepo)
-	getUserProfileSvc := service.NewGetUserProfileSvc(notificationGrpcClient, iUserRepo, iEventPublisher)
+	getUserProfileSvc := service.NewGetUserProfileSvc(hybridCache, notificationGrpcClient, iUserRepo, iEventPublisher)
 	userGrpcSvc := grpc.UserGrpcSvc{
 		RegisterSvc:       registerSvc,
 		LoginSvc:          loginSvc,
@@ -60,6 +61,7 @@ func InitializeUserHandler(db *sqlx.DB, log *zap.Logger, kafkaManager *kafka.Man
 
 // wire.go:
 
+// grpc-clients
 func provideNotificationFunc(cfg *config.Config) (*grpc2.NotificationGrpcClient, func(), error) {
 	c, err := grpc2.NewNotificationGrpcClient(cfg.InternalService.NotificationService)
 	if err != nil {

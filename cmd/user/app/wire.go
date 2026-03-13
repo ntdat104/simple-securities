@@ -8,6 +8,7 @@ import (
 	"simple-securities/config"
 	"simple-securities/internal/user/di"
 	grpcHandler "simple-securities/internal/user/handler/grpc"
+	"simple-securities/pkg/db/cache"
 	"simple-securities/pkg/db/txmanager"
 	"simple-securities/pkg/kafka"
 
@@ -18,6 +19,7 @@ import (
 
 func InitializeUserHandler(
 	db *sqlx.DB,
+	hybridCache *cache.HybridCache,
 	log *zap.Logger,
 	kafkaManager *kafka.Manager,
 	cfg *config.Config,
@@ -35,6 +37,7 @@ func InitializeUserHandler(
 	return grpcHandler.UserGrpcSvc{}, nil, nil
 }
 
+// grpc-clients
 func provideNotificationFunc(cfg *config.Config) (*grpcClient.NotificationGrpcClient, func(), error) {
 	c, err := grpcClient.NewNotificationGrpcClient(cfg.InternalService.NotificationService)
 	if err != nil {

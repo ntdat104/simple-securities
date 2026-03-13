@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"simple-securities/common/client/grpc"
@@ -14,7 +15,9 @@ import (
 	"simple-securities/internal/user/application/mapper"
 	"simple-securities/internal/user/application/util"
 	"simple-securities/internal/user/domain/messaging"
+	"simple-securities/internal/user/domain/model"
 	"simple-securities/internal/user/domain/repo"
+	"simple-securities/pkg/db/cache"
 	"simple-securities/pkg/errors"
 	"simple-securities/pkg/jwt"
 	"simple-securities/pkg/logger"
@@ -27,16 +30,23 @@ type GetUserProfileSvc interface {
 }
 
 type getUserProfileSvc struct {
-	notiClient *grpc.NotificationGrpcClient
-	userRepo   repo.IUserRepo
-	publisher  messaging.IEventPublisher
+	hybridCache *cache.HybridCache
+	notiClient  *grpc.NotificationGrpcClient
+	userRepo    repo.IUserRepo
+	publisher   messaging.IEventPublisher
 }
 
-func NewGetUserProfileSvc(notiClient *grpc.NotificationGrpcClient, userRepo repo.IUserRepo, publisher messaging.IEventPublisher) GetUserProfileSvc {
+func NewGetUserProfileSvc(
+	hybridCache *cache.HybridCache,
+	notiClient *grpc.NotificationGrpcClient,
+	userRepo repo.IUserRepo,
+	publisher messaging.IEventPublisher,
+) GetUserProfileSvc {
 	return &getUserProfileSvc{
-		notiClient: notiClient,
-		userRepo:   userRepo,
-		publisher:  publisher,
+		hybridCache: hybridCache,
+		notiClient:  notiClient,
+		userRepo:    userRepo,
+		publisher:   publisher,
 	}
 }
 
@@ -61,10 +71,17 @@ func (s *getUserProfileSvc) Execute(ctx context.Context, accessToken string) (*d
 		return nil, errors.New(errors.ErrorTypeUnauthorized, "Token claims missing user uuid.")
 	}
 
-	userExist, err := s.userRepo.FindByIdAndEmailAndUuid(ctx, userId, email, userUuid)
+	key := constant.UserProfile(fmt.Sprintf("%d", userId))
+	userExist, err := cache.Get(s.hybridCache, ctx, key, func() (*model.User, error) {
+		return s.userRepo.FindByIdAndEmailAndUuid(ctx, userId, email, userUuid)
+	})
+	cache.Delete(s.hybridCache, ctx, key)
+	cache.DeleteRegistry(s.hybridCache, ctx, key)
+
 	if err != nil {
-		return nil, errors.Newf(errors.ErrorTypeSystem, "Failed to get user by ID: %v", err)
+		return nil, errors.Newf(errors.ErrorTypeSystem, "Failed to get user profile: %v", err)
 	}
+
 	if userExist == nil {
 		return nil, constant.ErrUserNotFound
 	}

@@ -11,6 +11,7 @@ import (
 	"simple-securities/pkg/conv"
 	"simple-securities/pkg/datetime"
 	"simple-securities/pkg/kafka"
+	"simple-securities/pkg/logger"
 
 	"go.uber.org/zap"
 )
@@ -47,15 +48,37 @@ func (p *KafkaEventPublisher) Publish(ctx context.Context, event messaging.Domai
 		Data: json.RawMessage(data),
 	}
 
-	return p.manager.NewSendMessage().
+	header := map[string]string{
+		constants.RequestId: requestId,
+		constants.Timestamp: conv.ConvertInt64ToString(kafkaEvent.Meta.Timestamp),
+		constants.Datetime:  kafkaEvent.Meta.Datetime,
+	}
+
+	err = p.manager.NewSendMessage().
 		Topic(event.EventName()).
 		Key(event.EventKey()).
 		Partition(1).
-		Headers(map[string]string{
-			constants.RequestId: requestId,
-			constants.Timestamp: conv.ConvertInt64ToString(kafkaEvent.Meta.Timestamp),
-			constants.Datetime:  kafkaEvent.Meta.Datetime,
-		}).
+		Headers(header).
 		Event(kafkaEvent).
 		Do(ctx)
+
+	if err != nil {
+		logger.Logger.Error("publish event failed",
+			zap.Any(constants.Error, err),
+			zap.String(constants.Topic, event.EventName()),
+			zap.String(constants.Key, event.EventKey()),
+			zap.Any(constants.Header, header),
+			zap.Any(constants.Event, kafkaEvent),
+		)
+		return err
+	}
+
+	logger.Logger.Info("publish event success",
+		zap.String(constants.Topic, event.EventName()),
+		zap.String(constants.Key, event.EventKey()),
+		zap.Any(constants.Header, header),
+		zap.Any(constants.Event, kafkaEvent),
+	)
+
+	return nil
 }

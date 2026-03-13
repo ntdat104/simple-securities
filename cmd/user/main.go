@@ -11,12 +11,14 @@ import (
 	user "simple-securities/gen/user/v1"
 	grpcHandler "simple-securities/internal/user/handler/grpc"
 	"simple-securities/pkg/conv"
+	"simple-securities/pkg/db/cache"
 	"simple-securities/pkg/db/sqlite"
 	"simple-securities/pkg/kafka"
 	"simple-securities/pkg/logger"
 	"simple-securities/pkg/server"
 	pkgGrpc "simple-securities/pkg/server/grpc"
 
+	"github.com/dgraph-io/ristretto/v2"
 	"go.uber.org/zap"
 	googleGrpc "google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
@@ -44,6 +46,23 @@ func main() {
 		"migrations/sqlite/000002_init_user_history_db.up.sql",
 	})
 
+	redisCache, err := cache.NewRedisClient(cache.DefaultRedisConfig())
+	if err != nil {
+		log.Fatalf("Failed to connect to Redis: %v", err)
+	}
+	defer redisCache.Close()
+
+	memCache, err := ristretto.NewCache(&ristretto.Config[string, any]{
+		NumCounters: 1e7,     // number of keys to track frequency of (10M).
+		MaxCost:     1 << 30, // maximum cost of cache (1GB).
+		BufferItems: 64,      // number of keys per Get buffer.
+	})
+	if err != nil {
+		log.Fatalf("Failed to setup memCache: %v", err)
+	}
+
+	hybridCache := cache.NewHybridCache(memCache, redisCache.Client)
+
 	// Kafka Setup
 	kafkaCfg := kafka.Config{
 		ServiceName: config.GlobalConfig.App.Name,
@@ -59,6 +78,7 @@ func main() {
 	// Tất cả gRPC Clients được khởi tạo và quản lý bên trong Wire
 	userSvc, cleanup, err := app.InitializeUserHandler(
 		db.DB,
+		hybridCache,
 		logger.Logger,
 		kafkaManager,
 		config.GlobalConfig,
