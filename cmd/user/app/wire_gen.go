@@ -15,12 +15,19 @@ import (
 	"simple-securities/internal/user/handler/grpc"
 	"simple-securities/internal/user/infras/messaging"
 	"simple-securities/internal/user/infras/repo"
+	"simple-securities/internal/user/scheduler"
 	"simple-securities/pkg/db/cache"
 	"simple-securities/pkg/db/txmanager"
 	"simple-securities/pkg/kafka"
 )
 
 // Injectors from wire.go:
+
+func InitializeUserScheduler(db *sqlx.DB, log *zap.Logger) *scheduler.UserCronScheduler {
+	iUserRepo := repo.NewUserRepo(db)
+	userCronScheduler := scheduler.NewUserCronScheduler(iUserRepo, log)
+	return userCronScheduler
+}
 
 func InitializeUserHandler(db *sqlx.DB, hybridCache *cache.HybridCache, log *zap.Logger, kafkaManager *kafka.Manager, cfg *config.Config) (grpc.UserGrpcSvc, func(), error) {
 	txManager := txmanager.NewTxManager(db)

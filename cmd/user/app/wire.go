@@ -8,6 +8,7 @@ import (
 	"simple-securities/config"
 	"simple-securities/internal/user/di"
 	grpcHandler "simple-securities/internal/user/handler/grpc"
+	"simple-securities/internal/user/scheduler"
 	"simple-securities/pkg/db/cache"
 	"simple-securities/pkg/db/txmanager"
 	"simple-securities/pkg/kafka"
@@ -16,6 +17,17 @@ import (
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 )
+
+func InitializeUserScheduler(
+	db *sqlx.DB,
+	log *zap.Logger,
+) *scheduler.UserCronScheduler {
+	wire.Build(
+		di.RepositorySet,
+		di.SchedulerSet,
+	)
+	return nil
+}
 
 func InitializeUserHandler(
 	db *sqlx.DB,

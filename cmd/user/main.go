@@ -74,6 +74,10 @@ func main() {
 	kafkaManager := kafka.NewManager(kafkaCfg, kafkaBrokers, logger.Logger)
 	defer kafkaManager.Close()
 
+	// Initialize cron scheduler via Wire
+	cronScheduler := app.InitializeUserScheduler(db.DB, logger.Logger)
+	cronScheduler.Start()
+
 	// Initialize App via Wire (Optimized)
 	// Tất cả gRPC Clients được khởi tạo và quản lý bên trong Wire
 	userSvc, cleanup, err := app.InitializeUserHandler(
@@ -117,5 +121,5 @@ func main() {
 		},
 	)
 
-	server.AddShutdownHook(grpcServer, db.DB)
+	server.AddShutdownHook(grpcServer, cronScheduler, db.DB)
 }
