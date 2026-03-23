@@ -41,3 +41,24 @@ type CreditRolledBack struct {
 	Reason        string `json:"reason"`
 	Timestamp     int64  `json:"timestamp"`
 }
+
+// StockUnlocked — published by Personal Service after inserting unlock record.
+// Credit Service consumes this to auto-commit the reservation.
+type StockUnlocked struct {
+	ReservationID  string `json:"reservation_id"`
+	UserID         uint64 `json:"user_id"`
+	StockSymbol    string `json:"stock_symbol"`
+	UnlockRecordID string `json:"unlock_record_id"` // Personal's DB record ID for compensation
+	IdempotencyKey string `json:"idempotency_key"`
+	Timestamp      int64  `json:"timestamp"`
+}
+
+// CreditCommitFailed — published by Credit Service when auto-commit fails.
+// Personal Service consumes this to compensate (delete unlock record).
+type CreditCommitFailed struct {
+	ReservationID  string `json:"reservation_id"`
+	UserID         uint64 `json:"user_id"`
+	UnlockRecordID string `json:"unlock_record_id"`
+	Reason         string `json:"reason"`
+	Timestamp      int64  `json:"timestamp"`
+}
