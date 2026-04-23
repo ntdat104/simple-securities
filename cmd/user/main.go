@@ -8,7 +8,7 @@ import (
 	"simple-securities/cmd/user/app"
 	"simple-securities/common/constants"
 	"simple-securities/config"
-	user "simple-securities/gen/user/v1"
+	corev1 "simple-securities/gen/core/v1"
 	grpcHandler "simple-securities/internal/user/handler/grpc"
 	"simple-securities/pkg/conv"
 	"simple-securities/pkg/db/cache"
@@ -75,7 +75,7 @@ func main() {
 	defer kafkaManager.Close()
 
 	// Initialize cron scheduler via Wire
-	cronScheduler := app.InitializeUserScheduler(db.DB, logger.Logger)
+	cronScheduler := app.InitializeCoreScheduler(db.DB, logger.Logger)
 	cronScheduler.Start()
 
 	// Initialize App via Wire (Optimized)
@@ -117,7 +117,7 @@ func main() {
 
 	go grpcServer.Start(
 		func(server *googleGrpc.Server) {
-			user.RegisterUserServiceServer(server, userHandler)
+			corev1.RegisterUserServiceServer(server, userHandler)
 		},
 	)
 

@@ -3,11 +3,11 @@ package grpc
 import (
 	"context"
 	common "simple-securities/gen/common/v1"
-	userpb "simple-securities/gen/user/v1"
+	corev1 "simple-securities/gen/core/v1"
 	"simple-securities/internal/user/application/dto"
 )
 
-func (h *UserGrpcHandler) Login(ctx context.Context, req *userpb.LoginRequest) (*userpb.LoginResponse, error) {
+func (h *UserGrpcHandler) Login(ctx context.Context, req *corev1.LoginRequest) (*corev1.LoginResponse, error) {
 	res, err := h.loginSvc.Execute(ctx, &dto.LoginReq{
 		Email:    req.Email,
 		Password: req.Password,
@@ -22,7 +22,7 @@ func (h *UserGrpcHandler) Login(ctx context.Context, req *userpb.LoginRequest) (
 		lastLoginAt = res.User.LastLoginAt.UnixMilli()
 	}
 
-	return &userpb.LoginResponse{
+	return &corev1.LoginResponse{
 		User: &common.UserDto{
 			Id:          res.User.ID,
 			Uuid:        res.User.Uuid,

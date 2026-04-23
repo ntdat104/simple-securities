@@ -3,11 +3,11 @@ package grpc
 import (
 	"context"
 	common "simple-securities/gen/common/v1"
-	userpb "simple-securities/gen/user/v1"
+	corev1 "simple-securities/gen/core/v1"
 	"simple-securities/internal/user/application/dto"
 )
 
-func (h *UserGrpcHandler) Register(ctx context.Context, req *userpb.RegisterRequest) (*userpb.RegisterResponse, error) {
+func (h *UserGrpcHandler) Register(ctx context.Context, req *corev1.RegisterRequest) (*corev1.RegisterResponse, error) {
 	res, err := h.registerSvc.Execute(ctx, &dto.RegisterReq{
 		Email:    req.Email,
 		Password: req.Password,
@@ -15,7 +15,7 @@ func (h *UserGrpcHandler) Register(ctx context.Context, req *userpb.RegisterRequ
 	if err != nil {
 		return nil, err
 	}
-	return &userpb.RegisterResponse{
+	return &corev1.RegisterResponse{
 		User: &common.UserDto{
 			Id:          res.User.ID,
 			Uuid:        res.User.Uuid,

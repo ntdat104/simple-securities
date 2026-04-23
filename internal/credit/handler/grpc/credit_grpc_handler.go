@@ -3,19 +3,19 @@ package grpc
 import (
 	"context"
 
-	creditv1 "simple-securities/gen/credit/v1"
+	personalizev1 "simple-securities/gen/personalize/v1"
 	"simple-securities/internal/credit/application/dto"
 	"simple-securities/internal/credit/application/service"
 	"simple-securities/internal/credit/domain/enum"
 )
 
 type CreditGrpcHandler struct {
-	creditv1.UnimplementedCreditServiceServer
-	topUpSvc            service.TopUpSvc
-	reserveSvc          service.ReserveCreditsSvc
-	commitSvc           service.CommitReservationSvc
-	rollbackSvc         service.RollbackReservationSvc
-	getBalanceSvc       service.GetCreditBalanceSvc
+	personalizev1.UnimplementedCreditServiceServer
+	topUpSvc      service.TopUpSvc
+	reserveSvc    service.ReserveCreditsSvc
+	commitSvc     service.CommitReservationSvc
+	rollbackSvc   service.RollbackReservationSvc
+	getBalanceSvc service.GetCreditBalanceSvc
 }
 
 func NewCreditGrpcHandler(
@@ -34,7 +34,7 @@ func NewCreditGrpcHandler(
 	}
 }
 
-func (h *CreditGrpcHandler) TopUp(ctx context.Context, req *creditv1.TopUpRequest) (*creditv1.TopUpResponse, error) {
+func (h *CreditGrpcHandler) TopUp(ctx context.Context, req *personalizev1.TopUpRequest) (*personalizev1.TopUpResponse, error) {
 	resp, err := h.topUpSvc.Execute(ctx, &dto.TopUpReq{
 		UserID:         parseUint64(req.UserId),
 		WalletType:     enum.WalletType(req.WalletType.String()),
@@ -46,10 +46,10 @@ func (h *CreditGrpcHandler) TopUp(ctx context.Context, req *creditv1.TopUpReques
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
-	return &creditv1.TopUpResponse{WalletId: resp.WalletID, NewBalance: resp.NewBalance}, nil
+	return &personalizev1.TopUpResponse{WalletId: resp.WalletID, NewBalance: resp.NewBalance}, nil
 }
 
-func (h *CreditGrpcHandler) ReserveCredits(ctx context.Context, req *creditv1.ReserveCreditsRequest) (*creditv1.ReserveCreditsResponse, error) {
+func (h *CreditGrpcHandler) ReserveCredits(ctx context.Context, req *personalizev1.ReserveCreditsRequest) (*personalizev1.ReserveCreditsResponse, error) {
 	resp, err := h.reserveSvc.Execute(ctx, &dto.ReserveCreditsReq{
 		UserID:         parseUint64(req.UserId),
 		Amount:         req.Amount,
@@ -61,22 +61,22 @@ func (h *CreditGrpcHandler) ReserveCredits(ctx context.Context, req *creditv1.Re
 		return nil, toGrpcError(err)
 	}
 
-	var deductions []*creditv1.WalletDeduction
+	var deductions []*personalizev1.WalletDeduction
 	for _, d := range resp.Deductions {
-		deductions = append(deductions, &creditv1.WalletDeduction{
+		deductions = append(deductions, &personalizev1.WalletDeduction{
 			WalletId:   d.WalletID,
 			WalletType: toProtoWalletType(d.WalletType),
 			Amount:     d.Amount,
 		})
 	}
-	return &creditv1.ReserveCreditsResponse{
+	return &personalizev1.ReserveCreditsResponse{
 		ReservationId:  resp.ReservationID,
 		ReservedAmount: resp.ReservedAmount,
 		Deductions:     deductions,
 	}, nil
 }
 
-func (h *CreditGrpcHandler) CommitReservation(ctx context.Context, req *creditv1.CommitReservationRequest) (*creditv1.CommitReservationResponse, error) {
+func (h *CreditGrpcHandler) CommitReservation(ctx context.Context, req *personalizev1.CommitReservationRequest) (*personalizev1.CommitReservationResponse, error) {
 	resp, err := h.commitSvc.Execute(ctx, &dto.CommitReservationReq{
 		ReservationID:  req.ReservationId,
 		IdempotencyKey: req.IdempotencyKey,
@@ -84,13 +84,13 @@ func (h *CreditGrpcHandler) CommitReservation(ctx context.Context, req *creditv1
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
-	return &creditv1.CommitReservationResponse{
+	return &personalizev1.CommitReservationResponse{
 		Success:       resp.Success,
 		TotalDeducted: resp.TotalDeducted,
 	}, nil
 }
 
-func (h *CreditGrpcHandler) RollbackReservation(ctx context.Context, req *creditv1.RollbackReservationRequest) (*creditv1.RollbackReservationResponse, error) {
+func (h *CreditGrpcHandler) RollbackReservation(ctx context.Context, req *personalizev1.RollbackReservationRequest) (*personalizev1.RollbackReservationResponse, error) {
 	resp, err := h.rollbackSvc.Execute(ctx, &dto.RollbackReservationReq{
 		ReservationID: req.ReservationId,
 		Reason:        req.Reason,
@@ -98,10 +98,10 @@ func (h *CreditGrpcHandler) RollbackReservation(ctx context.Context, req *credit
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
-	return &creditv1.RollbackReservationResponse{Success: resp.Success}, nil
+	return &personalizev1.RollbackReservationResponse{Success: resp.Success}, nil
 }
 
-func (h *CreditGrpcHandler) GetCreditBalance(ctx context.Context, req *creditv1.GetCreditBalanceRequest) (*creditv1.GetCreditBalanceResponse, error) {
+func (h *CreditGrpcHandler) GetCreditBalance(ctx context.Context, req *personalizev1.GetCreditBalanceRequest) (*personalizev1.GetCreditBalanceResponse, error) {
 	resp, err := h.getBalanceSvc.Execute(ctx, &dto.GetCreditBalanceReq{
 		UserID: parseUint64(req.UserId),
 	})
@@ -109,9 +109,9 @@ func (h *CreditGrpcHandler) GetCreditBalance(ctx context.Context, req *creditv1.
 		return nil, toGrpcError(err)
 	}
 
-	var wallets []*creditv1.WalletBalance
+	var wallets []*personalizev1.WalletBalance
 	for _, w := range resp.Wallets {
-		wallets = append(wallets, &creditv1.WalletBalance{
+		wallets = append(wallets, &personalizev1.WalletBalance{
 			WalletId:   w.WalletID,
 			WalletType: toProtoWalletType(w.WalletType),
 			Balance:    w.Balance,
@@ -120,7 +120,7 @@ func (h *CreditGrpcHandler) GetCreditBalance(ctx context.Context, req *creditv1.
 			ExpireAt:   w.ExpireAtMs,
 		})
 	}
-	return &creditv1.GetCreditBalanceResponse{
+	return &personalizev1.GetCreditBalanceResponse{
 		UserId:         req.UserId,
 		TotalAvailable: resp.TotalAvailable,
 		Wallets:        wallets,

@@ -3,142 +3,135 @@ package main
 import (
 	"context"
 	"log"
-	"time"
+	"net"
+	"net/http"
+	"os"
+	"sync"
 
-	// Import package Go được tạo ra từ user.proto
-	userpb "simple-securities/gen/user/v1"
+	corev1 "simple-securities/gen/core/v1"
+	crypto "simple-securities/gen/crypto/v1"
+	market "simple-securities/gen/market/v1"
+	noti "simple-securities/gen/notification/v1"
+	stock "simple-securities/gen/stock/v1"
 
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"golang.org/x/time/rate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status" // Dùng để xử lý lỗi gRPC tốt hơn
 )
 
-const (
-	address = "localhost:50054" // Địa chỉ của gRPC Server
-	// Dữ liệu dùng thử
-	testEmail    = "testuser@example.com"
-	testPassword = "password123"
-)
+type IPRateLimiter struct {
+	ips map[string]*rate.Limiter
+	mu  *sync.Mutex
+	r   rate.Limit
+	b   int
+}
+
+func NewIPRateLimiter(r rate.Limit, b int) *IPRateLimiter {
+	return &IPRateLimiter{
+		ips: make(map[string]*rate.Limiter),
+		mu:  &sync.Mutex{},
+		r:   r,
+		b:   b,
+	}
+}
+
+func (i *IPRateLimiter) GetLimiter(ip string) *rate.Limiter {
+	i.mu.Lock()
+	defer i.mu.Unlock()
+
+	limiter, exists := i.ips[ip]
+	if !exists {
+		limiter = rate.NewLimiter(i.r, i.b)
+		i.ips[ip] = limiter
+	}
+
+	return limiter
+}
+
+func RateLimitMiddleware(limiter *IPRateLimiter, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Extract IP address from RemoteAddr (stripping the port)
+		ip, _, err := net.SplitHostPort(r.RemoteAddr)
+		if err != nil {
+			// Fallback if SplitHostPort fails
+			ip = r.RemoteAddr
+		}
+
+		if !limiter.GetLimiter(ip).Allow() {
+			http.Error(w, "Too Many Requests", http.StatusTooManyRequests)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
 
 func main() {
-	// 1. Kết nối tới gRPC Server
-	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("❌ Lỗi: Không thể kết nối tới server %s: %v", address, err)
-	}
-	defer conn.Close()
-
-	// 2. Tạo Client stub
-	client := userpb.NewUserServiceClient(conn)
-
-	// Biến để lưu trữ token từ Login cho cuộc gọi GetUserProfile
-	var accessToken string
-
-	// 3. Gọi các RPC methods
-
-	// --- Ví dụ 1: Register ---
-	// Gọi Register và cố gắng lấy token
-	if token, ok := callRegister(client); ok {
-		accessToken = token
-	}
-
-	// --- Ví dụ 2: Login ---
-	// Gọi Login và cố gắng lấy token
-	if token, ok := callLogin(client); ok {
-		accessToken = token
-	}
-
-	// --- Ví dụ 3: GetUserProfile (Chỉ gọi nếu có token) ---
-	if accessToken != "" {
-		callGetUserProfile(client, accessToken)
-	} else {
-		log.Println("⚠️ Bỏ qua GetUserProfile vì không có Access Token hợp lệ.")
-	}
-}
-
-// Hàm gọi RPC Register
-func callRegister(client userpb.UserServiceClient) (string, bool) {
-	log.Println("--- Đang gọi RPC: Register ---")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second) // Tăng timeout
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	req := &userpb.RegisterRequest{
-		Email:    testEmail,
-		Password: testPassword,
+	notiAddr := os.Getenv("NOTI_ADDR")
+	if notiAddr == "" {
+		notiAddr = "localhost:50052"
 	}
 
-	res, err := client.Register(ctx, req)
-	if err != nil {
-		// Log lỗi chi tiết hơn nếu là lỗi gRPC Status
-		if st, ok := status.FromError(err); ok && st.Code() == 7 { // Code 7 là AlreadyExists
-			log.Printf("⚠️ Lỗi gọi Register: Tài khoản đã tồn tại. Thử tiếp tục với Login: %v", st.Message())
-			return "", false
-		}
-		log.Fatalf("❌ Lỗi nghiêm trọng khi gọi Register: %v", err)
+	cryptoAddr := os.Getenv("CRYPTO_ADDR")
+	if cryptoAddr == "" {
+		cryptoAddr = "localhost:50053"
 	}
 
-	// In thông tin phản hồi dựa trên cấu trúc mới (RegisterResponse có UserDto, access_token)
-	log.Printf("✅ Phản hồi Register thành công:")
-	log.Printf("   User ID: %d", res.GetUser().GetId())
-	log.Printf("   User UUID: %s", res.GetUser().GetUuid())
-	log.Printf("   Email: %s", res.GetUser().GetEmail())
-	log.Printf("   Access Token: %s...", res.GetAccessToken()[:20]) // Cắt ngắn token
-	log.Printf("   Loại Token: %s (Hết hạn sau %d giây)", res.GetTokenType(), res.GetExp())
-	log.Println("----------------------------------")
-	return res.GetAccessToken(), true
-}
-
-// Hàm gọi RPC Login
-func callLogin(client userpb.UserServiceClient) (string, bool) {
-	log.Println("--- Đang gọi RPC: Login ---")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second) // Tăng timeout
-	defer cancel()
-
-	req := &userpb.LoginRequest{
-		Email:    testEmail,
-		Password: testPassword,
+	coreAddr := os.Getenv("CORE_ADDR")
+	if coreAddr == "" {
+		coreAddr = "localhost:50054"
 	}
 
-	res, err := client.Login(ctx, req)
-	if err != nil {
-		log.Fatalf("❌ Lỗi khi gọi Login: %v", err)
+	stockAddr := os.Getenv("STOCK_ADDR")
+	if stockAddr == "" {
+		stockAddr = "localhost:50055"
 	}
 
-	// In thông tin phản hồi dựa trên cấu trúc mới (LoginResponse có UserDto, access_token)
-	log.Printf("✅ Phản hồi Login thành công:")
-	log.Printf("   User ID: %d", res.GetUser().GetId())
-	log.Printf("   User UUID: %s", res.GetUser().GetUuid())
-	log.Printf("   Email: %s", res.GetUser().GetEmail())
-	log.Printf("   Access Token: %s...", res.GetAccessToken()[:20]) // Cắt ngắn token
-	log.Printf("   Loại Token: %s (Hết hạn sau %d giây)", res.GetTokenType(), res.GetExp())
-	log.Println("----------------------------------")
-	return res.GetAccessToken(), true
-}
-
-// Hàm gọi RPC GetUserProfile
-// Bây giờ nhận vào accessToken để gửi qua metadata
-func callGetUserProfile(client userpb.UserServiceClient, accessToken string) {
-	log.Println("--- Đang gọi RPC: GetUserProfile (Có Auth Token) ---")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	// ❗ Bổ sung: Thêm Authorization Token vào context (metadata)
-	authHeader := "Bearer " + accessToken
-	md := metadata.Pairs("authorization", authHeader)
-	ctx = metadata.NewOutgoingContext(ctx, md)
-
-	req := &userpb.GetUserProfileRequest{}
-
-	res, err := client.GetUserProfile(ctx, req)
-	if err != nil {
-		log.Fatalf("❌ Lỗi khi gọi GetUserProfile: %v", err)
+	marketAddr := os.Getenv("MARKET_ADDR")
+	if marketAddr == "" {
+		marketAddr = "localhost:50055"
 	}
 
-	// In thông tin phản hồi dựa trên cấu trúc mới (GetUserProfileResponse có UserDto, status, kyc_status)
-	log.Printf("✅ Phản hồi GetUserProfile thành công:")
-	log.Printf("   User ID: %d", res.GetUser().GetId())
-	log.Printf("   Email: %s", res.GetUser().GetEmail())
-	log.Printf("   Trạng thái tài khoản: %v", res.GetUser().GetStatus()) // UserStatus
-	log.Println("----------------------------------")
+	corePort := os.Getenv("CORE_PORT")
+	if corePort == "" {
+		corePort = ":8080"
+	}
+
+	mux := runtime.NewServeMux()
+
+	// Create a limiter: 5 requests per second, burst of 10
+	limiter := NewIPRateLimiter(20, 40)
+
+	// Wrap the mux with the middleware
+	handler := RateLimitMiddleware(limiter, mux)
+
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+
+	if err := noti.RegisterNotificationServiceHandlerFromEndpoint(ctx, mux, notiAddr, opts); err != nil {
+		log.Fatalf("Failed to register NotificationService: %v", err)
+	}
+
+	if err := crypto.RegisterCryptoServiceHandlerFromEndpoint(ctx, mux, cryptoAddr, opts); err != nil {
+		log.Fatalf("Failed to register CryptoService: %v", err)
+	}
+
+	if err := stock.RegisterStockServiceHandlerFromEndpoint(ctx, mux, stockAddr, opts); err != nil {
+		log.Fatalf("Failed to register StockService: %v", err)
+	}
+
+	if err := market.RegisterMarketServiceHandlerFromEndpoint(ctx, mux, stockAddr, opts); err != nil {
+		log.Fatalf("Failed to register StockService: %v", err)
+	}
+
+	if err := corev1.RegisterUserServiceHandlerFromEndpoint(ctx, mux, coreAddr, opts); err != nil {
+		log.Fatalf("Failed to register UserService: %v", err)
+	}
+
+	if err := http.ListenAndServe(corePort, handler); err != nil {
+		log.Fatalf("Failed to start HTTP server: %v", err)
+	}
 }

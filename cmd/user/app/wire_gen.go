@@ -23,7 +23,7 @@ import (
 
 // Injectors from wire.go:
 
-func InitializeUserScheduler(db *sqlx.DB, log *zap.Logger) *scheduler.UserCronScheduler {
+func InitializeCoreScheduler(db *sqlx.DB, log *zap.Logger) *scheduler.UserCronScheduler {
 	iUserRepo := repo.NewUserRepo(db)
 	userCronScheduler := scheduler.NewUserCronScheduler(iUserRepo, log)
 	return userCronScheduler

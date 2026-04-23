@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 	common "simple-securities/gen/common/v1"
-	userpb "simple-securities/gen/user/v1"
+	corev1 "simple-securities/gen/core/v1"
 	"strings"
 
 	"google.golang.org/grpc/codes"
@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *UserGrpcHandler) GetUserProfile(ctx context.Context, req *userpb.GetUserProfileRequest) (*userpb.GetUserProfileResponse, error) {
+func (h *UserGrpcHandler) GetUserProfile(ctx context.Context, req *corev1.GetUserProfileRequest) (*corev1.GetUserProfileResponse, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, status.Error(codes.Unauthenticated, "Authorization metadata not found.")
@@ -43,7 +43,7 @@ func (h *UserGrpcHandler) GetUserProfile(ctx context.Context, req *userpb.GetUse
 		lastLoginAt = res.LastLoginAt.UnixMilli()
 	}
 
-	return &userpb.GetUserProfileResponse{
+	return &corev1.GetUserProfileResponse{
 		User: &common.UserDto{
 			Id:          res.ID,
 			Uuid:        res.Uuid,

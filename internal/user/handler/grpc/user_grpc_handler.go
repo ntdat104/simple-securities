@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	userpb "simple-securities/gen/user/v1"
+	corev1 "simple-securities/gen/core/v1"
 
 	"simple-securities/internal/user/application/service"
 )
@@ -14,14 +14,14 @@ type UserGrpcSvc struct {
 }
 
 type UserGrpcHandler struct {
-	userpb.UnimplementedUserServiceServer
+	corev1.UnimplementedUserServiceServer
 	registerSvc       service.RegisterSvc
 	loginSvc          service.LoginSvc
 	refreshTokenSvc   service.RefreshTokenSvc
 	getUserProfileSvc service.GetUserProfileSvc
 }
 
-func NewUserGrpcHandler(svc UserGrpcSvc) userpb.UserServiceServer {
+func NewUserGrpcHandler(svc UserGrpcSvc) corev1.UserServiceServer {
 	return &UserGrpcHandler{
 		registerSvc:       svc.RegisterSvc,
 		loginSvc:          svc.LoginSvc,

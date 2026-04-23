@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	creditv1 "simple-securities/gen/credit/v1"
+	personalizev1 "simple-securities/gen/personalize/v1"
 	"simple-securities/internal/credit/domain/enum"
 	"simple-securities/pkg/errors"
 )
@@ -34,17 +34,17 @@ func parseUint64(s string) uint64 {
 	return v
 }
 
-func toProtoWalletType(wt enum.WalletType) creditv1.WalletType {
+func toProtoWalletType(wt enum.WalletType) personalizev1.WalletType {
 	switch wt {
 	case enum.WalletTypeMembership:
-		return creditv1.WalletType_WALLET_TYPE_MEMBERSHIP
+		return personalizev1.WalletType_WALLET_TYPE_MEMBERSHIP
 	case enum.WalletTypeCourse:
-		return creditv1.WalletType_WALLET_TYPE_COURSE
+		return personalizev1.WalletType_WALLET_TYPE_COURSE
 	case enum.WalletTypePurchased:
-		return creditv1.WalletType_WALLET_TYPE_PURCHASED
+		return personalizev1.WalletType_WALLET_TYPE_PURCHASED
 	case enum.WalletTypeGiveaway:
-		return creditv1.WalletType_WALLET_TYPE_GIVEAWAY
+		return personalizev1.WalletType_WALLET_TYPE_GIVEAWAY
 	default:
-		return creditv1.WalletType_WALLET_TYPE_UNSPECIFIED
+		return personalizev1.WalletType_WALLET_TYPE_UNSPECIFIED
 	}
 }

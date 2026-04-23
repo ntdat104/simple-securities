@@ -8,11 +8,11 @@ import (
 	"os"
 	"sync"
 
+	corev1 "simple-securities/gen/core/v1"
 	crypto "simple-securities/gen/crypto/v1"
 	market "simple-securities/gen/market/v1"
 	noti "simple-securities/gen/notification/v1"
 	stock "simple-securities/gen/stock/v1"
-	user "simple-securities/gen/user/v1"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"golang.org/x/time/rate"
@@ -81,9 +81,9 @@ func main() {
 		cryptoAddr = "localhost:50053"
 	}
 
-	userAddr := os.Getenv("USER_ADDR")
-	if userAddr == "" {
-		userAddr = "localhost:50054"
+	coreAddr := os.Getenv("CORE_ADDR")
+	if coreAddr == "" {
+		coreAddr = "localhost:50054"
 	}
 
 	stockAddr := os.Getenv("STOCK_ADDR")
@@ -127,7 +127,7 @@ func main() {
 		log.Fatalf("Failed to register StockService: %v", err)
 	}
 
-	if err := user.RegisterUserServiceHandlerFromEndpoint(ctx, mux, userAddr, opts); err != nil {
+	if err := corev1.RegisterUserServiceHandlerFromEndpoint(ctx, mux, coreAddr, opts); err != nil {
 		log.Fatalf("Failed to register UserService: %v", err)
 	}
 

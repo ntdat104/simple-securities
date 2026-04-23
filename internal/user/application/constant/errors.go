@@ -14,6 +14,15 @@ var (
 	ErrUserEmailTaken      = errors.New(errors.ErrorTypeConflict, "user email already taken")
 	ErrUserInvalidUpdate   = errors.New(errors.ErrorTypeValidation, "invalid user update data")
 	ErrUserModified        = errors.New(errors.ErrorTypeConflict, "user modified by another process")
+
+	ErrInsufficientCredits   = errors.New(errors.ErrorTypeBusiness, "insufficient credits")
+	ErrWalletNotFound        = errors.New(errors.ErrorTypeNotFound, "credit wallet not found")
+	ErrReservationNotFound   = errors.New(errors.ErrorTypeNotFound, "reservation not found")
+	ErrReservationExpired    = errors.New(errors.ErrorTypeBusiness, "reservation has expired")
+	ErrReservationNotPending = errors.New(errors.ErrorTypeBusiness, "reservation is not in PENDING status")
+	ErrDuplicateIdempotency  = errors.New(errors.ErrorTypeBusiness, "duplicate request: idempotency key already used")
+	ErrInvalidAmount         = errors.New(errors.ErrorTypeBusiness, "amount must be greater than zero")
+	ErrExpireAtRequired      = errors.New(errors.ErrorTypeBusiness, "expire_at is required for this wallet type")
 )
 
 func NewUserNotFoundWithID(id uint64) *errors.AppError {

@@ -18,7 +18,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func InitializeUserScheduler(
+func InitializeCoreScheduler(
 	db *sqlx.DB,
 	log *zap.Logger,
 ) *scheduler.UserCronScheduler {

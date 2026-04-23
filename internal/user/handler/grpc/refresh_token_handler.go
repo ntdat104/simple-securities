@@ -3,10 +3,10 @@ package grpc
 import (
 	"context"
 	common "simple-securities/gen/common/v1"
-	userpb "simple-securities/gen/user/v1"
+	corev1 "simple-securities/gen/core/v1"
 )
 
-func (h *UserGrpcHandler) RefreshToken(ctx context.Context, req *userpb.RefreshTokenRequest) (*userpb.RefreshTokenResponse, error) {
+func (h *UserGrpcHandler) RefreshToken(ctx context.Context, req *corev1.RefreshTokenRequest) (*corev1.RefreshTokenResponse, error) {
 	res, err := h.refreshTokenSvc.Execute(ctx, req.RefreshToken)
 	if err != nil {
 		return nil, err
@@ -17,7 +17,7 @@ func (h *UserGrpcHandler) RefreshToken(ctx context.Context, req *userpb.RefreshT
 		lastLoginAt = res.User.LastLoginAt.UnixMilli()
 	}
 
-	return &userpb.RefreshTokenResponse{
+	return &corev1.RefreshTokenResponse{
 		User: &common.UserDto{
 			Id:          res.User.ID,
 			Uuid:        res.User.Uuid,
