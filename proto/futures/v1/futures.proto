@@ -1,0 +1,292 @@
+syntax = "proto3";
+
+package futures.v1;
+
+import "google/api/annotations.proto";
+
+// FuturesService owns USDⓈ-M perpetual futures: collateral account, positions, orders,
+// risk (margin, liquidation), mark/index price and funding. All decimals are strings.
+service FuturesService {
+  // ---- market (public) ----
+  rpc GetMarkPrices(GetMarkPricesRequest) returns (GetMarkPricesResponse) {
+    option (google.api.http) = {get: "/v1/futures/mark-prices"};
+  }
+  rpc ListFundingRates(ListFundingRatesRequest) returns (ListFundingRatesResponse) {
+    option (google.api.http) = {get: "/v1/futures/funding-rates"};
+  }
+
+  // ---- account ----
+  rpc GetAccount(GetAccountRequest) returns (Account) {
+    option (google.api.http) = {get: "/v1/futures/users/{user_id}/account"};
+  }
+  rpc ListPositions(ListPositionsRequest) returns (ListPositionsResponse) {
+    option (google.api.http) = {get: "/v1/futures/users/{user_id}/positions"};
+  }
+  rpc SetLeverage(SetLeverageRequest) returns (SymbolSetting) {
+    option (google.api.http) = {post: "/v1/futures/leverage" body: "*"};
+  }
+  rpc SetMarginType(SetMarginTypeRequest) returns (SymbolSetting) {
+    option (google.api.http) = {post: "/v1/futures/margin-type" body: "*"};
+  }
+  rpc AdjustIsolatedMargin(AdjustIsolatedMarginRequest) returns (Position) {
+    option (google.api.http) = {post: "/v1/futures/position-margin" body: "*"};
+  }
+  // TransferToSpot debits the futures account and credits the spot wallet asynchronously
+  // (outbox event futures.transfers -> wallet service).
+  rpc TransferToSpot(TransferToSpotRequest) returns (TransferResponse) {
+    option (google.api.http) = {post: "/v1/futures/transfers/spot" body: "*"};
+  }
+  rpc ListIncome(ListIncomeRequest) returns (ListIncomeResponse) {
+    option (google.api.http) = {get: "/v1/futures/users/{user_id}/income"};
+  }
+
+  // ---- trading ----
+  rpc PlaceOrder(PlaceOrderRequest) returns (Order) {
+    option (google.api.http) = {post: "/v1/futures/orders" body: "*"};
+  }
+  rpc CancelOrder(CancelOrderRequest) returns (Order) {
+    option (google.api.http) = {post: "/v1/futures/orders/{order_id}/cancel" body: "*"};
+  }
+  // ClosePosition sends a reduce-only MARKET order for the whole position.
+  rpc ClosePosition(ClosePositionRequest) returns (Order) {
+    option (google.api.http) = {post: "/v1/futures/close-position" body: "*"};
+  }
+  rpc GetOrder(GetOrderRequest) returns (Order) {
+    option (google.api.http) = {get: "/v1/futures/orders/{order_id}"};
+  }
+  rpc ListOpenOrders(ListOpenOrdersRequest) returns (ListOrdersResponse) {
+    option (google.api.http) = {get: "/v1/futures/users/{user_id}/open-orders"};
+  }
+  rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse) {
+    option (google.api.http) = {get: "/v1/futures/users/{user_id}/orders"};
+  }
+  rpc ListTrades(ListTradesRequest) returns (ListTradesResponse) {
+    option (google.api.http) = {get: "/v1/futures/users/{user_id}/trades"};
+  }
+}
+
+message MarkPrice {
+  string symbol = 1;
+  string mark_price = 2;
+  string index_price = 3;
+  string last_funding_rate = 4; // estimated rate of the next settlement
+  int64 next_funding_time = 5;  // epoch ms
+  int64 time = 6;
+}
+
+message GetMarkPricesRequest {
+  string symbol = 1; // empty = all
+}
+
+message GetMarkPricesResponse {
+  repeated MarkPrice prices = 1;
+}
+
+message FundingRate {
+  string symbol = 1;
+  string funding_rate = 2;
+  int64 funding_time = 3;
+  string mark_price = 4;
+}
+
+message ListFundingRatesRequest {
+  string symbol = 1;
+  int32 limit = 2;
+}
+
+message ListFundingRatesResponse {
+  repeated FundingRate rates = 1;
+}
+
+message Position {
+  string symbol = 1;
+  string position_amt = 2; // signed: + long, - short
+  string entry_price = 3;
+  string break_even_price = 4;
+  string mark_price = 5;
+  string unrealized_pnl = 6;
+  string liquidation_price = 7; // "0" when none
+  int32 leverage = 8;
+  string margin_type = 9; // CROSSED | ISOLATED
+  string isolated_margin = 10;
+  string notional = 11;
+  string initial_margin = 12;
+  string maint_margin = 13;
+  string update_time = 14; // RFC3339
+}
+
+message Account {
+  string asset = 1; // USDT
+  string wallet_balance = 2;
+  string unrealized_pnl = 3;
+  string margin_balance = 4;
+  string available_balance = 5;
+  string max_withdraw_amount = 6;
+  string total_initial_margin = 7;
+  string total_maint_margin = 8;
+  string total_open_order_margin = 9;
+  repeated Position positions = 10;
+}
+
+message GetAccountRequest {
+  string user_id = 1;
+}
+
+message ListPositionsRequest {
+  string user_id = 1;
+  string symbol = 2;
+}
+
+message ListPositionsResponse {
+  repeated Position positions = 1;
+}
+
+message SymbolSetting {
+  string symbol = 1;
+  int32 leverage = 2;
+  string margin_type = 3;
+  string max_notional = 4;
+}
+
+message SetLeverageRequest {
+  string user_id = 1;
+  string symbol = 2;
+  int32 leverage = 3;
+}
+
+message SetMarginTypeRequest {
+  string user_id = 1;
+  string symbol = 2;
+  string margin_type = 3; // CROSSED | ISOLATED
+}
+
+message AdjustIsolatedMarginRequest {
+  string user_id = 1;
+  string symbol = 2;
+  string amount = 3;
+  string type = 4; // ADD | REDUCE
+}
+
+message TransferToSpotRequest {
+  string user_id = 1;
+  string asset = 2;
+  string amount = 3;
+  string idempotency_key = 4;
+}
+
+message TransferResponse {
+  string transfer_id = 1;
+  string asset = 2;
+  string amount = 3;
+  string status = 4; // PENDING (credited on the other side asynchronously)
+}
+
+message Income {
+  int64 id = 1;
+  string symbol = 2;
+  string income_type = 3; // TRANSFER | REALIZED_PNL | COMMISSION | FUNDING_FEE | INSURANCE_CLEAR | ISOLATED_MARGIN
+  string income = 4;
+  string asset = 5;
+  string info = 6;
+  string time = 7;
+}
+
+message ListIncomeRequest {
+  string user_id = 1;
+  string symbol = 2;
+  string income_type = 3;
+  int32 limit = 4;
+}
+
+message ListIncomeResponse {
+  repeated Income income = 1;
+}
+
+message Order {
+  string order_id = 1;
+  string client_order_id = 2;
+  string user_id = 3;
+  string symbol = 4;
+  string side = 5;          // BUY | SELL
+  string type = 6;          // LIMIT | MARKET
+  string time_in_force = 7; // GTC | IOC | FOK | GTX (post-only)
+  string price = 8;
+  string quantity = 9;
+  string executed_qty = 10;
+  string cum_quote = 11;
+  string avg_price = 12;
+  bool reduce_only = 13;
+  bool liquidation = 14;
+  string status = 15; // NEW | PARTIALLY_FILLED | FILLED | CANCELED | EXPIRED | REJECTED
+  string reject_reason = 16;
+  string realized_pnl = 17;
+  string created_at = 18;
+  string updated_at = 19;
+}
+
+message PlaceOrderRequest {
+  string user_id = 1;
+  string symbol = 2;
+  string side = 3;
+  string type = 4;
+  string time_in_force = 5;
+  string price = 6;
+  string quantity = 7;
+  bool reduce_only = 8;
+  string client_order_id = 9;
+}
+
+message CancelOrderRequest {
+  string user_id = 1;
+  string order_id = 2;
+}
+
+message ClosePositionRequest {
+  string user_id = 1;
+  string symbol = 2;
+}
+
+message GetOrderRequest {
+  string user_id = 1;
+  string order_id = 2;
+}
+
+message ListOpenOrdersRequest {
+  string user_id = 1;
+  string symbol = 2;
+}
+
+message ListOrdersRequest {
+  string user_id = 1;
+  string symbol = 2;
+  int32 limit = 3;
+}
+
+message ListOrdersResponse {
+  repeated Order orders = 1;
+}
+
+message Trade {
+  int64 trade_id = 1;
+  string order_id = 2;
+  string symbol = 3;
+  string side = 4;
+  string price = 5;
+  string qty = 6;
+  string quote_qty = 7;
+  string realized_pnl = 8;
+  string commission = 9;
+  string commission_asset = 10;
+  bool is_maker = 11;
+  string time = 12;
+}
+
+message ListTradesRequest {
+  string user_id = 1;
+  string symbol = 2;
+  int32 limit = 3;
+}
+
+message ListTradesResponse {
+  repeated Trade trades = 1;
+}

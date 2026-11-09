@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package order.v1;
+
+import "google/api/annotations.proto";
+
+// OrderService owns the order lifecycle and user trade history.
+service OrderService {
+  rpc PlaceOrder(PlaceOrderRequest) returns (Order) {
+    option (google.api.http) = {post: "/v1/orders" body: "*"};
+  }
+  rpc CancelOrder(CancelOrderRequest) returns (Order) {
+    option (google.api.http) = {post: "/v1/orders/{order_id}/cancel" body: "*"};
+  }
+  rpc GetOrder(GetOrderRequest) returns (Order) {
+    option (google.api.http) = {get: "/v1/orders/{order_id}"};
+  }
+  rpc ListOpenOrders(ListOpenOrdersRequest) returns (ListOrdersResponse) {
+    option (google.api.http) = {get: "/v1/users/{user_id}/open-orders"};
+  }
+  rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse) {
+    option (google.api.http) = {get: "/v1/users/{user_id}/orders"};
+  }
+  rpc ListTrades(ListTradesRequest) returns (ListTradesResponse) {
+    option (google.api.http) = {get: "/v1/users/{user_id}/trades"};
+  }
+}
+
+message Order {
+  string order_id = 1;
+  string client_order_id = 2;
+  string user_id = 3;
+  string symbol = 4;
+  string side = 5;          // BUY | SELL
+  string type = 6;          // LIMIT | MARKET | LIMIT_MAKER
+  string time_in_force = 7; // GTC | IOC | FOK
+  string price = 8;
+  string quantity = 9;
+  string quote_quantity = 10; // MARKET BUY budget
+  string executed_qty = 11;
+  string cum_quote_qty = 12;
+  string status = 13; // PENDING_NEW | NEW | PARTIALLY_FILLED | FILLED | CANCELED | EXPIRED | REJECTED
+  string reject_reason = 14;
+  string created_at = 15;
+  string updated_at = 16;
+}
+
+message PlaceOrderRequest {
+  string user_id = 1;
+  string symbol = 2;
+  string side = 3;
+  string type = 4;
+  string time_in_force = 5;
+  string price = 6;
+  string quantity = 7;
+  string quote_quantity = 8;
+  string client_order_id = 9;
+}
+
+message CancelOrderRequest {
+  string user_id = 1;
+  string order_id = 2;
+}
+
+message GetOrderRequest {
+  string user_id = 1;
+  string order_id = 2;
+}
+
+message ListOpenOrdersRequest {
+  string user_id = 1;
+  string symbol = 2;
+}
+
+message ListOrdersRequest {
+  string user_id = 1;
+  string symbol = 2;
+  int32 limit = 3;
+}
+
+message ListOrdersResponse {
+  repeated Order orders = 1;
+}
+
+message Trade {
+  int64 trade_id = 1;
+  string order_id = 2;
+  string symbol = 3;
+  string side = 4;
+  string price = 5;
+  string qty = 6;
+  string quote_qty = 7;
+  string commission = 8;
+  string commission_asset = 9;
+  bool is_maker = 10;
+  string time = 11;
+}
+
+message ListTradesRequest {
+  string user_id = 1;
+  string symbol = 2;
+  int32 limit = 3;
+}
+
+message ListTradesResponse {
+  repeated Trade trades = 1;
+}
