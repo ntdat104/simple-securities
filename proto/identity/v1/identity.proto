@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package identity.v1;
+
+import "google/api/annotations.proto";
+
+// IdentityService owns users, credentials and sessions (refresh tokens).
+service IdentityService {
+  rpc Register(RegisterRequest) returns (AuthResponse) {
+    option (google.api.http) = {post: "/v1/identity/register" body: "*"};
+  }
+  rpc Login(LoginRequest) returns (AuthResponse) {
+    option (google.api.http) = {post: "/v1/identity/login" body: "*"};
+  }
+  rpc Refresh(RefreshRequest) returns (AuthResponse) {
+    option (google.api.http) = {post: "/v1/identity/refresh" body: "*"};
+  }
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {
+    option (google.api.http) = {post: "/v1/identity/logout" body: "*"};
+  }
+  rpc GetUser(GetUserRequest) returns (User) {
+    option (google.api.http) = {get: "/v1/identity/users/{user_id}"};
+  }
+}
+
+message User {
+  string user_id = 1;
+  string email = 2;
+  string created_at = 3; // RFC3339
+}
+
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message RefreshRequest {
+  string refresh_token = 1;
+}
+
+message LogoutRequest {
+  string refresh_token = 1;
+}
+
+message LogoutResponse {}
+
+message AuthResponse {
+  User user = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+  int64 access_expires_in = 4; // seconds
+}
+
+message GetUserRequest {
+  string user_id = 1;
+}

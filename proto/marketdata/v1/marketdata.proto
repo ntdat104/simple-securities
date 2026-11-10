@@ -1,0 +1,123 @@
+syntax = "proto3";
+
+package marketdata.v1;
+
+import "google/api/annotations.proto";
+
+// MarketDataService serves public market data (read side).
+service MarketDataService {
+  rpc GetExchangeInfo(GetExchangeInfoRequest) returns (ExchangeInfo) {
+    option (google.api.http) = {get: "/v1/market/exchange-info"};
+  }
+  rpc GetTickers(GetTickersRequest) returns (GetTickersResponse) {
+    option (google.api.http) = {get: "/v1/market/tickers"};
+  }
+  rpc GetKlines(GetKlinesRequest) returns (GetKlinesResponse) {
+    option (google.api.http) = {get: "/v1/market/klines"};
+  }
+  rpc GetDepth(GetDepthRequest) returns (Depth) {
+    option (google.api.http) = {get: "/v1/market/depth"};
+  }
+  rpc GetTrades(GetTradesRequest) returns (GetTradesResponse) {
+    option (google.api.http) = {get: "/v1/market/trades"};
+  }
+}
+
+message SymbolInfo {
+  string symbol = 1;
+  string base_asset = 2;
+  string quote_asset = 3;
+  string tick_size = 4;
+  string step_size = 5;
+  string min_notional = 6;
+  string maker_fee = 7;
+  string taker_fee = 8;
+  string status = 9;
+}
+
+message GetExchangeInfoRequest {}
+
+message ExchangeInfo {
+  repeated SymbolInfo symbols = 1;
+  int64 server_time = 2;
+}
+
+message Ticker {
+  string symbol = 1;
+  string last_price = 2;
+  string open_price = 3;
+  string high_price = 4;
+  string low_price = 5;
+  string volume = 6;
+  string quote_volume = 7;
+  string price_change = 8;
+  string price_change_percent = 9;
+  int64 trade_count = 10;
+  int64 close_time = 11;
+}
+
+message GetTickersRequest {
+  string symbol = 1; // empty = all
+}
+
+message GetTickersResponse {
+  repeated Ticker tickers = 1;
+}
+
+message Kline {
+  int64 open_time = 1;
+  string open = 2;
+  string high = 3;
+  string low = 4;
+  string close = 5;
+  string volume = 6;
+  int64 close_time = 7;
+  string quote_volume = 8;
+  int64 trade_count = 9;
+}
+
+message GetKlinesRequest {
+  string symbol = 1;
+  string interval = 2; // 1m 5m 15m 1h 4h 1d
+  int32 limit = 3;
+  int64 end_time = 4;
+}
+
+message GetKlinesResponse {
+  repeated Kline klines = 1;
+}
+
+message PriceLevel {
+  string price = 1;
+  string qty = 2;
+}
+
+message GetDepthRequest {
+  string symbol = 1;
+  int32 limit = 2;
+}
+
+message Depth {
+  string symbol = 1;
+  int64 last_update_id = 2;
+  repeated PriceLevel bids = 3;
+  repeated PriceLevel asks = 4;
+}
+
+message PublicTrade {
+  int64 trade_id = 1;
+  string price = 2;
+  string qty = 3;
+  string quote_qty = 4;
+  int64 time = 5;
+  bool is_buyer_maker = 6;
+}
+
+message GetTradesRequest {
+  string symbol = 1;
+  int32 limit = 2;
+}
+
+message GetTradesResponse {
+  repeated PublicTrade trades = 1;
+}

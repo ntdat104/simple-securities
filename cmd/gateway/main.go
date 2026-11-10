@@ -1,137 +1,86 @@
+// Command gateway is the public edge: REST /api/v1, WebSocket /ws, JWT auth, rate limiting and the
+// static trading UI.
 package main
 
 import (
 	"context"
-	"log"
-	"net"
-	"net/http"
+	"fmt"
 	"os"
-	"sync"
+	"time"
 
-	corev1 "simple-securities/gen/core/v1"
-	crypto "simple-securities/gen/crypto/v1"
-	market "simple-securities/gen/market/v1"
-	noti "simple-securities/gen/notification/v1"
-	stock "simple-securities/gen/stock/v1"
+	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"golang.org/x/time/rate"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"simple-securities/internal/gateway/api"
+	"simple-securities/internal/gateway/ratelimit"
+	"simple-securities/internal/gateway/rest"
+	"simple-securities/internal/gateway/upstream"
+	"simple-securities/internal/gateway/ws"
+	"simple-securities/pkg/app"
+	"simple-securities/pkg/auth"
+	"simple-securities/pkg/config"
+	"simple-securities/pkg/httpx"
+	"simple-securities/pkg/kafka"
+	"simple-securities/pkg/logger"
+	"simple-securities/web"
 )
 
-type IPRateLimiter struct {
-	ips map[string]*rate.Limiter
-	mu  *sync.Mutex
-	r   rate.Limit
-	b   int
-}
-
-func NewIPRateLimiter(r rate.Limit, b int) *IPRateLimiter {
-	return &IPRateLimiter{
-		ips: make(map[string]*rate.Limiter),
-		mu:  &sync.Mutex{},
-		r:   r,
-		b:   b,
-	}
-}
-
-func (i *IPRateLimiter) GetLimiter(ip string) *rate.Limiter {
-	i.mu.Lock()
-	defer i.mu.Unlock()
-
-	limiter, exists := i.ips[ip]
-	if !exists {
-		limiter = rate.NewLimiter(i.r, i.b)
-		i.ips[ip] = limiter
-	}
-
-	return limiter
-}
-
-func RateLimitMiddleware(limiter *IPRateLimiter, next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Extract IP address from RemoteAddr (stripping the port)
-		ip, _, err := net.SplitHostPort(r.RemoteAddr)
-		if err != nil {
-			// Fallback if SplitHostPort fails
-			ip = r.RemoteAddr
-		}
-
-		if !limiter.GetLimiter(ip).Allow() {
-			http.Error(w, "Too Many Requests", http.StatusTooManyRequests)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
-}
-
 func main() {
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
+	if err := run(); err != nil {
+		fmt.Fprintln(os.Stderr, "gateway:", err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
+	common := config.LoadCommon("gateway", "", ":8080", "")
+	log := logger.New(common.Service, common.Env, common.LogLevel)
+	defer func() { _ = log.Sync() }()
+
+	ctx, cancel := app.Context()
 	defer cancel()
 
-	notiAddr := os.Getenv("NOTI_ADDR")
-	if notiAddr == "" {
-		notiAddr = "localhost:50052"
+	ups, err := upstream.New(upstream.ConfigFromEnv())
+	if err != nil {
+		return err
+	}
+	defer func() { _ = ups.Close() }()
+
+	rdb := redis.NewClient(&redis.Options{
+		Addr:         config.String("REDIS_ADDR", "localhost:6379"),
+		DialTimeout:  time.Second,
+		ReadTimeout:  200 * time.Millisecond,
+		WriteTimeout: 200 * time.Millisecond,
+		PoolSize:     100,
+	})
+	defer func() { _ = rdb.Close() }()
+
+	limiter := ratelimit.New(ratelimit.NewRedisStore(rdb), log)
+	jwt := auth.New(config.String("JWT_SECRET", "dev-secret-change-me-32-bytes-long!!"),
+		config.Duration("JWT_TTL", 15*time.Minute))
+	trader := api.NewTrader(ups.Order, ups.Futures, limiter)
+	origins := config.List("CORS_ORIGINS", []string{"*"})
+
+	hub := ws.NewHub(trader, jwt, origins, log)
+	tail, err := kafka.NewTailConsumer(common.Brokers, ws.Topics, hub.HandleMessage, log.Named("tail"))
+	if err != nil {
+		return fmt.Errorf("tail consumer: %w", err)
 	}
 
-	cryptoAddr := os.Getenv("CRYPTO_ADDR")
-	if cryptoAddr == "" {
-		cryptoAddr = "localhost:50053"
-	}
+	srv := rest.NewServer(rest.Config{
+		Origins:    origins,
+		TrustProxy: config.Bool("TRUST_PROXY", false),
+		WebDir:     config.String("WEB_DIR", ""),
+		Index:      web.Index,
+	}, ups, trader, jwt, limiter, hub, log)
+	// Redis is optional (rate limiting fails open), so readiness does not depend on it.
+	handler := httpx.ServiceHandler(srv.Handler(), nil)
 
-	coreAddr := os.Getenv("CORE_ADDR")
-	if coreAddr == "" {
-		coreAddr = "localhost:50054"
-	}
-
-	stockAddr := os.Getenv("STOCK_ADDR")
-	if stockAddr == "" {
-		stockAddr = "localhost:50055"
-	}
-
-	marketAddr := os.Getenv("MARKET_ADDR")
-	if marketAddr == "" {
-		marketAddr = "localhost:50055"
-	}
-
-	corePort := os.Getenv("CORE_PORT")
-	if corePort == "" {
-		corePort = ":8080"
-	}
-
-	mux := runtime.NewServeMux()
-
-	// Create a limiter: 5 requests per second, burst of 10
-	limiter := NewIPRateLimiter(20, 40)
-
-	// Wrap the mux with the middleware
-	handler := RateLimitMiddleware(limiter, mux)
-
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-
-	if err := noti.RegisterNotificationServiceHandlerFromEndpoint(ctx, mux, notiAddr, opts); err != nil {
-		log.Fatalf("Failed to register NotificationService: %v", err)
-	}
-
-	if err := crypto.RegisterCryptoServiceHandlerFromEndpoint(ctx, mux, cryptoAddr, opts); err != nil {
-		log.Fatalf("Failed to register CryptoService: %v", err)
-	}
-
-	if err := stock.RegisterStockServiceHandlerFromEndpoint(ctx, mux, stockAddr, opts); err != nil {
-		log.Fatalf("Failed to register StockService: %v", err)
-	}
-
-	if err := market.RegisterMarketServiceHandlerFromEndpoint(ctx, mux, stockAddr, opts); err != nil {
-		log.Fatalf("Failed to register StockService: %v", err)
-	}
-
-	if err := corev1.RegisterUserServiceHandlerFromEndpoint(ctx, mux, coreAddr, opts); err != nil {
-		log.Fatalf("Failed to register UserService: %v", err)
-	}
-
-	if err := http.ListenAndServe(corePort, handler); err != nil {
-		log.Fatalf("Failed to start HTTP server: %v", err)
-	}
+	log.Info("gateway starting", zap.String("http", common.HTTPAddr),
+		zap.String("upstream_transport", upstream.ConfigFromEnv().Transport))
+	return app.Run(ctx, log,
+		tail.Run,
+		hub.Run,
+		func(ctx context.Context) error { return httpx.Serve(ctx, common.HTTPAddr, handler, log) },
+	)
 }

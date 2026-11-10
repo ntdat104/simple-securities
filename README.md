@@ -1,150 +1,98 @@
-# 🚀 Simple Securities Microservices
+# Simple Securities Exchange
 
-> `Simple Securities` is an **imaginary and practical trading microservices system**, built with **Golang** and advanced architecture styles such as **Hexagonal Architecture**, **Domain Driven Design (DDD)**, **CQRS**, **Event Sourcing**, and **Event Driven Architecture**. It uses **Kafka** for messaging, **gRPC + gRPC Gateway** for service communication, and modern tooling for observability, configuration, and testing.
+A Binance-style **spot and USDⓈ-M perpetual futures crypto exchange** built as Go microservices with event-driven design:
+transactional **outbox / inbox**, Kafka, gRPC **and** HTTP between services, an in-memory
+price-time-priority matching engine, real-time WebSocket market data and trading, and a
+Tailwind web UI.
 
-💡 This project is designed as a **reference implementation** and technical playground, not a production-ready exchange.
-
-🚀 The application is **in progress** and evolves with new features and improvements.
-
----
-
-## ✨ Features
-
-- ✅ **Hexagonal Architecture** (ports & adapters)
-- ✅ **Domain Driven Design (DDD)**
-- ✅ **CQRS Pattern** (Command Query Responsibility Segregation)
-- ✅ **Event Sourcing** (durable event store)
-- ✅ **Event Driven Architecture** with **Kafka**
-- ✅ **Change Data Capture** using **Debezium** + Kafka
-- ✅ **gRPC** for internal service communication
-- ✅ **gRPC Gateway** for HTTP/REST routing
-- ✅ **Postgres & EventStoreDB** for transactional writes (ACID)
-- ✅ **MongoDB & ElasticSearch** for read models (NoSQL, search)
-- ✅ **Unit Testing** with mocks using **Mockery**
-- ✅ **Integration & End-to-End Testing** with **testcontainers-go**
-- ✅ **Zap** structured logging
-- ✅ **Viper** configuration management
-- ✅ **Docker & Docker Compose** for local deployment
-- 🚧 **Kubernetes & Helm** (future work)
-
----
-
-## 🏗️ Services
-
-- 🔑 **core-service** → manages users, wallets, and permissions
-- 💰 **crypto-service** → handles crypto orders, real-time prices via websockets, margin, futures, and crypto portfolios
-- 📈 **stock-service** → manages stock orders, real-time stock prices, buy/sell operations, and stock portfolios
-- 🔔 **notification-service** → push notifications, fetch by user or id
-- 🌐 **gateway-service** → REST gateway using **grpc-gateway** for routing
-
----
-
-## 🛠️ Tech Stack
-
-- **Language**: Go 1.25.0
-- **Service Communication**: gRPC + gRPC Gateway
-- **Messaging**: Kafka
-- **CDC**: Debezium → Kafka
-- **Databases**:
-  - Postgres (write DB)
-  - EventStoreDB (event sourcing)
-  - MongoDB (read DB)
-  - ElasticSearch (search)
-- **Config**: Viper
-- **Logging**: Zap
-- **Testing**: testify, mockery, testcontainers-go
-- **Deployment**: Docker & Docker Compose
-
----
-
-## 📚 Technologies & Libraries
-
-Here’s a list of key libraries and tools used across services:
-
-### 🔹 Core Libraries
-- [**gRPC**](https://grpc.io/) — RPC communication between services
-- [**grpc-gateway**](https://github.com/grpc-ecosystem/grpc-gateway) — REST ↔ gRPC mapping
-- [**protobuf**](https://developers.google.com/protocol-buffers) — schema definitions
-- [**Viper**](https://github.com/spf13/viper) — configuration management
-- [**Zap**](https://github.com/uber-go/zap) — structured logging
-- [**Mockery**](https://github.com/vektra/mockery) — generating mocks for tests
-- [**testify**](https://github.com/stretchr/testify) — unit testing assertions
-- [**testcontainers-go**](https://github.com/testcontainers/testcontainers-go) — integration testing with real containers
-
-### 🔹 Databases & Messaging
-- [**Postgres**](https://www.postgresql.org/) — relational DB for writes
-- [**EventStoreDB**](https://www.eventstore.com/) — event sourcing store
-- [**MongoDB**](https://www.mongodb.com/) — read DB (NoSQL)
-- [**ElasticSearch**](https://www.elastic.co/) — search engine
-- [**Kafka**](https://kafka.apache.org/) — event streaming
-- [**Debezium**](https://debezium.io/) — change data capture
-
-### 🔹 Dev & Ops
-- [**Docker**](https://www.docker.com/) — containerization
-- [**Docker Compose**](https://docs.docker.com/compose/) — local orchestration
-- [**Air**](https://github.com/cosmtrek/air) — live reload for Go
-- [**Make**](https://www.gnu.org/software/make/) — build automation
-
----
-
-## 📐 Architecture
-
-![Hexagonal Architecture](https://github.com/Sairyss/domain-driven-hexagon/raw/master/assets/images/DomainDrivenHexagon.png)
-
-### 🔹 Hexagonal Architecture
-- **Domain**: aggregates, entities, domain events
-- **Application**: commands, queries, handlers
-- **Adapters**: persistence (Postgres, EventStoreDB), messaging (Kafka), transport (gRPC, HTTP)
-
-### 🔹 CQRS & Event Sourcing
-- Commands mutate state, events are persisted in EventStoreDB
-- Events are published to Kafka for other services
-- Read models built asynchronously in MongoDB / ElasticSearch
-
-### 🔹 Change Data Capture (CDC)
-- Debezium streams Postgres changes into Kafka
-- Enables reliable read-model updates & audit logs
-
----
-
-## 🧪 Testing
-
-### Unit Tests
-```bash
-go test ./... -v
 ```
-Mocks generated with **mockery**.
-
-### Integration & E2E Tests
-```bash
-make test-integration
+                ┌──────────── web/index.html (Tailwind UI) ────────────┐
+                │        REST /api/v1          WebSocket /ws           │
+                └───────────────────────┬──────────────────────────────┘
+                                        ▼
+                                 ┌────────────┐  Redis (rate limit)
+                                 │  gateway   │◀──── tail: market.*, matching.events,
+                                 └─────┬──────┘       order.updates, wallet.balance.events
+                     gRPC or HTTP      │  (UPSTREAM_TRANSPORT=grpc|http)
+       ┌───────────────┬───────────────┼────────────────┬──────────────────┐
+       ▼               ▼               ▼                ▼                  │
+  ┌─────────┐    ┌──────────┐    ┌──────────┐    ┌────────────┐            │
+  │identity │    │  wallet  │◀───│  order   │    │ marketdata │            │
+  └────┬────┘    └────┬─────┘gRPC└────┬─────┘    └─────▲──────┘            │
+       │outbox        │outbox/inbox   │outbox/inbox    │inbox              │
+       ▼              ▼               ▼                │                   │
+  ════════════════════════════ Kafka ══════════════════════════════════════╛
+                                      │ order.commands (key=symbol)
+                                      ▼
+                               ┌────────────┐  matching.events (trades, order status)
+                               │  matching  │──▶ market.depth (100ms snapshots)
+                               └────────────┘
 ```
-Uses **testcontainers-go** to spin up real dependencies.
 
----
+Each service owns its own Postgres database (database-per-service). Data access uses **GORM**, and
+schemas are created/updated at startup with **GORM AutoMigrate** (models in each service, serialised
+across replicas with a Postgres advisory lock).
 
-## 📊 Observability
-- **Logging**: Zap (structured, leveled)
-- **Tracing/Metrics**: OpenTelemetry (Jaeger, Prometheus, Grafana)
+## Services
 
----
+| Service    | Ports (gRPC/HTTP) | Responsibility |
+|------------|-------------------|----------------|
+| gateway    | –/8080            | Public REST API, WebSocket streams + WS trading API, JWT, rate limiting, UI |
+| identity   | 9101/8101         | Register/login, JWT access tokens, rotating refresh tokens |
+| wallet     | 9102/8102         | Balances (free/locked), order locks, ledger, trade settlement, fees |
+| order      | 9103/8103         | Order validation & lifecycle, user trade history |
+| matching   | –/8104            | Order books, matching (LIMIT GTC/IOC/FOK, MARKET, POST-ONLY), STP |
+| marketdata | 9105/8105         | Klines, 24h tickers, public trades, depth |
+| futures    | 9106/8106         | USDⓈ-M perpetuals: margin account, positions, leverage, mark/index price, funding, liquidation |
+| matching-futures | –/8107      | Same matching binary with `MARKET=futures` (futures order books) |
+| marketdata-futures | 9108/8108 | Same marketdata binary with `MARKET=futures` |
+| mmbot      | –                 | Market-maker bot that provides spot and futures liquidity (follows Binance prices) |
 
-## 🐳 Deployment
-- Dockerfiles per service (multi-stage builds)
-- `docker-compose` for local development
-- Future: Kubernetes + Helm
+## Quick start
 
----
+```bash
+make up                 # build & start everything (docker compose)
+open http://localhost:8080
+```
 
-## 🤝 Contributing
+If ports 8080/5432/6379 are already in use: `GATEWAY_PORT=18080 PG_PORT=15432 REDIS_PORT=16379 make up`.
 
-1. Follow [Conventional Commits](https://www.conventionalcommits.org/)
-2. Run `make format && make lint` before commits
-3. Add tests for new features
-4. Open issues for large changes
+Run a service from source against the dockerised infra:
 
----
+```bash
+make infra              # postgres, kafka (localhost:9094), redis
+make run-identity       # go run ./cmd/identity (env defaults target localhost)
+```
 
-## 📜 License
+## Key design decisions
 
-MIT License — see [LICENSE](./LICENSE)
+- **Outbox**: state change + event row in one DB transaction. After commit, a separate goroutine is
+  woken and publishes to Kafka right away. A 1s poll covers crashes. One leader per service
+  (Postgres advisory lock) keeps the event order.
+- **Inbox**: consumers claim `event_id` in the same transaction as their side effects. Kafka offsets
+  are committed after that, which gives effectively-once processing. Poison messages go to `<topic>.dlq`.
+- **Synchronous risk check, async matching**: `order` locks funds in `wallet` over gRPC (idempotent
+  per order id) before the order reaches the engine. A recovery job reconciles orders stuck in `PENDING_NEW`.
+- **Single writer per symbol**: `order.commands` is keyed by symbol, so one matching instance owns
+  each book. The book state is persisted in the same transaction as the emitted events.
+- **Both transports**: every service serves gRPC and grpc-gateway HTTP from the same proto. Callers
+  pick one with `UPSTREAM_TRANSPORT` / `WALLET_TRANSPORT`.
+
+Full design, event contract, API and WebSocket protocol: [docs/architecture.md](docs/architecture.md).
+Futures (margin model, funding, liquidation, `/fapi/v1` API): [docs/futures.md](docs/futures.md).
+
+## Development
+
+```bash
+make proto   # buf generate (protoc-gen-go, -go-grpc, -grpc-gateway in $GOPATH/bin)
+make build
+make lint
+```
+
+Layout: `cmd/<svc>` (wiring) · `internal/<svc>` (domain, store, app, grpcapi, consumer) ·
+`pkg/` (database (GORM), outbox, inbox, kafka, grpcx, httpx, events, symbols, auth…) · `proto/` → `gen/` ·
+`web/index.html` · `deploy/`.
+
+## License
+
+MIT, see [LICENSE](LICENSE).

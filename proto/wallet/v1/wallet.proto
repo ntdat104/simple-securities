@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+package wallet.v1;
+
+import "google/api/annotations.proto";
+
+// WalletService owns balances (available / locked) and the immutable ledger.
+// All amounts are decimal strings.
+service WalletService {
+  rpc GetBalances(GetBalancesRequest) returns (GetBalancesResponse) {
+    option (google.api.http) = {get: "/v1/wallet/users/{user_id}/balances"};
+  }
+  // Deposit is a simulated on-chain deposit (faucet), only enabled in non-prod.
+  rpc Deposit(DepositRequest) returns (LedgerEntry) {
+    option (google.api.http) = {post: "/v1/wallet/deposit" body: "*"};
+  }
+  rpc Withdraw(WithdrawRequest) returns (LedgerEntry) {
+    option (google.api.http) = {post: "/v1/wallet/withdraw" body: "*"};
+  }
+  // LockFunds moves funds available -> locked for an order. Idempotent on order_id.
+  rpc LockFunds(LockFundsRequest) returns (LockFundsResponse) {
+    option (google.api.http) = {post: "/v1/wallet/locks" body: "*"};
+  }
+  // UnlockFunds releases the remaining lock of an order (compensation). Idempotent.
+  rpc UnlockFunds(UnlockFundsRequest) returns (UnlockFundsResponse) {
+    option (google.api.http) = {post: "/v1/wallet/locks/{order_id}/release" body: "*"};
+  }
+  rpc GetLock(GetLockRequest) returns (GetLockResponse) {
+    option (google.api.http) = {get: "/v1/wallet/locks/{order_id}"};
+  }
+  // TransferToFutures debits the spot wallet and credits the futures account asynchronously
+  // (outbox event wallet.transfers -> futures service). Idempotent on idempotency_key.
+  rpc TransferToFutures(TransferToFuturesRequest) returns (LedgerEntry) {
+    option (google.api.http) = {post: "/v1/wallet/transfers/futures" body: "*"};
+  }
+  rpc ListLedger(ListLedgerRequest) returns (ListLedgerResponse) {
+    option (google.api.http) = {get: "/v1/wallet/users/{user_id}/ledger"};
+  }
+}
+
+message Balance {
+  string asset = 1;
+  string free = 2;
+  string locked = 3;
+}
+
+message GetBalancesRequest {
+  string user_id = 1;
+}
+
+message GetBalancesResponse {
+  repeated Balance balances = 1;
+}
+
+message DepositRequest {
+  string user_id = 1;
+  string asset = 2;
+  string amount = 3;
+  string idempotency_key = 4;
+}
+
+message WithdrawRequest {
+  string user_id = 1;
+  string asset = 2;
+  string amount = 3;
+  string address = 4;
+  string idempotency_key = 5;
+}
+
+message TransferToFuturesRequest {
+  string user_id = 1;
+  string asset = 2; // USDT
+  string amount = 3;
+  string idempotency_key = 4;
+}
+
+message LedgerEntry {
+  int64 id = 1;
+  string user_id = 2;
+  string asset = 3;
+  string delta_free = 4;
+  string delta_locked = 5;
+  string free_after = 6;
+  string locked_after = 7;
+  string ref_type = 8; // DEPOSIT | WITHDRAW | ORDER_LOCK | ORDER_UNLOCK | TRADE | FEE | AIRDROP | FUTURES_TRANSFER_OUT | FUTURES_TRANSFER_IN
+  string ref_id = 9;
+  string created_at = 10;
+}
+
+message LockFundsRequest {
+  string order_id = 1;
+  string user_id = 2;
+  string asset = 3;
+  string amount = 4;
+}
+
+message LockFundsResponse {
+  string order_id = 1;
+  string asset = 2;
+  string amount = 3;
+  bool already_locked = 4;
+}
+
+message UnlockFundsRequest {
+  string order_id = 1;
+  string reason = 2;
+}
+
+message UnlockFundsResponse {
+  string released = 1;
+}
+
+message GetLockRequest {
+  string order_id = 1;
+}
+
+message GetLockResponse {
+  bool found = 1;
+  string order_id = 2;
+  string user_id = 3;
+  string asset = 4;
+  string amount = 5;
+  string remaining = 6;
+  string status = 7; // ACTIVE | RELEASED
+}
+
+message ListLedgerRequest {
+  string user_id = 1;
+  int32 limit = 2;
+  int64 before_id = 3;
+}
+
+message ListLedgerResponse {
+  repeated LedgerEntry entries = 1;
+}
